@@ -14,7 +14,7 @@ scalaVersion := "2.13.12"
 // It's possible to define many kinds of settings, such as:
 
 name := "rs_spacedata"
-organization := "cde.htwg.rs_spacedata"
+organization := "de.htwg.rs_spacedata"
 version := "1.0"
 
 // Note, it's not required for you to define these three settings. These are
