@@ -5,10 +5,15 @@ import scala.concurrent.{Await, Future}
 import akka.pattern.ask
 import akka.util.Timeout
 
+
 object Main extends App {
   println("Hello, World!")
 
-  implicit val system: ActorSystem = ActorSystem("APIActorSystem")
+  import SpaceX_API._
+
+  val spacedata: Unit = SpaceX_API starlink all
+
+  /*implicit val system: ActorSystem = ActorSystem("APIActorSystem")
 
   val apiClientActor = system.actorOf(Props[APIClientActor], "apiClientActor")
 
@@ -25,6 +30,6 @@ object Main extends App {
   } finally {
     // Terminate the actor system after FetchData is executed or timed out
     system.terminate()
-  }
+  }*/
 }
 
