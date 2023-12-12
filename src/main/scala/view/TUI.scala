@@ -1,7 +1,8 @@
 package SpaceData.view
 
 class TUI {
-
+  print(printHeader())
+  
   def printHeader() : String = {
     """
       |╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -34,7 +35,7 @@ class TUI {
     }
   }
 
-  printHeader()
+  //printHeader()
 
   // Input
   val userInput = scala.io.StdIn.readLine()
