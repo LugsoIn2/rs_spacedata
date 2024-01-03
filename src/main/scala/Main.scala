@@ -4,6 +4,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import akka.pattern.ask
 import akka.util.Timeout
+import model.StarlinkSat
 
 
 object Main extends App {
@@ -11,7 +12,10 @@ object Main extends App {
 
   import SpaceX_API._
 
-  val spacedata: Unit = SpaceX_API starlink all
+  val sats: List[StarlinkSat] = SpaceX_API starlink all
+  
+  // Print number of Starlink satellites
+  println(s"Number of Starlink satellites: ${sats.length}")
 
   /*implicit val system: ActorSystem = ActorSystem("APIActorSystem")
 

@@ -12,32 +12,47 @@ import io.circe._
 
 object SpaceX_API {
 
-    var starlinkSats: List[StarlinkSat] = List().empty
+    
     //var launches: List[Launch] = List().empty
 
-    def starlink(slct: Selector): Unit /* List[StarlinkSat] =*/ = slct match {
-        case all => {
-            val response: String = HttpClient.getStarlink()
-            //println("Response:")
-            //println(response.toString)
-            val parsedJson: Either[io.circe.Error, Json] = parse(response)
-            parsedJson match {
-                case Right(json) =>
-                    val items: List[Json] = json.asArray.getOrElse(Vector.empty).toList
-                    println(s"Found ${items.length} items")
-
-                    items.foreach { item =>
-                        val itemId = item.hcursor.downField("id").as[String].getOrElse(0)
-                        val height = item.hcursor.downField("height_km").as[String].getOrElse("Unknown")
-                        //println(s"Item ID: $itemId, Height_km: $height")
-                    }
-
-                case Left(error) =>
-                println(s"Failed to parse JSON: $error")
+    def starlink(slct: Selector): List[StarlinkSat] = {
+        val response: String = HttpClient.getStarlink(slct)
+        val starlinkSatsListJson: List[io.circe.Json] = parseToList(response)
+        var starlinkSats: List[StarlinkSat] = List().empty
+        if (starlinkSatsListJson.nonEmpty) {
+            starlinkSatsListJson.foreach { item =>
+                val starlinkSat: StarlinkSat = createInstanceStarlinkSat(item)
+                starlinkSats = starlinkSats :+ starlinkSat
             }
         }
-        //case active => starlinkSats//.filter(_.active)
-        //case inactive => starlinkSats//.filter(!_.active)
+        starlinkSats
+    }
+
+    def createInstanceStarlinkSat(json: io.circe.Json): StarlinkSat = {
+        val starlinkSat = StarlinkSat(
+            name = json.hcursor.downField("spaceTrack").downField("OBJECT_NAME").as[String].getOrElse("Unknown"),
+            launchDate = json.hcursor.downField("spaceTrack").downField("LAUNCH_DATE").as[String].getOrElse("Unknown"),
+            period = json.hcursor.downField("spaceTrack").downField("PERIOD").as[String].getOrElse("Unknown"),
+            height = json.hcursor.downField("height_km").as[Int].getOrElse(0),
+            latitude = json.hcursor.downField("latitude").as[Double].getOrElse(0),
+            longitude = json.hcursor.downField("longitude").as[Double].getOrElse(0),
+            earthRevolutions = json.hcursor.downField("spaceTrack").downField("MEAN_MOTION").as[Int].getOrElse(0)
+        )
+        starlinkSat
+    }
+
+    def parseToList(json: String): List[io.circe.Json] = {
+        val parsedJson: Either[io.circe.Error, Json] = parse(json)
+        parsedJson match {
+            case Right(json) =>
+                val items: List[Json] = json.asArray.getOrElse(Vector.empty).toList
+                println(s"Found ${items.length} items")
+                return items
+
+            case Left(error) =>
+            println(s"Failed to parse JSON: $error")
+        }
+        List.empty
     }
 
     /*def getAllLaunches(): List[Launch] = {
@@ -63,7 +78,7 @@ object HttpClient {
             val response = new StringBuilder()
 
             while ({inputLine = reader.readLine(); inputLine != null}) {
-            response.append(inputLine)
+                response.append(inputLine)
             }
 
             reader.close()
@@ -76,9 +91,17 @@ object HttpClient {
         
     }
 
-  def getStarlink(): String = {
-    val url = new URL("https://api.spacexdata.com/v4/starlink") // Replace with your API endpoint
-    executeRequest(url)
+  def getStarlink(slct: Selector): String = slct match {
+    case all => {
+        val url = new URL("https://api.spacexdata.com/v4/starlink")
+        executeRequest(url)
+    } case active => {
+        val url = new URL("https://api.spacexdata.com/v4/starlink") // Replace with corresponding API query
+        executeRequest(url)
+    } case inactive => {
+        val url = new URL("https://api.spacexdata.com/v4/starlink") // Replace with corresponding API query
+        executeRequest(url)
+    }
   }
 
   def getLaunches(): String = {
