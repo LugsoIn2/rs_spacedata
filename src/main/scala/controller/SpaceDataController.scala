@@ -21,22 +21,22 @@ class SpaceDataController() {
 
   def getLauchesList(slct: String): Unit = {
     //TODO
-    print("TODO:getLauchesList(slct: String)")
+    println("TODO:getLauchesList(slct: String)")
   }
 
   def getCountLaunches(slct: String): Unit = {
     //TODO
-    print("TODO:getCountLaunches(slct: String)")
+    println("TODO:getCountLaunches(slct: String)")
   }
 
   def getStarlinkSatDetails(id: String): Unit = {
     //TODO
-    print("TODO:getStarlinkSatDetails(id: String)")
+    println("TODO:getStarlinkSatDetails(id: String)")
   }
 
   def getLaunchDetails(id: String): Unit = {
     //TODO
-    print("TODO:getLaunchDetails(id: String)")
+    println("TODO:getLaunchDetails(id: String)")
   }
 
   def getDashboardValues(): List[(String, Int)] = {

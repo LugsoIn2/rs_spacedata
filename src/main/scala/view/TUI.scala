@@ -28,19 +28,11 @@ class TUI(controller:SpaceDataController) {
   // TUI
   def processInput(input: String): Unit = {
     input match {
-      case "d" => println("Show Dashboard.")
-                    //Controller Func here
-                    showDashboard()
-      case "sl" => println("Show Starlink Satalites.")
-                    //Controller Func here
-                    showStarlinkSatalites()
-      case "la" => println("Show launches.")
-                    //Controller Func here
-                    showLauches()
-      case "slid" => println("Show launches.")
-                    //Controller Func here
-      case "laid" => println("Show launches.")
-                    //Controller Func here
+      case "d" => showDashboard()
+      case "sl" => showStarlinkSatalites()
+      case "la" => showLauches()
+      case "slid" => showStarlinkSataliteDetails()
+      case "laid" => showLaucheDetails()
       case "exit" => System.exit(0)              
       case _ => if (input.trim.isEmpty()) {
                   print(printHeader())
@@ -91,6 +83,19 @@ class TUI(controller:SpaceDataController) {
       |""".stripMargin
   }
 
+  def printDetails(): String = {
+    """
+      |║ ██████  ███████ ████████  █████  ██ ██      ███████ 
+      |║ ██   ██ ██         ██    ██   ██ ██ ██      ██      
+      |║ ██   ██ █████      ██    ███████ ██ ██      ███████ 
+      |║ ██   ██ ██         ██    ██   ██ ██ ██           ██ 
+      |║ ██████  ███████    ██    ██   ██ ██ ███████ ███████ 
+      |║ - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      |""".stripMargin
+  }
+
+
+
   def printHelpLine(): String = {
     """Finished: press enter to show menü..."""
   }
@@ -112,13 +117,14 @@ class TUI(controller:SpaceDataController) {
     //TODO:
     var launchlist = controller.getLauchesList(slct)
     //printListInChunks(xxxxx)
-    print("TODO: Launches List")
+    println("TODO: Launches List")
     print(printHelpLine())
   }
 
   def showStarlinkSataliteDetails(): Unit = {
     val id = scala.io.StdIn.readLine("ID: ")
     print(printStarlink())
+    print(printDetails())
     println(s"Satellite details with $id are displayed.")
     //TODO StarlinkSatalite with id
     var satdetails = controller.getStarlinkSatDetails(id)
@@ -128,8 +134,9 @@ class TUI(controller:SpaceDataController) {
   def showLaucheDetails(): Unit = {
     val id = scala.io.StdIn.readLine("ID: ")
     print(printLaunches())
+    print(printDetails())
     println(s"Satellite details with $id are displayed.")
-    print("TODO: Launch details with id")
+    println("TODO: Launch details with id")
     //TODO  Launch with id
     var launchdetails = controller.getLaunchDetails(id)
     print(printHelpLine())
