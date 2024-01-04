@@ -1,4 +1,4 @@
-package model
+package SpaceData.model
 
 case class StarlinkSat( 
     name: String,

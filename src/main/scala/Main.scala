@@ -13,6 +13,8 @@ object Main extends App {
   import SpaceX_API._
 
   val sats: List[StarlinkSat] = SpaceX_API starlink all
+  val activeSats: List[StarlinkSat] = SpaceX_API starlink active
+  val inactiveSats: List[StarlinkSat] = SpaceX_API starlink inactive
   
   // Print number of Starlink satellites
   println(s"Number of Starlink satellites: ${sats.length}")
