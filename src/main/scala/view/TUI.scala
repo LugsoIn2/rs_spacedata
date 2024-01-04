@@ -35,23 +35,27 @@ class TUI(controller:SpaceDataController) {
       case "la" => println("Show launches.")
                     //Controller Func here
       case "exit" => System.exit(0)              
-      case _ => println("Ungültige Eingabe.")
-                print(printHeader())
+      case _ => if (input.trim.isEmpty()) {
+                  print(printHeader())
+                } else {
+                  println("incorrect input.")
+                }
     }
   }
 
   def showDashboard(): Unit = {
     var dashbVals:List[(String, Int)] = controller.getDashboardValues()
-    print(printDashboardStarlink())
+    print(printStarlink())
+    print(printDashboardFirstRow())
     dashbVals.foreach { case (listName, count) =>
       println(s"║ $listName, $count")
     }
-    print(printDashboardLaunches())
+    print(printLaunches())
     //TODO Launches
-    
+    print(printHelpLine())
   }
 
-  def printDashboardStarlink(): String = {
+  def printStarlink(): String = {
     """
       |║ ███████ ████████  █████  ██████  ██      ██ ███    ██ ██   ██     
       |║ ██         ██    ██   ██ ██   ██ ██      ██ ████   ██ ██  ██   
@@ -59,12 +63,17 @@ class TUI(controller:SpaceDataController) {
       |║      ██    ██    ██   ██ ██   ██ ██      ██ ██  ██ ██ ██  ██   
       |║ ███████    ██    ██   ██ ██   ██ ███████ ██ ██   ████ ██   ██ 
       |║ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+      |""".stripMargin
+  }
+
+  def printDashboardFirstRow(): String = {
+    """
       |║ Category, Numbers                                             
       |║+---------------------+
       |""".stripMargin
   }
 
-  def printDashboardLaunches(): String = {
+  def printLaunches(): String = {
     """
       |║ ██       █████  ██    ██ ███    ██  ██████ ██   ██ ███████ ███████ 
       |║ ██      ██   ██ ██    ██ ████   ██ ██      ██   ██ ██      ██      
@@ -72,24 +81,52 @@ class TUI(controller:SpaceDataController) {
       |║ ██      ██   ██ ██    ██ ██  ██ ██ ██      ██   ██ ██           ██ 
       |║ ███████ ██   ██  ██████  ██   ████  ██████ ██   ██ ███████ ███████ 
       |║ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      |║ Category, Numbers                                             
-      |║+---------------------+
       |""".stripMargin
+  }
+
+  def printHelpLine(): String = {
+    """Finished: press enter to show menü..."""
   }
 
 
   def showStarlinkSatalites(): Unit = {
     val slct = scala.io.StdIn.readLine("Options - [all, active, inactive]: ")
     println(s"Satellites in the $slct category are displayed.")
+    print(printStarlink())
     var satlist:List[StarlinkSat] = controller.getStarlinkSatList(slct)
-    satlist.foreach { sat =>
-      println(sat.name)
-    }
+    printListInChunks(satlist, (sat: StarlinkSat) => sat.name, 15, "q")
+    print(printHelpLine())
   }
 
   def showLauches(): Unit = {
     print("TODO: Launches List")
+    print(printHelpLine())
   }
+
+
+// def printListInChunks[T](objList: List[T], attributeExtractor: T => String, chunkSize: Int): Unit = {
+//   objList.grouped(chunkSize).foreach { chunk =>
+//     chunk.foreach(obj => println(attributeExtractor(obj)))
+//     scala.io.StdIn.readLine("press enter for the next page...")
+//   }
+// }
+
+def printListInChunks[T](objList: List[T], attributeExtractor: T => String, chunkSize: Int, cancelKey: String): Unit = {
+  var continuePrinting = true
+
+  objList.grouped(chunkSize).foreach { chunk =>
+    if (continuePrinting) {
+      chunk.foreach(obj => println(attributeExtractor(obj)))
+      
+      val userInput = scala.io.StdIn.readLine(s"press enter for the next page or '$cancelKey' to abort: ")
+      
+      if (userInput.toLowerCase == cancelKey.toLowerCase) {
+        continuePrinting = false
+      }
+    }
+  }
+}
+
 
   def displayResult(result: String): Unit = {
     // Resultii und so
@@ -97,12 +134,12 @@ class TUI(controller:SpaceDataController) {
   }
 
   def getUserInput(): String = {
-    print("Eingabe: ")
+    print("Input: ")
     scala.io.StdIn.readLine()
   }
 
   def printExitMessage(): Unit = {
-    println("Anwendung wird beendet. Auf Wiedersehen!")
+    println("Progamm exited, bye!")
   }
 
 
