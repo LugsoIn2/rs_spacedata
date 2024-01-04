@@ -1,4 +1,9 @@
-import model.StarlinkSat
+package SpaceData.controller
+
+//import model.StarlinkSat
+import SpaceData.model.StarlinkSat
+import SpaceData.util.dsl.Selector
+import SpaceData.util.dsl.SpaceXApiClient
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -10,13 +15,13 @@ import java.net.{HttpURLConnection, URL}
 import io.circe.parser._
 import io.circe._
 
-object SpaceX_API {
+object SpaceDataStarLinkController {
 
     
     //var launches: List[Launch] = List().empty
 
     def starlink(slct: Selector): List[StarlinkSat] = {
-        val response: String = HttpClient.getStarlink(slct)
+        val response: String = SpaceXApiClient.getStarlink(slct)
         val starlinkSatsListJson: List[io.circe.Json] = parseToList(response)
         var starlinkSats: List[StarlinkSat] = List().empty
         if (starlinkSatsListJson.nonEmpty) {
@@ -58,54 +63,4 @@ object SpaceX_API {
     /*def getAllLaunches(): List[Launch] = {
         launches
     }*/
-}
-
-object HttpClient {
-
-    def executeRequest(url: URL): String = {
-        val connection = url.openConnection().asInstanceOf[HttpURLConnection]
-
-        connection.setRequestMethod("GET")
-
-        val responseCode = connection.getResponseCode
-        println(s"Response Code: $responseCode")
-
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            val inputStream = connection.getInputStream
-            val reader = new BufferedReader(new InputStreamReader(inputStream))
-            var inputLine: String = null
-
-            val response = new StringBuilder()
-
-            while ({inputLine = reader.readLine(); inputLine != null}) {
-                response.append(inputLine)
-            }
-
-            reader.close()
-            response.toString
-            
-        } else {
-            println("HTTP GET request failed")
-            "None"
-        }
-        
-    }
-
-  def getStarlink(slct: Selector): String = slct match {
-    case all => {
-        val url = new URL("https://api.spacexdata.com/v4/starlink")
-        executeRequest(url)
-    } case active => {
-        val url = new URL("https://api.spacexdata.com/v4/starlink") // Replace with corresponding API query
-        executeRequest(url)
-    } case inactive => {
-        val url = new URL("https://api.spacexdata.com/v4/starlink") // Replace with corresponding API query
-        executeRequest(url)
-    }
-  }
-
-  def getLaunches(): String = {
-    val url = new URL("https://api.spacexdata.com/v4/launches") // Replace with your API endpoint
-    executeRequest(url)
-  }
 }

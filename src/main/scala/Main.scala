@@ -1,3 +1,5 @@
+package SpaceData
+
 import akka.stream.ActorMaterializer
 import akka.actor.{ActorSystem, Props}
 import scala.concurrent.duration._
@@ -10,11 +12,13 @@ import model.StarlinkSat
 object Main extends App {
   println("Hello, World!")
 
-  import SpaceX_API._
+  //import SpaceX_API._
+  import controller.SpaceDataStarLinkController
+  import util.dsl.Selector
 
-  val sats: List[StarlinkSat] = SpaceX_API starlink all
-  val activeSats: List[StarlinkSat] = SpaceX_API starlink active
-  val inactiveSats: List[StarlinkSat] = SpaceX_API starlink inactive
+  val sats: List[StarlinkSat] = SpaceDataStarLinkController starlink all
+  val activeSats: List[StarlinkSat] = SpaceDataStarLinkController starlink active
+  val inactiveSats: List[StarlinkSat] = SpaceDataStarLinkController starlink inactive
   
   // Print number of Starlink satellites
   println(s"Number of Starlink satellites: ${sats.length}")

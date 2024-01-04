@@ -4,11 +4,10 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.{HttpURLConnection, URL}
 
+import SpaceData.util.dsl.Selector
 
 
 object SpaceXApiClient {
-
-    import SpaceData.util.dsl.Selector
 
     def executeRequest(url: URL): String = {
         val connection = url.openConnection().asInstanceOf[HttpURLConnection]
