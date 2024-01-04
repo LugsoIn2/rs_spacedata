@@ -28,15 +28,16 @@ class TUI(controller:SpaceDataController) {
     input match {
       case "d" => println("Show Dashboard.")
                     //Controller Func here
-                    startDashboard()
+                    showDashboard()
       case "sl" => println("Show Starlink Satalites.")
                     //Controller Func here
       case "la" => println("Show launches.")
                     //Controller Func here
       case "exit" => System.exit(0)              
       case _ => println("Ungültige Eingabe.")
+                print(printHeader())
     }
-    print(printHeader())
+    //print(printHeader())
   }
 
 
@@ -46,6 +47,43 @@ class TUI(controller:SpaceDataController) {
     satlist.foreach { sat =>
       displayResult(sat.name)
     }
+  }
+
+  def showDashboard(): Unit = {
+    var dashbVals:List[(String, Int)] = controller.getDashboardValues()
+    print(printDashboardStarlink())
+    dashbVals.foreach { case (listName, count) =>
+      println(s"║ $listName, $count")
+    }
+    print(printDashboardLaunches())
+    //TODO Launches
+    
+  }
+
+  def printDashboardStarlink(): String = {
+    """
+      |║ ███████ ████████  █████  ██████  ██      ██ ███    ██ ██   ██     
+      |║ ██         ██    ██   ██ ██   ██ ██      ██ ████   ██ ██  ██   
+      |║ ███████    ██    ███████ ██████  ██      ██ ██ ██  ██ █████    
+      |║      ██    ██    ██   ██ ██   ██ ██      ██ ██  ██ ██ ██  ██   
+      |║ ███████    ██    ██   ██ ██   ██ ███████ ██ ██   ████ ██   ██ 
+      |║ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+      |║ Category, Numbers                                             
+      |║+---------------------+
+      |""".stripMargin
+  }
+
+  def printDashboardLaunches(): String = {
+    """
+      |║ ██       █████  ██    ██ ███    ██  ██████ ██   ██ ███████ ███████ 
+      |║ ██      ██   ██ ██    ██ ████   ██ ██      ██   ██ ██      ██      
+      |║ ██      ███████ ██    ██ ██ ██  ██ ██      ███████ █████   ███████ 
+      |║ ██      ██   ██ ██    ██ ██  ██ ██ ██      ██   ██ ██           ██ 
+      |║ ███████ ██   ██  ██████  ██   ████  ██████ ██   ██ ███████ ███████ 
+      |║ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+      |║ Category, Numbers                                             
+      |║+---------------------+
+      |""".stripMargin
   }
 
 

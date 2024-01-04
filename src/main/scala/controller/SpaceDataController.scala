@@ -5,6 +5,7 @@ import SpaceData.controller.SpaceDataStarLinkController
 import SpaceData.util.dsl.all
 import SpaceData.util.dsl.active
 import SpaceData.util.dsl.inactive
+import SpaceData.util.dsl.Selector
 
 class SpaceDataController() {
 
@@ -14,4 +15,27 @@ class SpaceDataController() {
     starlinksatlist
   }
 
+  def getCountStarlinkSat(slct: Selector): Int = {
+    val starlinksatlist = SpaceDataStarLinkController.starlink(slct)
+    starlinksatlist.size
+  }
+
+  def getDashboardValues(): List[(String, Int)] = {
+    var dashbVals: List[(String, Int)] = List.empty[(String, Int)]
+    dashbVals = dashbVals :+ ("all", getCountStarlinkSat(all))
+    dashbVals = dashbVals :+ ("active", getCountStarlinkSat(active))
+    dashbVals = dashbVals :+ ("inactive", getCountStarlinkSat(inactive))
+    dashbVals
+  }
+
 }
+
+
+//  result = result :+ ("Alle", allCount)
+//   result = result :+ ("Aktive", activeCount)
+  // val allCount = allStarlinkSatList.size
+  // val activeCount = activeStarlinkSatList.size
+  // // Zähler für weitere Listen nach Bedarf hinzufügen
+
+  // List(("Alle", allCount), ("Aktive", activeCount))
+  // // Tuple für weitere Listen nach Bedarf hinzufügen
