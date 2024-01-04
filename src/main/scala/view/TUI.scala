@@ -1,5 +1,6 @@
 package SpaceData.view
 import SpaceData.controller.SpaceDataController
+import SpaceData.model.StarlinkSat
 
 class TUI(controller:SpaceDataController) {
   print(printHeader())
@@ -39,8 +40,11 @@ class TUI(controller:SpaceDataController) {
 
 
   def startDashboard(): Unit = {
-    var sat = controller.getStarlinkSat()
-    displayResult(sat.launchDate)
+    var satlist:List[StarlinkSat] = controller.getStarlinkSat()
+    
+    satlist.foreach { sat =>
+      displayResult(sat.name)
+    }
   }
 
 
