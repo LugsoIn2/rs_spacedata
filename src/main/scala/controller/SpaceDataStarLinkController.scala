@@ -36,6 +36,7 @@ object SpaceDataStarLinkController {
     def createInstanceStarlinkSat(json: io.circe.Json): StarlinkSat = {
         val starlinkSat = StarlinkSat(
             name = json.hcursor.downField("spaceTrack").downField("OBJECT_NAME").as[String].getOrElse("Unknown"),
+            id = json.hcursor.downField("id").as[String].getOrElse("Unknown"),
             launchDate = json.hcursor.downField("spaceTrack").downField("LAUNCH_DATE").as[String].getOrElse("Unknown"),
             period = json.hcursor.downField("spaceTrack").downField("PERIOD").as[String].getOrElse("Unknown"),
             height = json.hcursor.downField("height_km").as[Int].getOrElse(0),

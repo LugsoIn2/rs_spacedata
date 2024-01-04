@@ -101,7 +101,7 @@ class TUI(controller:SpaceDataController) {
     print(printStarlink())
     println(s"Satellites in the $slct category are displayed.")
     var satlist:List[StarlinkSat] = controller.getStarlinkSatList(slct)
-    printListInChunks(satlist, (sat: StarlinkSat) => sat.name, (sat: StarlinkSat) => sat.name, 15, "q")
+    printListInChunks(satlist, (sat: StarlinkSat) => sat.name, (sat: StarlinkSat) => sat.id, 15, "q")
     print(printHelpLine())
   }
 

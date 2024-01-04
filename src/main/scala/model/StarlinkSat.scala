@@ -2,6 +2,7 @@ package SpaceData.model
 
 case class StarlinkSat( 
     name: String,
+    id: String,
     launchDate: String,
     period: String,
     height: Int,
