@@ -29,13 +29,3 @@ class SpaceDataController() {
   }
 
 }
-
-
-//  result = result :+ ("Alle", allCount)
-//   result = result :+ ("Aktive", activeCount)
-  // val allCount = allStarlinkSatList.size
-  // val activeCount = activeStarlinkSatList.size
-  // // Zähler für weitere Listen nach Bedarf hinzufügen
-
-  // List(("Alle", allCount), ("Aktive", activeCount))
-  // // Tuple für weitere Listen nach Bedarf hinzufügen
