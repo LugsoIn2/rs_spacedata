@@ -25,7 +25,16 @@ version := "1.0"
 // Want to use a published library in your project?
 // You can define other libraries as dependencies in your build like this:
 
-libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.3.0"
+//libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.3.0"
+libraryDependencies ++= Seq(
+  "com.typesafe.akka" %% "akka-actor" % "2.6.17",
+  "com.typesafe.akka" %% "akka-stream" % "2.6.17",
+  "com.typesafe.akka" %% "akka-http" % "10.2.7",
+  "org.asynchttpclient" % "async-http-client" % "2.12.3",
+  "io.circe" %% "circe-core" % "0.14.1",
+  "io.circe" %% "circe-parser" % "0.14.1"
+)
+
 
 // Here, `libraryDependencies` is a set of dependencies, and by using `+=`,
 // we're adding the scala-parser-combinators dependency to the set of dependencies
