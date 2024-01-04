@@ -21,7 +21,22 @@ class SpaceDataController() {
 
   def getLauchesList(slct: String): Unit = {
     //TODO
-    print("TODO:Launches")
+    print("TODO:getLauchesList(slct: String)")
+  }
+
+  def getCountLaunches(slct: String): Unit = {
+    //TODO
+    print("TODO:getCountLaunches(slct: String)")
+  }
+
+  def getStarlinkSatDetails(id: String): Unit = {
+    //TODO
+    print("TODO:getStarlinkSatDetails(id: String)")
+  }
+
+  def getLaunchDetails(id: String): Unit = {
+    //TODO
+    print("TODO:getLaunchDetails(id: String)")
   }
 
   def getDashboardValues(): List[(String, Int)] = {
@@ -39,6 +54,9 @@ class SpaceDataController() {
       case "all" => all: Selector
       case "active" => active: Selector
       case "inactive" => inactive: Selector
+      //TODO:
+      //case "starlink-launch" =>
+      //case "id" =>
       case _ => throw new IllegalArgumentException("Ungültiger Selector")
     }
   }

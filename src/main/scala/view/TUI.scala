@@ -17,6 +17,8 @@ class TUI(controller:SpaceDataController) {
       |║                                      Press "d" to show the Dashboard                                              ║
       |║                                      Press "sl" to show Starlink Satalites                                        ║
       |║                                      Press "la" to show Launches                                                  ║
+      |║                                      Press "slid" to show specific Starlink Satalite details via the id           ║
+      |║                                      Press "laid" to show specific Launch details via the id                      ║
       |║                                                                                                                   ║
       |╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
       |""".stripMargin
@@ -33,6 +35,11 @@ class TUI(controller:SpaceDataController) {
                     //Controller Func here
                     showStarlinkSatalites()
       case "la" => println("Show launches.")
+                    //Controller Func here
+                    showLauches()
+      case "slid" => println("Show launches.")
+                    //Controller Func here
+      case "laid" => println("Show launches.")
                     //Controller Func here
       case "exit" => System.exit(0)              
       case _ => if (input.trim.isEmpty()) {
@@ -91,25 +98,42 @@ class TUI(controller:SpaceDataController) {
 
   def showStarlinkSatalites(): Unit = {
     val slct = scala.io.StdIn.readLine("Options - [all, active, inactive]: ")
-    println(s"Satellites in the $slct category are displayed.")
     print(printStarlink())
+    println(s"Satellites in the $slct category are displayed.")
     var satlist:List[StarlinkSat] = controller.getStarlinkSatList(slct)
     printListInChunks(satlist, (sat: StarlinkSat) => sat.name, 15, "q")
     print(printHelpLine())
   }
 
   def showLauches(): Unit = {
+    val slct = scala.io.StdIn.readLine("Options - [all, starlink-launch]: ")
+    print(printLaunches())
+    println(s"Launches in the $slct category are displayed.")
+    //TODO:
+    var launchlist = controller.getLauchesList(slct)
+    //printListInChunks(xxxxx)
     print("TODO: Launches List")
     print(printHelpLine())
   }
 
+  def showStarlinkSataliteDetails(): Unit = {
+    val id = scala.io.StdIn.readLine("ID: ")
+    print(printStarlink())
+    println(s"Satellite details with $id are displayed.")
+    //TODO StarlinkSatalite with id
+    var satdetails = controller.getStarlinkSatDetails(id)
+    print(printHelpLine())
+  }
 
-// def printListInChunks[T](objList: List[T], attributeExtractor: T => String, chunkSize: Int): Unit = {
-//   objList.grouped(chunkSize).foreach { chunk =>
-//     chunk.foreach(obj => println(attributeExtractor(obj)))
-//     scala.io.StdIn.readLine("press enter for the next page...")
-//   }
-// }
+  def showLaucheDetails(): Unit = {
+    val id = scala.io.StdIn.readLine("ID: ")
+    print(printLaunches())
+    println(s"Satellite details with $id are displayed.")
+    print("TODO: Launch details with id")
+    //TODO  Launch with id
+    var launchdetails = controller.getLaunchDetails(id)
+    print(printHelpLine())
+  }
 
 def printListInChunks[T](objList: List[T], attributeExtractor: T => String, chunkSize: Int, cancelKey: String): Unit = {
   var continuePrinting = true
