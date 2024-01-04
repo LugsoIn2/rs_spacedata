@@ -1,6 +1,7 @@
 package SpaceData.view
+import SpaceData.controller.SpaceDataController
 
-class TUI {
+class TUI(controller:SpaceDataController) {
   print(printHeader())
 
   def printHeader() : String = {
@@ -26,20 +27,21 @@ class TUI {
     input match {
       case "d" => println("Show Dashboard.")
                     //Controller Func here
-                    //print(printStartfuuoderso())
+                    startDashboard()
       case "sl" => println("Show Starlink Satalites.")
                     //Controller Func here
       case "la" => println("Show launches.")
                     //Controller Func here
+      case "exit" => System.exit(0)              
       case _ => println("Ungültige Eingabe.")
     }
   }
 
-  //printHeader()
 
-  // Input
-  ////val userInput = scala.io.StdIn.readLine()
-  ////processInput(userInput)
+  def startDashboard(): Unit = {
+    var sat = controller.getStarlinkSat()
+    displayResult(sat.launchDate)
+  }
 
 
   def displayResult(result: String): Unit = {
