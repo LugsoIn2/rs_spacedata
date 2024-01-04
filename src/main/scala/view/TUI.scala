@@ -36,6 +36,7 @@ class TUI(controller:SpaceDataController) {
       case "exit" => System.exit(0)              
       case _ => println("Ungültige Eingabe.")
     }
+    print(printHeader())
   }
 
 
