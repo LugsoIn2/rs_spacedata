@@ -31,21 +31,12 @@ class TUI(controller:SpaceDataController) {
                     showDashboard()
       case "sl" => println("Show Starlink Satalites.")
                     //Controller Func here
+                    showStarlinkSatalites()
       case "la" => println("Show launches.")
                     //Controller Func here
       case "exit" => System.exit(0)              
       case _ => println("Ungültige Eingabe.")
                 print(printHeader())
-    }
-    //print(printHeader())
-  }
-
-
-  def startDashboard(): Unit = {
-    var satlist:List[StarlinkSat] = controller.getStarlinkSat()
-    
-    satlist.foreach { sat =>
-      displayResult(sat.name)
     }
   }
 
@@ -86,6 +77,19 @@ class TUI(controller:SpaceDataController) {
       |""".stripMargin
   }
 
+
+  def showStarlinkSatalites(): Unit = {
+    val slct = scala.io.StdIn.readLine("Options - [all, active, inactive]: ")
+    println(s"Satellites in the $slct category are displayed.")
+    var satlist:List[StarlinkSat] = controller.getStarlinkSatList(slct)
+    satlist.foreach { sat =>
+      println(sat.name)
+    }
+  }
+
+  def showLauches(): Unit = {
+    print("TODO: Launches List")
+  }
 
   def displayResult(result: String): Unit = {
     // Resultii und so
