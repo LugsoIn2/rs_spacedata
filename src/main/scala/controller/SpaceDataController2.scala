@@ -7,9 +7,10 @@ import SpaceData.util.dsl.active
 import SpaceData.util.dsl.inactive
 import SpaceData.util.dsl.Selector
 
-class SpaceDataController() {
+class SpaceDataController2() {
+  val starlinksatlist = SpaceDataStarLinkController.starlink(stringToSelecor("all"))
+
   def getStarlinkSatList(slct: String): List[StarlinkSat] = {
-    val starlinksatlist = SpaceDataStarLinkController.starlink(stringToSelecor(slct))
     starlinksatlist
   }
 
@@ -17,6 +18,22 @@ class SpaceDataController() {
     val starlinksatlist = getStarlinkSatList(slct)
     starlinksatlist.size
   }
+
+  def getStarlinkSatDetails(id: String): Option[StarlinkSat] = {
+    val foundStarlinkSat: Option[StarlinkSat] = findStarlinkSatById(starlinksatlist,id)
+    foundStarlinkSat match {
+      case Some(starlinkSat) =>
+        //val starlinkSatDetails:  = ()
+        Some(starlinkSat)
+      case None =>
+        None
+    }
+  }
+
+  def findStarlinkSatById(starlinkSats: List[StarlinkSat], targetId: String): Option[StarlinkSat] = {
+    starlinkSats.find(_.id == targetId)
+  }
+
 
   def getLauchesList(slct: String): Unit = {
     //TODO
@@ -26,12 +43,6 @@ class SpaceDataController() {
   def getCountLaunches(slct: String): Unit = {
     //TODO
     println("TODO:getCountLaunches(slct: String)")
-  }
-
-  def getStarlinkSatDetails(id: String): Unit = {
-    //TODO
-    println("TODO:getStarlinkSatDetails(id: String)")
-
   }
 
   def getLaunchDetails(id: String): Unit = {

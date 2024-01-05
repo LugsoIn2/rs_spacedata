@@ -1,8 +1,10 @@
 package SpaceData.view
-import SpaceData.controller.SpaceDataController
+//import SpaceData.controller.SpaceDataController
+import SpaceData.controller.SpaceDataController2
 import SpaceData.model.StarlinkSat
 
-class TUI(controller:SpaceDataController) {
+//class TUI(controller:SpaceDataController) {
+  class TUI(controller:SpaceDataController2) {
   print(printHeader())
 
   def printHeader() : String = {
@@ -126,8 +128,13 @@ class TUI(controller:SpaceDataController) {
     print(printStarlink())
     print(printDetails())
     println(s"Satellite details with $id are displayed.")
-    //TODO StarlinkSatalite with id
-    var satdetails = controller.getStarlinkSatDetails(id)
+    var satdetails: Option[StarlinkSat] = controller.getStarlinkSatDetails(id)
+    val details: String = satdetails.fold("StarlinkSat not found") { starlinkSat =>
+    s"ID: ${starlinkSat.id}\nName: ${starlinkSat.name}\nLaunch Date: ${starlinkSat.launchDate}\nPeriod: ${starlinkSat.period}\n" +
+      s"Height: ${starlinkSat.height}\nLatitude: ${starlinkSat.latitude}\nLongitute: ${starlinkSat.longitude}\n" +
+      s"EarthRevolutions: ${starlinkSat.earthRevolutions}\n"
+    }
+    println(details)
     print(printHelpLine())
   }
 
