@@ -19,6 +19,7 @@ class TUI(controller:SpaceDataController) {
       |║                                      Press "la" to show Launches                                                  ║
       |║                                      Press "slid" to show specific Starlink Satalite details via the id           ║
       |║                                      Press "laid" to show specific Launch details via the id                      ║
+      |║                                      Type "exit" to exit the tool                                                 ║
       |║                                                                                                                   ║
       |╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
       |""".stripMargin

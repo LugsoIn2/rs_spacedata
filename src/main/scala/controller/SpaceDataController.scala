@@ -8,22 +8,27 @@ import SpaceData.util.dsl.inactive
 import SpaceData.util.dsl.Selector
 
 class SpaceDataController() {
-  val starlinksatlist = SpaceDataStarLinkController.starlink(stringToSelecor("all"))
+  val starlinksatlist = SpaceDataStarLinkController.starlink(all)
+  val starlinksatlistActive = SpaceDataStarLinkController.starlink(active)
+  val starlinksatlistInactive = SpaceDataStarLinkController.starlink(inactive)
 
   def getStarlinkSatList(slct: String): List[StarlinkSat] = {
-    starlinksatlist
-  }
-
-  def getCountStarlinkSat(slct: String): Int = {
-    val starlinksatlist = getStarlinkSatList(slct)
-    starlinksatlist.size
+    val selector = stringToSelecor(slct)
+    selector match {
+        case `all` => {
+          starlinksatlist
+        } case `active` => {
+          starlinksatlistActive
+      } case `inactive` => {
+          starlinksatlistInactive
+      }
+    }
   }
 
   def getStarlinkSatDetails(id: String): Option[StarlinkSat] = {
     val foundStarlinkSat: Option[StarlinkSat] = findStarlinkSatById(starlinksatlist,id)
     foundStarlinkSat match {
       case Some(starlinkSat) =>
-        //val starlinkSatDetails:  = ()
         Some(starlinkSat)
       case None =>
         None
@@ -40,11 +45,6 @@ class SpaceDataController() {
     println("TODO:getLauchesList(slct: String)")
   }
 
-  def getCountLaunches(slct: String): Unit = {
-    //TODO
-    println("TODO:getCountLaunches(slct: String)")
-  }
-
   def getLaunchDetails(id: String): Unit = {
     //TODO
     println("TODO:getLaunchDetails(id: String)")
@@ -52,9 +52,9 @@ class SpaceDataController() {
 
   def getDashboardValues(): List[(String, Int)] = {
     var dashbVals: List[(String, Int)] = List.empty[(String, Int)]
-    dashbVals = dashbVals :+ ("all", getCountStarlinkSat("all"))
-    dashbVals = dashbVals :+ ("active", getCountStarlinkSat("active"))
-    dashbVals = dashbVals :+ ("inactive", getCountStarlinkSat("inactive"))
+    dashbVals = dashbVals :+ ("all", starlinksatlist.size)
+    dashbVals = dashbVals :+ ("active", starlinksatlistActive.size)
+    dashbVals = dashbVals :+ ("inactive", starlinksatlistInactive.size)
     dashbVals
   }
 
