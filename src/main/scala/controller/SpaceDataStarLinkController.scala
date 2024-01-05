@@ -4,6 +4,7 @@ package SpaceData.controller
 import SpaceData.model.StarlinkSat
 import SpaceData.util.dsl.Selector
 import SpaceData.util.dsl.SpaceXApiClient
+import SpaceData.util.Helpers._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
@@ -16,9 +17,6 @@ import io.circe.parser._
 import io.circe._
 
 object SpaceDataStarLinkController {
-
-    
-    //var launches: List[Launch] = List().empty
 
     def starlink(slct: Selector): List[StarlinkSat] = {
         val response: String = SpaceXApiClient.getStarlink(slct)
@@ -47,19 +45,19 @@ object SpaceDataStarLinkController {
         starlinkSat
     }
 
-    def parseToList(json: String): List[io.circe.Json] = {
-        val parsedJson: Either[io.circe.Error, Json] = parse(json)
-        parsedJson match {
-            case Right(json) =>
-                val items: List[Json] = json.asArray.getOrElse(Vector.empty).toList
-                println(s"Found ${items.length} items")
-                return items
+    // def parseToList(json: String): List[io.circe.Json] = {
+    //     val parsedJson: Either[io.circe.Error, Json] = parse(json)
+    //     parsedJson match {
+    //         case Right(json) =>
+    //             val items: List[Json] = json.asArray.getOrElse(Vector.empty).toList
+    //             println(s"Found ${items.length} items")
+    //             return items
 
-            case Left(error) =>
-            println(s"Failed to parse JSON: $error")
-        }
-        List.empty
-    }
+    //         case Left(error) =>
+    //         println(s"Failed to parse JSON: $error")
+    //     }
+    //     List.empty
+    // }
 
     /*def getAllLaunches(): List[Launch] = {
         launches

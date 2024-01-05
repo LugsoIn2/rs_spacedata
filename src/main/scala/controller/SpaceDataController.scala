@@ -6,11 +6,14 @@ import SpaceData.util.dsl.all
 import SpaceData.util.dsl.active
 import SpaceData.util.dsl.inactive
 import SpaceData.util.dsl.Selector
+import SpaceData.model.Launch
 
 class SpaceDataController() {
   val starlinksatlist = SpaceDataStarLinkController.starlink(all)
   val starlinksatlistActive = SpaceDataStarLinkController.starlink(active)
   val starlinksatlistInactive = SpaceDataStarLinkController.starlink(inactive)
+
+  val launcheslist = SpaceDataLaunchController.launches()
 
   def getStarlinkSatList(slct: String): List[StarlinkSat] = {
     val selector = stringToSelecor(slct)
@@ -40,9 +43,8 @@ class SpaceDataController() {
   }
 
 
-  def getLauchesList(slct: String): Unit = {
-    //TODO
-    println("TODO:getLauchesList(slct: String)")
+  def getLauchesList(slct: String): List[Launch] = {
+    launcheslist
   }
 
   def getLaunchDetails(id: String): Unit = {
