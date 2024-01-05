@@ -1,10 +1,8 @@
 package SpaceData.view
-//import SpaceData.controller.SpaceDataController
-import SpaceData.controller.SpaceDataController2
+import SpaceData.controller.SpaceDataController
 import SpaceData.model.StarlinkSat
 
-//class TUI(controller:SpaceDataController) {
-  class TUI(controller:SpaceDataController2) {
+class TUI(controller:SpaceDataController) {
   print(printHeader())
 
   def printHeader() : String = {
