@@ -4,7 +4,8 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.{HttpURLConnection, URL}
 
-import SpaceData.util.dsl.Selector
+import SpaceData.util.dsl.SelectorStarlinkSat
+import SpaceData.util.dsl.SelectorLaunch
 
 
 object SpaceXApiClient {
@@ -38,21 +39,29 @@ object SpaceXApiClient {
         
     }
 
-  def getStarlink(slct: Selector): String = slct match {
-    case all => {
+  def getStarlink(slct: SelectorStarlinkSat): String = slct match {
+    case `all` => {
         val url = new URL("https://api.spacexdata.com/v4/starlink")
         executeRequest(url)
-    } case active => {
+    } case `active` => {
         val url = new URL("https://api.spacexdata.com/v4/starlink") // Replace with corresponding API query
         executeRequest(url)
-    } case inactive => {
+    } case `inactive` => {
         val url = new URL("https://api.spacexdata.com/v4/starlink") // Replace with corresponding API query
         executeRequest(url)
     }
   }
 
-  def getLaunches(): String = {
-    val url = new URL("https://api.spacexdata.com/v4/launches") // Replace with your API endpoint
-    executeRequest(url)
+  def getLaunches(slct: SelectorLaunch): String = slct match {
+    case `allLaunches` => {
+        val url = new URL("https://api.spacexdata.com/v4/launches")
+        executeRequest(url)
+    } case `succeeded` => {
+        val url = new URL("https://api.spacexdata.com/v4/launches") // Replace with corresponding API query
+        executeRequest(url)
+    } case `failed` => {
+        val url = new URL("https://api.spacexdata.com/v4/launches") // Replace with corresponding API query
+        executeRequest(url)
+    } 
   }
 }

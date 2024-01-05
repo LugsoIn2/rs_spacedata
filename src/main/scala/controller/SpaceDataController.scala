@@ -2,10 +2,11 @@
 package SpaceData.controller
 import SpaceData.model.StarlinkSat
 import SpaceData.controller.SpaceDataStarLinkController
-import SpaceData.util.dsl.all
-import SpaceData.util.dsl.active
-import SpaceData.util.dsl.inactive
-import SpaceData.util.dsl.Selector
+//import SpaceData.util.dsl.all
+//import SpaceData.util.dsl.active
+//import SpaceData.util.dsl.inactive
+//import SpaceData.util.dsl.SelectorStarlinkSat
+import SpaceData.util.dsl._
 import SpaceData.model.Launch
 
 class SpaceDataController() {
@@ -13,7 +14,7 @@ class SpaceDataController() {
   val starlinksatlistActive = SpaceDataStarLinkController.starlink(active)
   val starlinksatlistInactive = SpaceDataStarLinkController.starlink(inactive)
 
-  val launcheslist = SpaceDataLaunchController.launches()
+  val launcheslist = SpaceDataLaunchController.launches(allLaunches)
 
   def getStarlinkSatList(slct: String): List[StarlinkSat] = {
     val selector = stringToSelecor(slct)
@@ -61,12 +62,12 @@ class SpaceDataController() {
   }
 
 
-  def stringToSelecor(slct: String): Selector = {
+  def stringToSelecor(slct: String): SelectorStarlinkSat = {
       //val selector: Selector
       slct.toLowerCase match {
-      case "all" => all: Selector
-      case "active" => active: Selector
-      case "inactive" => inactive: Selector
+      case "all" => all: SelectorStarlinkSat
+      case "active" => active: SelectorStarlinkSat
+      case "inactive" => inactive: SelectorStarlinkSat
       //TODO:
       //case "starlink-launch" =>
       //case "id" =>

@@ -1,15 +1,16 @@
 package SpaceData.controller
 
 import SpaceData.model.Launch
-import SpaceData.util.dsl.Selector
+import SpaceData.util.dsl.SelectorStarlinkSat
+import SpaceData.util.dsl.SelectorLaunch
 import SpaceData.util.dsl.SpaceXApiClient
 import SpaceData.util.Helpers._
 
 
 object SpaceDataLaunchController {
 
-    def launches(): List[Launch] = {
-        val response: String = SpaceXApiClient.getLaunches()
+    def launches(slct: SelectorLaunch): List[Launch] = {
+        val response: String = SpaceXApiClient.getLaunches(slct)
         val launchesListJson: List[io.circe.Json] = parseToList(response)
         var launches: List[Launch] = List().empty
         if (launchesListJson.nonEmpty) {

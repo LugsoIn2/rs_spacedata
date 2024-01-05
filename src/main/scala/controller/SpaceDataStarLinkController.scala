@@ -2,7 +2,7 @@ package SpaceData.controller
 
 //import model.StarlinkSat
 import SpaceData.model.StarlinkSat
-import SpaceData.util.dsl.Selector
+import SpaceData.util.dsl.SelectorStarlinkSat
 import SpaceData.util.dsl.SpaceXApiClient
 import SpaceData.util.Helpers._
 
@@ -18,7 +18,7 @@ import io.circe._
 
 object SpaceDataStarLinkController {
 
-    def starlink(slct: Selector): List[StarlinkSat] = {
+    def starlink(slct: SelectorStarlinkSat): List[StarlinkSat] = {
         val response: String = SpaceXApiClient.getStarlink(slct)
         val starlinkSatsListJson: List[io.circe.Json] = parseToList(response)
         var starlinkSats: List[StarlinkSat] = List().empty
