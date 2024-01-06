@@ -79,12 +79,12 @@ object SpaceXApiClient {
         SpaceData.util.Helpers.parseToList(response, "get")
     } case `active` => {
         val url = new URL("https://api.spacexdata.com/v4/starlink/query")
-        val payload = """{"query":{"spaceTrack.DECAYED":{"$ne":1}}}""".stripMargin
+        val payload = """{"query":{"spaceTrack.DECAYED":{"$ne":1}}, "options": {"offset": 0, "limit": 100}}""".stripMargin
         val response: String = executePostRequest(url, payload)
         SpaceData.util.Helpers.parseToList(response, "post")
     } case `inactive` => {
         val url = new URL("https://api.spacexdata.com/v4/starlink/query")
-        val payload = """{"query":{"spaceTrack.DECAYED":{"$ne":0}}}""".stripMargin
+        val payload = """{"query":{"spaceTrack.DECAYED":{"$ne":0}}, "options": {"offset": 0, "limit": 100}}""".stripMargin
         val response: String = executePostRequest(url, payload)
         SpaceData.util.Helpers.parseToList(response, "post")
     }

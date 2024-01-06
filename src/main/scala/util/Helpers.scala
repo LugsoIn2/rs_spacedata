@@ -12,15 +12,6 @@ object  Helpers {
             val docsNumber: Either[io.circe.Error, Int] = parsedJson.flatMap(_.hcursor.downField("totalDocs").as[Int])
             println(s"DocsNumber: $docsNumber")
             parsedJson = parsedJson.flatMap(_.hcursor.downField("docs").as[Json])
-            // val docsList: Option[List[Json]] = parsedJson.toOption.flatMap { json =>
-            //     json.hcursor.downField("docs").focus.flatMap(_.asArray).map(_.toList)
-            // }
-            // val length: Int = docsList.map(_.length).getOrElse(0)
-            // println(s"Length of docsList: $length")
-            // return docsList.getOrElse(List.empty)
-            //println(parsedJson)
-            //parsedJson = parsedJson.flatMap(_.hcursor.downField("docs").as[List[Json]])
-            //println(s"Found ${parsedJson.length} items")
         }
         parsedJson match {
             case Right(json) =>
