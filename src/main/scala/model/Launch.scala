@@ -6,4 +6,8 @@ case class Launch(
     date_utc: String,
     launchpad: String,
     success: Boolean
-    ) { }
+    ) { 
+        override def toString: String = s"ID: ${id}\nName: ${name}\n" +
+          s"Launch Date: ${date_utc}\nLaunchpad: ${launchpad}\n" +
+          s"Success: ${success}\n"
+    }

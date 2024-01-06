@@ -131,11 +131,7 @@ class TUI(controller:SpaceDataController) {
     print(printDetails())
     println(s"Satellite details with $id are displayed.")
     var satdetails: Option[StarlinkSat] = controller.getStarlinkSatDetails(id)
-    val details: String = satdetails.fold("StarlinkSat not found") { starlinkSat =>
-    s"ID: ${starlinkSat.id}\nName: ${starlinkSat.name}\nLaunch Date: ${starlinkSat.launchDate}\nPeriod: ${starlinkSat.period}\n" +
-      s"Height: ${starlinkSat.height}\nLatitude: ${starlinkSat.latitude}\nLongitute: ${starlinkSat.longitude}\n" +
-      s"EarthRevolutions: ${starlinkSat.earthRevolutions}\n"
-    }
+    val details: String = satdetails.fold("StarlinkSat not found") { starlinkSat => starlinkSat.toString()}
     println(details)
     print(printHelpLine())
   }
@@ -146,10 +142,7 @@ class TUI(controller:SpaceDataController) {
     print(printDetails())
     println(s"Satellite details with $id are displayed.")
     var launchdetails: Option[Launch]= controller.getLaunchDetails(id)
-    val details: String = launchdetails.fold("Launch not found") { launch =>
-    s"ID: ${launch.id}\nName: ${launch.name}\nLaunch Date: ${launch.date_utc}\nLaunchpad: ${launch.launchpad}\n" +
-      s"Success: ${launch.success}\n"
-    }
+    val details: String = launchdetails.fold("Launch not found") { launch => launch.toString()}
     println(details)
     print(printHelpLine())
   }

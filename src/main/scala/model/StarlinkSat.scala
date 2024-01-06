@@ -8,7 +8,13 @@ case class StarlinkSat(
     height: Int,
     latitude: Double,
     longitude: Double,
-    earthRevolutions: Int) { }
+    earthRevolutions: Int) { 
+        override def toString: String = s"ID: ${id}\nName: ${name}\n" +
+          s"Launch Date: ${launchDate}\nPeriod: ${period}\n" +
+          s"Height: ${height}\nLatitude: ${latitude}\nLongitute: ${longitude}\n" +
+          s"EarthRevolutions: ${earthRevolutions}\n"
+
+    }
 
 // class SpaceDataModel {
 //   def processApiData(data: StarlinkSat): String = {
