@@ -10,8 +10,7 @@ import SpaceData.util.Helpers._
 object SpaceDataLaunchController {
 
     def launches(slct: SelectorLaunch): List[Launch] = {
-        val response: String = SpaceXApiClient.getLaunches(slct)
-        val launchesListJson: List[io.circe.Json] = parseToList(response)
+        val launchesListJson: List[io.circe.Json] = SpaceXApiClient.getLaunches(slct)
         var launches: List[Launch] = List().empty
         if (launchesListJson.nonEmpty) {
             launchesListJson.foreach { item =>

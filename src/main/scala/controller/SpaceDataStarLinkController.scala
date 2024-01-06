@@ -19,8 +19,8 @@ import io.circe._
 object SpaceDataStarLinkController {
 
     def starlink(slct: SelectorStarlinkSat): List[StarlinkSat] = {
-        val response: String = SpaceXApiClient.getStarlink(slct)
-        val starlinkSatsListJson: List[io.circe.Json] = parseToList(response)
+        //val response: String = 
+        val starlinkSatsListJson: List[io.circe.Json] = SpaceXApiClient.getStarlink(slct)
         var starlinkSats: List[StarlinkSat] = List().empty
         if (starlinkSatsListJson.nonEmpty) {
             starlinkSatsListJson.foreach { item =>
