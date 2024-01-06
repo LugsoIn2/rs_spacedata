@@ -1,6 +1,7 @@
 package SpaceData.view
 import SpaceData.controller.SpaceDataController
 import SpaceData.model.StarlinkSat
+import SpaceData.model.Launch
 
 class TUI(controller:SpaceDataController) {
   print(printHeader())
@@ -44,14 +45,17 @@ class TUI(controller:SpaceDataController) {
   }
 
   def showDashboard(): Unit = {
-    var dashbVals:List[(String, Int)] = controller.getDashboardValues()
+    val (dashbStarlinkVals, dashbLaunchVals) = controller.getDashboardValues()
     print(printStarlink())
     print(printDashboardFirstRow())
-    dashbVals.foreach { case (listName, count) =>
+    dashbStarlinkVals.foreach { case (listName, count) =>
       println(s"║ $listName, $count")
     }
     print(printLaunches())
-    //TODO Launches
+    print(printDashboardFirstRow())
+    dashbLaunchVals.foreach { case (listName, count) =>
+      println(s"║ $listName, $count")
+    }
     print(printHelpLine())
   }
 
@@ -112,18 +116,17 @@ class TUI(controller:SpaceDataController) {
   }
 
   def showLauches(): Unit = {
-    val slct = scala.io.StdIn.readLine("Options - [all, starlink-launch]: ")
+    val slct = scala.io.StdIn.readLine("Options - [allLaunches, succeeded, failed]: ")
     print(printLaunches())
     println(s"Launches in the $slct category are displayed.")
     //TODO:
     var launchlist = controller.getLauchesList(slct)
-    //printListInChunks(xxxxx)
-    println("TODO: Launches List")
+    printListInChunks(launchlist, (launch: Launch) => launch.name, (launch: Launch) => launch.id, 15, "q")
     print(printHelpLine())
   }
 
   def showStarlinkSataliteDetails(): Unit = {
-    val id = scala.io.StdIn.readLine("ID: ")
+    val id = scala.io.StdIn.readLine("Starlink-Satelite-ID: ")
     print(printStarlink())
     print(printDetails())
     println(s"Satellite details with $id are displayed.")
@@ -138,13 +141,16 @@ class TUI(controller:SpaceDataController) {
   }
 
   def showLaucheDetails(): Unit = {
-    val id = scala.io.StdIn.readLine("ID: ")
+    val id = scala.io.StdIn.readLine("Launch-ID: ")
     print(printLaunches())
     print(printDetails())
     println(s"Satellite details with $id are displayed.")
-    println("TODO: Launch details with id")
-    //TODO  Launch with id
-    var launchdetails = controller.getLaunchDetails(id)
+    var launchdetails: Option[Launch]= controller.getLaunchDetails(id)
+    val details: String = launchdetails.fold("Launch not found") { launch =>
+    s"ID: ${launch.id}\nName: ${launch.name}\nLaunch Date: ${launch.date_utc}\nLaunchpad: ${launch.launchpad}\n" +
+      s"Success: ${launch.success}\n"
+    }
+    println(details)
     print(printHelpLine())
   }
 
