@@ -1,10 +1,10 @@
 package SpaceData.controller
 
 import SpaceData.model.Launch
-import SpaceData.util.dsl.SelectorStarlinkSat
-import SpaceData.util.dsl.SelectorLaunch
-import SpaceData.util.dsl.SpaceXApiClient
-import SpaceData.util.Helpers._
+import SpaceData.util.spacexApiClient.SelectorStarlinkSat
+import SpaceData.util.spacexApiClient.SelectorLaunch
+import SpaceData.util.spacexApiClient.SpaceXApiClient
+import SpaceData.util.spacexApiClient.Helpers._
 
 
 object SpaceDataLaunchController {

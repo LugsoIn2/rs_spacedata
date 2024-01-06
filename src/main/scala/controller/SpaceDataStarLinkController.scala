@@ -2,9 +2,9 @@ package SpaceData.controller
 
 //import model.StarlinkSat
 import SpaceData.model.StarlinkSat
-import SpaceData.util.dsl.SelectorStarlinkSat
-import SpaceData.util.dsl.SpaceXApiClient
-import SpaceData.util.Helpers._
+import SpaceData.util.spacexApiClient.SelectorStarlinkSat
+import SpaceData.util.spacexApiClient.SpaceXApiClient
+import SpaceData.util.spacexApiClient.Helpers._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}

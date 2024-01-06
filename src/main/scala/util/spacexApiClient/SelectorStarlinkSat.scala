@@ -1,4 +1,4 @@
-package SpaceData.util.dsl
+package SpaceData.util.spacexApiClient
 
 sealed trait SelectorStarlinkSat
 

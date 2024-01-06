@@ -1,4 +1,4 @@
-package SpaceData.util
+package SpaceData.util.spacexApiClient
 
 import io.circe.parser._
 import io.circe._

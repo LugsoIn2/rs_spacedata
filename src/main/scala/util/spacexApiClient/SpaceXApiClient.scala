@@ -1,12 +1,12 @@
-package SpaceData.util.dsl
+package SpaceData.util.spacexApiClient
 
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStream
 import java.net.{HttpURLConnection, URL}
 
-import SpaceData.util.dsl.SelectorStarlinkSat
-import SpaceData.util.dsl.SelectorLaunch
+import SpaceData.util.spacexApiClient.SelectorStarlinkSat
+import SpaceData.util.spacexApiClient.SelectorLaunch
 
 
 object SpaceXApiClient {
@@ -76,17 +76,17 @@ object SpaceXApiClient {
     case `all` => {
         val url = new URL("https://api.spacexdata.com/v4/starlink")
         val response: String = executeGetRequest(url)
-        SpaceData.util.Helpers.parseToList(response, "get")
+        SpaceData.util.spacexApiClient.Helpers.parseToList(response, "get")
     } case `active` => {
         val url = new URL("https://api.spacexdata.com/v4/starlink/query")
         val payload = """{"query":{"spaceTrack.DECAYED":{"$ne":1}}, "options": {"offset": 0, "limit": 100}}""".stripMargin
         val response: String = executePostRequest(url, payload)
-        SpaceData.util.Helpers.parseToList(response, "post")
+        SpaceData.util.spacexApiClient.Helpers.parseToList(response, "post")
     } case `inactive` => {
         val url = new URL("https://api.spacexdata.com/v4/starlink/query")
         val payload = """{"query":{"spaceTrack.DECAYED":{"$ne":0}}, "options": {"offset": 0, "limit": 100}}""".stripMargin
         val response: String = executePostRequest(url, payload)
-        SpaceData.util.Helpers.parseToList(response, "post")
+        SpaceData.util.spacexApiClient.Helpers.parseToList(response, "post")
     }
   }
 
@@ -94,15 +94,15 @@ object SpaceXApiClient {
     case `allLaunches` => {
         val url = new URL("https://api.spacexdata.com/v4/launches")
         val response: String = executeGetRequest(url)
-        SpaceData.util.Helpers.parseToList(response, "get")
+        SpaceData.util.spacexApiClient.Helpers.parseToList(response, "get")
     } case `succeeded` => {
         val url = new URL("https://api.spacexdata.com/v4/launches") // Replace with corresponding API query
         val response: String = executeGetRequest(url)
-        SpaceData.util.Helpers.parseToList(response, "get")
+        SpaceData.util.spacexApiClient.Helpers.parseToList(response, "get")
     } case `failed` => {
         val url = new URL("https://api.spacexdata.com/v4/launches") // Replace with corresponding API query
         val response: String = executeGetRequest(url)
-        SpaceData.util.Helpers.parseToList(response, "get")
+        SpaceData.util.spacexApiClient.Helpers.parseToList(response, "get")
     } 
   }
 }
