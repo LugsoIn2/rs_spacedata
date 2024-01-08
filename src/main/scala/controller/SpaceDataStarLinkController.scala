@@ -40,7 +40,8 @@ object SpaceDataStarLinkController {
             height = json.hcursor.downField("height_km").as[Double].getOrElse(0),
             latitude = json.hcursor.downField("latitude").as[Double].getOrElse(0),
             longitude = json.hcursor.downField("longitude").as[Double].getOrElse(0),
-            earthRevolutions = json.hcursor.downField("spaceTrack").downField("REV_AT_EPOCH").as[Int].getOrElse(0)
+            earthRevolutions = json.hcursor.downField("spaceTrack").downField("REV_AT_EPOCH").as[Int].getOrElse(0),
+            decayed = json.hcursor.downField("spaceTrack").downField("DECAYED").as[Int].getOrElse(0)
         )
         starlinkSat
     }

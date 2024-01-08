@@ -8,8 +8,7 @@ import akka.stream.ActorMaterializer
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
 
-import SpaceData.model.SpaceEntity
-import SpaceData.model.{Launch, StarlinkSat}
+import SpaceData.model.{Launch, StarlinkSat, SpaceEntity}
 
 import SpaceData.controller.SpaceDataStarLinkController
 import akka.stream.StreamRefMessages

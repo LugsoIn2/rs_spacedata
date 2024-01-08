@@ -4,4 +4,5 @@ import SpaceData.model.SpaceEntity
 
 case class Rocket( 
     name: String,
-    id: String) extends SpaceEntity
+    id: String,
+    active: Boolean) extends SpaceEntity
