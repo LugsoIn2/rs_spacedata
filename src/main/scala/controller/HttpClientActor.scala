@@ -14,6 +14,8 @@ import SpaceData.controller.SpaceDataStarLinkController
 import akka.stream.StreamRefMessages
 import akka.http.scaladsl.unmarshalling.Unmarshal
 
+import io.circe.Json
+
 // Message to trigger HTTP request in actor
 case class GetSpaceEntities(endpoint: String)
 
@@ -40,17 +42,7 @@ class HttpClientActor extends Actor with ActorLogging {
             val data = Unmarshal(response.entity).to[String] //response.entity.toString()
             data.onComplete {
                 case Success(body) =>
-                    val dataAsList: List[io.circe.Json] = SpaceData.util.spacexApiClient.Helpers.parseToList(body, "get")
-                    spaceEntities = endpoint match {
-                      case "/starlink" =>
-                          var entityList: List[SpaceEntity] = List.empty
-                          dataAsList.foreach { item =>
-                              entityList = entityList :+ SpaceDataStarLinkController.createInstanceStarlinkSat(item)
-                          }
-                          entityList
-                      case "/rockets" =>
-                          List.empty
-                    }
+                  spaceEntitiesDiff(endpoint, body)
                 case Failure(ex) =>
                     println(s"Failed to unmarshal response body: $ex")
             }
@@ -64,6 +56,23 @@ class HttpClientActor extends Actor with ActorLogging {
       // Respond with the current state
       sender() ! spaceEntities
   }
+
+
+  
+  def spaceEntitiesDiff(endpoint: String, body: String) {
+    val dataAsList: List[Json] = SpaceData.util.spacexApiClient.Helpers.parseToList(body, "get")
+    spaceEntities = endpoint match {
+      case "/starlink" =>
+          var entityList: List[SpaceEntity] = List.empty
+          dataAsList.foreach { item =>
+              entityList = entityList :+ SpaceDataStarLinkController.createInstanceStarlinkSat(item)
+          }
+          entityList
+      case "/rockets" =>
+          List.empty
+    }   
+  }
+
 }
 
 object HttpClientActor {
