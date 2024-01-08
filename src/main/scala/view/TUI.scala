@@ -1,7 +1,7 @@
 package SpaceData.view
 import SpaceData.controller.SpaceDataController
-import SpaceData.model.StarlinkSat
-import SpaceData.model.Launch
+import SpaceData.model.{StarlinkSat, Launch, Rocket}
+import SpaceData.util.dsl.{DSLParser, ShowCommand}
 
 class TUI(controller:SpaceDataController) {
   print(printHeader())
@@ -20,6 +20,7 @@ class TUI(controller:SpaceDataController) {
       |║                                      Press "la" to show Launches                                                  ║
       |║                                      Press "slid" to show specific Starlink Satalite details via the id           ║
       |║                                      Press "laid" to show specific Launch details via the id                      ║
+      |║                                      Type "dsl" to enter DSL mode                                                 ║
       |║                                      Type "exit" to exit the tool                                                 ║
       |║                                                                                                                   ║
       |╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
@@ -28,6 +29,23 @@ class TUI(controller:SpaceDataController) {
 
 
   // TUI
+  // def processInput(input: String): Unit = {
+  //   input match {
+  //     case "d" => showDashboard()
+  //     case "sl" => showStarlinkSatalites()
+  //     case "la" => showLauches()
+  //     case "slid" => showStarlinkSataliteDetails()
+  //     case "laid" => showLaucheDetails()
+  //     case "exit" => System.exit(0)              
+  //     case _ => if (input.trim.isEmpty()) {
+  //                 print(printHeader())
+  //               } else {
+  //                 println("incorrect input.")
+  //               }
+  //   }
+  // }
+
+
   def processInput(input: String): Unit = {
     input match {
       case "d" => showDashboard()
@@ -35,14 +53,33 @@ class TUI(controller:SpaceDataController) {
       case "la" => showLauches()
       case "slid" => showStarlinkSataliteDetails()
       case "laid" => showLaucheDetails()
-      case "exit" => System.exit(0)              
-      case _ => if (input.trim.isEmpty()) {
-                  print(printHeader())
-                } else {
-                  println("incorrect input.")
-                }
+      case "dsl" => enterDSLMode()  // New DSL mode entry
+      case "exit" => System.exit(0)
+      case _ =>
+        if (input.trim.isEmpty()) {
+          print(printHeader())
+        } else {
+          println("Incorrect input.")
+        }
     }
   }
+
+  // DSLMode Function
+  def enterDSLMode(): Unit = {
+    val dslCommand = scala.io.StdIn.readLine("Enter DSL command: ")
+    DSLParser.parseCommand(dslCommand) match {
+      case Some(ShowCommand(category, entity)) =>
+        if (entity.toLowerCase == "starlinksat") {
+          showStarlinkSatalitesDSL(category)
+        } else {
+          println("Unsupported entity in DSL command.")
+        }
+      case None =>
+        println("Invalid DSL command.")
+    }
+    print(printHelpLine())
+  }
+
 
   def showDashboard(): Unit = {
     val (dashbStarlinkVals, dashbLaunchVals) = controller.getDashboardValues()
@@ -105,9 +142,16 @@ class TUI(controller:SpaceDataController) {
     """Finished: press enter to show menü..."""
   }
 
-
   def showStarlinkSatalites(): Unit = {
     val slct = scala.io.StdIn.readLine("Options - [all, active, inactive]: ")
+    print(printStarlink())
+    println(s"Satellites in the $slct category are displayed.")
+    var satlist:List[StarlinkSat] = controller.getStarlinkSatList(slct)
+    printListInChunks(satlist, (sat: StarlinkSat) => sat.name, (sat: StarlinkSat) => sat.id, 15, "q")
+    print(printHelpLine())
+  }
+
+    def showStarlinkSatalitesDSL(slct: String): Unit = {
     print(printStarlink())
     println(s"Satellites in the $slct category are displayed.")
     var satlist:List[StarlinkSat] = controller.getStarlinkSatList(slct)

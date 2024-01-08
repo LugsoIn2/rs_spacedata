@@ -1,5 +1,7 @@
 package SpaceData.model
 
+import SpaceData.model.SpaceEntity
+
 case class StarlinkSat( 
     name: String,
     id: String,
@@ -8,7 +10,7 @@ case class StarlinkSat(
     height: Int,
     latitude: Double,
     longitude: Double,
-    earthRevolutions: Int) { 
+    earthRevolutions: Int) extends SpaceEntity { 
         override def toString: String = s"ID: ${id}\nName: ${name}\n" +
           s"Launch Date: ${launchDate}\nPeriod: ${period}\n" +
           s"Height: ${height}\nLatitude: ${latitude}\nLongitute: ${longitude}\n" +
