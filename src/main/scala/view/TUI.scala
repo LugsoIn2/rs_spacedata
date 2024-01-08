@@ -2,6 +2,7 @@ package SpaceData.view
 import SpaceData.controller.SpaceDataController
 import SpaceData.model.{StarlinkSat, Launch, Rocket}
 import SpaceData.util.dsl.{DSLParser, ShowCommand}
+import scala.io.Source
 
 class TUI(controller:SpaceDataController) {
   print(printHeader())
@@ -21,29 +22,12 @@ class TUI(controller:SpaceDataController) {
       |║                                      Press "slid" to show specific Starlink Satalite details via the id           ║
       |║                                      Press "laid" to show specific Launch details via the id                      ║
       |║                                      Type "dsl" to enter DSL mode                                                 ║
+      |║                                      Type "dslfile" to enter DSL-File mode                                        ║
       |║                                      Type "exit" to exit the tool                                                 ║
       |║                                                                                                                   ║
       |╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
       |""".stripMargin
   }
-
-
-  // TUI
-  // def processInput(input: String): Unit = {
-  //   input match {
-  //     case "d" => showDashboard()
-  //     case "sl" => showStarlinkSatalites()
-  //     case "la" => showLauches()
-  //     case "slid" => showStarlinkSataliteDetails()
-  //     case "laid" => showLaucheDetails()
-  //     case "exit" => System.exit(0)              
-  //     case _ => if (input.trim.isEmpty()) {
-  //                 print(printHeader())
-  //               } else {
-  //                 println("incorrect input.")
-  //               }
-  //   }
-  // }
 
 
   def processInput(input: String): Unit = {
@@ -53,7 +37,8 @@ class TUI(controller:SpaceDataController) {
       case "la" => showLauches()
       case "slid" => showStarlinkSataliteDetails()
       case "laid" => showLaucheDetails()
-      case "dsl" => enterDSLMode()  // New DSL mode entry
+      case "dsl" => enterDSLMode()  
+      case "dslfile" => enterDSLModeFile()
       case "exit" => System.exit(0)
       case _ =>
         if (input.trim.isEmpty()) {
@@ -78,6 +63,40 @@ class TUI(controller:SpaceDataController) {
         println("Invalid DSL command.")
     }
     print(printHelpLine())
+  }
+
+
+  def enterDSLModeFile(): Unit = {
+    println("Entering DSL mode. Please provide the file path for DSL commands:")
+    val filePath = scala.io.StdIn.readLine()
+    processCommandsFromFile(filePath)
+    print(printHelpLine())
+  }
+
+
+  def processCommandsFromFile(filePath: String): Unit = {
+    try {
+      val source = Source.fromFile(filePath)
+      val commands = source.getLines().toList
+      source.close()
+
+      commands.foreach { command =>
+        println(s"Executing DSL command: $command")
+        DSLParser.parseCommand(command) match {
+          case Some(ShowCommand(category, entity)) =>
+            if (entity.toLowerCase == "starlinksat") {
+              showStarlinkSatalitesDSL(category)
+            } else {
+              println("Unsupported entity in DSL command.")
+            }
+          case None =>
+            println(s"Invalid DSL command: $command")
+        }
+      }
+    } catch {
+      case e: Exception =>
+        println(s"Error reading or processing DSL commands from file: $e")
+    }
   }
 
 
