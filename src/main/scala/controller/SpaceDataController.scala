@@ -51,17 +51,18 @@ class SpaceDataController() {
     }
   }
 
-  // def getStarlinkSatDetails(id: String): Option[StarlinkSat] = {
-  //   val foundStarlinkSat: Option[StarlinkSat] = findStarlinkSatById(starlinksatlist,id)
-  //   foundStarlinkSat match {
-  //     case Some(starlinkSat) =>
-  //       Some(starlinkSat)
-  //     case None =>
-  //       None
-  //   }
-  // }
+  def getStarlinkSatDetails(id: String): Option[SpaceEntity] = {
+    val starlinksatlist = getStarlinkSatList("all")
+    val foundStarlinkSat: Option[SpaceEntity] = findStarlinkSatById(starlinksatlist,id)
+    foundStarlinkSat match {
+      case Some(starlinkSat) =>
+        Some(starlinkSat)
+      case None =>
+        None
+    }
+  }
 
-  def findStarlinkSatById(starlinkSats: List[StarlinkSat], targetId: String): Option[StarlinkSat] = {
+  def findStarlinkSatById(starlinkSats: List[SpaceEntity], targetId: String): Option[SpaceEntity] = {
     starlinkSats.find(_.id == targetId)
   }
 
@@ -95,17 +96,17 @@ class SpaceDataController() {
     lauches.find(_.id == targetId)
   }
 
-  // def getDashboardValues(): (List[(String, Int)],List[(String, Int)]) = {
-  //   var dashbStarlinkVals: List[(String, Int)] = List.empty[(String, Int)]
-  //   var dashbLaunchVals: List[(String, Int)] = List.empty[(String, Int)]
-  //   dashbStarlinkVals = dashbStarlinkVals :+ ("all", starlinksatlist.size)
-  //   dashbStarlinkVals = dashbStarlinkVals :+ ("active", starlinksatlistActive.size)
-  //   dashbStarlinkVals = dashbStarlinkVals :+ ("inactive", starlinksatlistInactive.size)
-  //   dashbLaunchVals = dashbLaunchVals :+ ("allLaunches", launcheslist.size)
-  //   dashbLaunchVals = dashbLaunchVals :+ ("succeeded", launcheslist.size)
-  //   dashbLaunchVals = dashbLaunchVals :+ ("failed", launcheslist.size)
-  //   (dashbStarlinkVals, dashbLaunchVals)
-  // }
+  def getDashboardValues(): (List[(String, Int)],List[(String, Int)]) = {
+    var dashbStarlinkVals: List[(String, Int)] = List.empty[(String, Int)]
+    var dashbLaunchVals: List[(String, Int)] = List.empty[(String, Int)]
+    dashbStarlinkVals = dashbStarlinkVals :+ ("all", getStarlinkSatList("all").size)
+    dashbStarlinkVals = dashbStarlinkVals :+ ("active", getStarlinkSatList("active").size)
+    dashbStarlinkVals = dashbStarlinkVals :+ ("inactive", getStarlinkSatList("inactive").size)
+    dashbLaunchVals = dashbLaunchVals :+ ("allLaunches", launcheslist.size)
+    dashbLaunchVals = dashbLaunchVals :+ ("succeeded", launcheslist.size)
+    dashbLaunchVals = dashbLaunchVals :+ ("failed", launcheslist.size)
+    (dashbStarlinkVals, dashbLaunchVals)
+  }
 
 
   def stringToSelecorStarlinkSat(slct: String): SelectorStarlinkSat = {
