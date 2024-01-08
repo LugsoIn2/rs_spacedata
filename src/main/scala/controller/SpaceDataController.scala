@@ -1,39 +1,65 @@
 // SpaceDataController.scala
 package SpaceData.controller
-import SpaceData.model.StarlinkSat
+import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
 import SpaceData.controller.SpaceDataStarLinkController
 import SpaceData.util.spacexApiClient._
-import SpaceData.model.Launch
+import akka.actor.{ActorSystem, Props}
+import akka.stream.ActorMaterializer
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
+import akka.pattern.ask
+import scala.concurrent.Future
+import javax.xml.crypto.Data
+import akka.util.Timeout
+
 
 class SpaceDataController() {
-  val starlinksatlist = SpaceDataStarLinkController.starlink(all)
-  val starlinksatlistActive = SpaceDataStarLinkController.starlink(active)
-  val starlinksatlistInactive = SpaceDataStarLinkController.starlink(inactive)
+  implicit val httpActorSystem: ActorSystem = ActorSystem("HttpActorSystem")
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  
+  // create Actors
+  val httpClientActorStarlinkSats = httpActorSystem.actorOf(Props(new HttpClientActor))
+  val httpClientActorRockets = httpActorSystem.actorOf(Props(new HttpClientActor))
+
+  // get data from API
+  httpClientActorStarlinkSats ! GetSpaceEntities("/starlink")
+  httpClientActorRockets ! GetSpaceEntities("/rockets")
+
+  //ar starlinksatlist = SpaceDataStarLinkController.starlink(all)
+  // val starlinksatlistActive = SpaceDataStarLinkController.starlink(active)
+  // val starlinksatlistInactive = SpaceDataStarLinkController.starlink(inactive)
 
   val launcheslist = SpaceDataLaunchController.launches(allLaunches)
 
-  def getStarlinkSatList(slct: String): List[StarlinkSat] = {
+  def getStarlinkSatList(slct: String): List[SpaceEntity] = {
     val selector = stringToSelecorStarlinkSat(slct)
     selector match {
         case `all` => {
-          starlinksatlist
+          //starlinksatlist
+          implicit val timeout: Timeout = Timeout(10.seconds)
+          val futureStarlinkSats: Future[Any] = httpClientActorStarlinkSats ? GetCurrentState
+          Await.result(futureStarlinkSats, timeout.duration).asInstanceOf[List[SpaceEntity]]
         } case `active` => {
-          starlinksatlistActive
+          //starlinksatlistActive
+          //httpClientActorStarlinkSats ! GetCurrentState
+          List.empty
       } case `inactive` => {
-          starlinksatlistInactive
+          //starlinksatlistInactive
+          //httpClientActorStarlinkSats ! GetCurrentState
+          List.empty
       }
     }
   }
 
-  def getStarlinkSatDetails(id: String): Option[StarlinkSat] = {
-    val foundStarlinkSat: Option[StarlinkSat] = findStarlinkSatById(starlinksatlist,id)
-    foundStarlinkSat match {
-      case Some(starlinkSat) =>
-        Some(starlinkSat)
-      case None =>
-        None
-    }
-  }
+  // def getStarlinkSatDetails(id: String): Option[StarlinkSat] = {
+  //   val foundStarlinkSat: Option[StarlinkSat] = findStarlinkSatById(starlinksatlist,id)
+  //   foundStarlinkSat match {
+  //     case Some(starlinkSat) =>
+  //       Some(starlinkSat)
+  //     case None =>
+  //       None
+  //   }
+  // }
 
   def findStarlinkSatById(starlinkSats: List[StarlinkSat], targetId: String): Option[StarlinkSat] = {
     starlinkSats.find(_.id == targetId)
@@ -69,17 +95,17 @@ class SpaceDataController() {
     lauches.find(_.id == targetId)
   }
 
-  def getDashboardValues(): (List[(String, Int)],List[(String, Int)]) = {
-    var dashbStarlinkVals: List[(String, Int)] = List.empty[(String, Int)]
-    var dashbLaunchVals: List[(String, Int)] = List.empty[(String, Int)]
-    dashbStarlinkVals = dashbStarlinkVals :+ ("all", starlinksatlist.size)
-    dashbStarlinkVals = dashbStarlinkVals :+ ("active", starlinksatlistActive.size)
-    dashbStarlinkVals = dashbStarlinkVals :+ ("inactive", starlinksatlistInactive.size)
-    dashbLaunchVals = dashbLaunchVals :+ ("allLaunches", launcheslist.size)
-    dashbLaunchVals = dashbLaunchVals :+ ("succeeded", launcheslist.size)
-    dashbLaunchVals = dashbLaunchVals :+ ("failed", launcheslist.size)
-    (dashbStarlinkVals, dashbLaunchVals)
-  }
+  // def getDashboardValues(): (List[(String, Int)],List[(String, Int)]) = {
+  //   var dashbStarlinkVals: List[(String, Int)] = List.empty[(String, Int)]
+  //   var dashbLaunchVals: List[(String, Int)] = List.empty[(String, Int)]
+  //   dashbStarlinkVals = dashbStarlinkVals :+ ("all", starlinksatlist.size)
+  //   dashbStarlinkVals = dashbStarlinkVals :+ ("active", starlinksatlistActive.size)
+  //   dashbStarlinkVals = dashbStarlinkVals :+ ("inactive", starlinksatlistInactive.size)
+  //   dashbLaunchVals = dashbLaunchVals :+ ("allLaunches", launcheslist.size)
+  //   dashbLaunchVals = dashbLaunchVals :+ ("succeeded", launcheslist.size)
+  //   dashbLaunchVals = dashbLaunchVals :+ ("failed", launcheslist.size)
+  //   (dashbStarlinkVals, dashbLaunchVals)
+  // }
 
 
   def stringToSelecorStarlinkSat(slct: String): SelectorStarlinkSat = {
