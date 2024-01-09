@@ -2,6 +2,7 @@
 package SpaceData.controller
 import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
 import SpaceData.controller.SpaceDataStarLinkController
+import SpaceData.controller.{active, inactive, all}
 import SpaceData.util.spacexApiClient._
 import akka.actor.{ActorSystem, Props}
 import akka.stream.ActorMaterializer
@@ -32,7 +33,7 @@ class SpaceDataController() {
   val launcheslist = SpaceDataLaunchController.launches(allLaunches)
 
   def getStarlinkSatList(slct: String): List[SpaceEntity] = {
-    val selector = stringToSelecorStarlinkSat(slct)
+    val selector = stringToSelecorSpaceEntity(slct)
     selector match {
         case `all` => {
           //starlinksatlist
@@ -40,10 +41,12 @@ class SpaceDataController() {
           val futureStarlinkSats: Future[Any] = httpClientActorStarlinkSats ? GetCurrentState
           Await.result(futureStarlinkSats, timeout.duration).asInstanceOf[List[SpaceEntity]]
         } case `active` => {
+          // TODO: filter with stream
           //starlinksatlistActive
           //httpClientActorStarlinkSats ! GetCurrentState
           List.empty
       } case `inactive` => {
+          // TODO: filter with stream
           //starlinksatlistInactive
           //httpClientActorStarlinkSats ! GetCurrentState
           List.empty
@@ -108,16 +111,16 @@ class SpaceDataController() {
     (dashbStarlinkVals, dashbLaunchVals)
   }
 
-
-  def stringToSelecorStarlinkSat(slct: String): SelectorStarlinkSat = {
+    def stringToSelecorSpaceEntity(slct: String): SelectorSpaceEntity = {
       //val selector: Selector
       slct.toLowerCase match {
-      case "all" => all: SelectorStarlinkSat
-      case "active" => active: SelectorStarlinkSat
-      case "inactive" => inactive: SelectorStarlinkSat
+      case "all" => all: SelectorSpaceEntity
+      case "active" => active: SelectorSpaceEntity
+      case "inactive" => inactive: SelectorSpaceEntity
       case _ => throw new IllegalArgumentException("Ungültiger SelectorStarlinkSat")
     }
   }
+
 
   def stringToSelecorLaunch(slct: String): SelectorLaunch = {
       //val selector: Selector
