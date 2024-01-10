@@ -19,6 +19,7 @@ class TUI(controller:SpaceDataController) {
       |║                                      Press "d" to show the Dashboard                                              ║
       |║                                      Press "sl" to show Starlink Satalites                                        ║
       |║                                      Press "la" to show Launches                                                  ║
+      |║                                      Press "r" to show Rockets                                                    ║
       |║                                      Press "slid" to show specific Starlink Satalite details via the id           ║
       |║                                      Press "laid" to show specific Launch details via the id                      ║
       |║                                      Type "dsl" to enter DSL mode                                                 ║
@@ -35,6 +36,7 @@ class TUI(controller:SpaceDataController) {
       case "d" => showDashboard()
       case "sl" => showStarlinkSatalites()
       case "la" => showLauches()
+      case "r"  => showRockets()
       case "slid" => showStarlinkSataliteDetails()
       case "laid" => showLaucheDetails()
       case "dsl" => enterDSLMode()  
@@ -167,6 +169,16 @@ class TUI(controller:SpaceDataController) {
     println(s"Satellites in the $slct category are displayed.")
     var satlist:List[SpaceEntity] = controller.getStarlinkSatList(slct)
     printListInChunks(satlist, (sat: SpaceEntity) => sat.name, (sat: SpaceEntity) => sat.id, 15, "q")
+    print(printHelpLine())
+  }
+
+  def showRockets(): Unit = {
+    val slct = scala.io.StdIn.readLine("Options - [all, active, inactive]: ")
+    //print(printRocket())
+    println(s"Rockets in the $slct category are displayed.")
+    var rockets:List[SpaceEntity] = controller.getRocketList(slct)
+    println(s"Number of $slct rockets: ${rockets.length}")
+    printListInChunks(rockets, (rocket: SpaceEntity) => rocket.name, (rocket: SpaceEntity) => rocket.id, 15, "q")
     print(printHelpLine())
   }
 

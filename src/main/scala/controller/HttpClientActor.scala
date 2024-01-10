@@ -10,7 +10,6 @@ import scala.util.{Failure, Success}
 
 import SpaceData.model.{Launch, StarlinkSat, SpaceEntity}
 
-import SpaceData.controller.SpaceDataStarLinkController
 import akka.stream.StreamRefMessages
 import akka.http.scaladsl.unmarshalling.Unmarshal
 
@@ -61,15 +60,18 @@ class HttpClientActor extends Actor with ActorLogging {
   
   def spaceEntitiesDiff(endpoint: String, body: String) {
     val dataAsList: List[Json] = SpaceData.util.spacexApiClient.Helpers.parseToList(body, "get")
+    var entityList: List[SpaceEntity] = List.empty
     spaceEntities = endpoint match {
       case "/starlink" =>
-          var entityList: List[SpaceEntity] = List.empty
           dataAsList.foreach { item =>
-              entityList = entityList :+ SpaceDataStarLinkController.createInstance(item)
+              entityList = entityList :+ StarlinkSatFactory.createInstance(item)
           }
           entityList
       case "/rockets" =>
-          List.empty
+          dataAsList.foreach { item =>
+              entityList = entityList :+ RocketFactory.createInstance(item)
+          }
+          entityList
     }   
   }
 

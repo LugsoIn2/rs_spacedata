@@ -16,7 +16,7 @@ import SpaceData.model.StarlinkSat
 import io.circe.parser._
 import io.circe._
 
-object SpaceDataStarLinkController {
+object StarlinkSatFactory {
 
     /*def starlink(slct: SelectorStarlinkSat): List[StarlinkSat] = {
         //val response: String = 
