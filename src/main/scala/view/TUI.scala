@@ -34,9 +34,11 @@ class TUI(controller:SpaceDataController) {
   def processInput(input: String): Unit = {
     input match {
       case "d" => showDashboard()
-      case "sl" => showStarlinkSatalites()
+      //case "sl" => showStarlinkSatalites()
+      case "sl" => showSpaceEntitys("starlinksat")
       case "la" => showLauches()
-      case "r"  => showRockets()
+      //case "r"  => showRockets()
+      case "r" => showSpaceEntitys("rocket")
       case "slid" => showStarlinkSataliteDetails()
       case "laid" => showLaucheDetails()
       case "dsl" => enterDSLMode()  
@@ -51,23 +53,35 @@ class TUI(controller:SpaceDataController) {
     }
   }
 
-  // DSLMode Function
+  // DSLMode Functions
   def enterDSLMode(): Unit = {
     val dslCommand = scala.io.StdIn.readLine("Enter DSL command: ")
     DSLParser.parseCommand(dslCommand) match {
       case Some(ShowCommand(category, entity)) =>
-        if (entity.toLowerCase == "starlinksat") {
-          showStarlinkSatalitesDSL(category)
-        } else {
-          println("Unsupported entity in DSL command.")
-        }
+          showSpaceEntityDSL(category, entity)
       case None =>
         println("Invalid DSL command.")
     }
     print(printHelpLine())
   }
 
+  def showSpaceEntityDSL(category: String, entity: String): Unit = {
+    var entitylist: List[SpaceEntity] = Nil
+    entity match {
+      case "starlinksat" => 
+        print(printStarlink())
+        println(s"Satellites in the $category category are displayed.")
+        entitylist = controller.getStarlinkSatList(category)
+      case "rockets" =>
+        print(printRockets())
+        println(s"Rockets in the $category category are displayed.")
+        entitylist = controller.getRocketList(category)
+    }
+    printListInChunks(entitylist, (entry: SpaceEntity) => entry.name, (entry: SpaceEntity) => entry.id, 15, "q")
+    print(printHelpLine())
+  }
 
+  // DSL FileMode Functions
   def enterDSLModeFile(): Unit = {
     println("Entering DSL mode. Please provide the file path for DSL commands:")
     val filePath = scala.io.StdIn.readLine()
@@ -81,16 +95,11 @@ class TUI(controller:SpaceDataController) {
       val source = Source.fromFile(filePath)
       val commands = source.getLines().toList
       source.close()
-
       commands.foreach { command =>
         println(s"Executing DSL command: $command")
         DSLParser.parseCommand(command) match {
           case Some(ShowCommand(category, entity)) =>
-            if (entity.toLowerCase == "starlinksat") {
-              showStarlinkSatalitesDSL(category)
-            } else {
-              println("Unsupported entity in DSL command.")
-            }
+              showSpaceEntityDSL(category, entity)
           case None =>
             println(s"Invalid DSL command: $command")
         }
@@ -125,6 +134,17 @@ class TUI(controller:SpaceDataController) {
       |║      ██    ██    ██   ██ ██   ██ ██      ██ ██  ██ ██ ██  ██   
       |║ ███████    ██    ██   ██ ██   ██ ███████ ██ ██   ████ ██   ██ 
       |║ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+      |""".stripMargin
+  }
+
+  def printRockets(): String = {
+    """
+      |║ ██████   ██████   ██████ ██   ██ ███████ ████████ ███████ 
+      |║ ██   ██ ██    ██ ██      ██  ██  ██         ██    ██      
+      |║ ██████  ██    ██ ██      █████   █████      ██    ███████ 
+      |║ ██   ██ ██    ██ ██      ██  ██  ██         ██         ██ 
+      |║ ██   ██  ██████   ██████ ██   ██ ███████    ██    ███████  
+      |║ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       |""".stripMargin
   }
 
@@ -163,30 +183,20 @@ class TUI(controller:SpaceDataController) {
     """Finished: press enter to show menü..."""
   }
 
-  def showStarlinkSatalites(): Unit = {
+  def showSpaceEntitys(entity: String): Unit = {
     val slct = scala.io.StdIn.readLine("Options - [all, active, inactive]: ")
-    print(printStarlink())
-    println(s"Satellites in the $slct category are displayed.")
-    var satlist:List[SpaceEntity] = controller.getStarlinkSatList(slct)
-    printListInChunks(satlist, (sat: SpaceEntity) => sat.name, (sat: SpaceEntity) => sat.id, 15, "q")
-    print(printHelpLine())
-  }
-
-  def showRockets(): Unit = {
-    val slct = scala.io.StdIn.readLine("Options - [all, active, inactive]: ")
-    //print(printRocket())
-    println(s"Rockets in the $slct category are displayed.")
-    var rockets:List[SpaceEntity] = controller.getRocketList(slct)
-    println(s"Number of $slct rockets: ${rockets.length}")
-    printListInChunks(rockets, (rocket: SpaceEntity) => rocket.name, (rocket: SpaceEntity) => rocket.id, 15, "q")
-    print(printHelpLine())
-  }
-
-    def showStarlinkSatalitesDSL(slct: String): Unit = {
-    print(printStarlink())
-    println(s"Satellites in the $slct category are displayed.")
-    var satlist:List[SpaceEntity] = controller.getStarlinkSatList(slct)
-    printListInChunks(satlist, (sat: SpaceEntity) => sat.name, (sat: SpaceEntity) => sat.id, 15, "q")
+    var entitylist: List[SpaceEntity] = Nil
+    entity match {
+      case "starlinksat" => 
+        print(printStarlink())
+        println(s"Satellites in the $slct category are displayed.")
+        entitylist = controller.getStarlinkSatList(slct)
+      case "rocket" =>
+        print(printRockets())
+        println(s"Rockets in the $slct category are displayed.")
+        entitylist = controller.getRocketList(slct)  
+    }
+    printListInChunks(entitylist, (entry: SpaceEntity) => entry.name, (entry: SpaceEntity) => entry.id, 15, "q")
     print(printHelpLine())
   }
 

@@ -1,2 +1,2 @@
 show active starlinksat
-show inactive starlinksat
+show all rockets
