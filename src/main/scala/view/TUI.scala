@@ -1,4 +1,5 @@
 package SpaceData.view
+import SpaceData.view.TUIStrings._
 import SpaceData.controller.SpaceDataController
 import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
 import SpaceData.util.dsl.{DSLParser, ShowCommand}
@@ -7,37 +8,11 @@ import scala.io.Source
 class TUI(controller:SpaceDataController) {
   print(printHeader())
 
-  def printHeader() : String = {
-    """
-      |╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-      |║                  ███████ ██████   █████   ██████ ███████       ██████   █████  ████████  █████                    ║
-      |║                  ██      ██   ██ ██   ██ ██      ██            ██   ██ ██   ██    ██    ██   ██                   ║
-      |║                  ███████ ██████  ███████ ██      █████   █████ ██   ██ ███████    ██    ███████                   ║
-      |║                       ██ ██      ██   ██ ██      ██            ██   ██ ██   ██    ██    ██   ██                   ║
-      |║                  ███████ ██      ██   ██  ██████ ███████       ██████  ██   ██    ██    ██   ██                   ║
-      |║                                                                                                                   ║
-      |║                                      Press "d" to show the Dashboard                                              ║
-      |║                                      Press "sl" to show Starlink Satalites                                        ║
-      |║                                      Press "la" to show Launches                                                  ║
-      |║                                      Press "r" to show Rockets                                                    ║
-      |║                                      Press "slid" to show specific Starlink Satalite details via the id           ║
-      |║                                      Press "laid" to show specific Launch details via the id                      ║
-      |║                                      Type "dsl" to enter DSL mode                                                 ║
-      |║                                      Type "dslfile" to enter DSL-File mode                                        ║
-      |║                                      Type "exit" to exit the tool                                                 ║
-      |║                                                                                                                   ║
-      |╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
-      |""".stripMargin
-  }
-
-
   def processInput(input: String): Unit = {
     input match {
       case "d" => showDashboard()
-      //case "sl" => showStarlinkSatalites()
       case "sl" => showSpaceEntitys("starlinksat")
       case "la" => showLauches()
-      //case "r"  => showRockets()
       case "r" => showSpaceEntitys("rocket")
       case "slid" => showStarlinkSataliteDetails()
       case "laid" => showLaucheDetails()
@@ -126,63 +101,6 @@ class TUI(controller:SpaceDataController) {
     print(printHelpLine())
   }
 
-  def printStarlink(): String = {
-    """
-      |║ ███████ ████████  █████  ██████  ██      ██ ███    ██ ██   ██     
-      |║ ██         ██    ██   ██ ██   ██ ██      ██ ████   ██ ██  ██   
-      |║ ███████    ██    ███████ ██████  ██      ██ ██ ██  ██ █████    
-      |║      ██    ██    ██   ██ ██   ██ ██      ██ ██  ██ ██ ██  ██   
-      |║ ███████    ██    ██   ██ ██   ██ ███████ ██ ██   ████ ██   ██ 
-      |║ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-      |""".stripMargin
-  }
-
-  def printRockets(): String = {
-    """
-      |║ ██████   ██████   ██████ ██   ██ ███████ ████████ ███████ 
-      |║ ██   ██ ██    ██ ██      ██  ██  ██         ██    ██      
-      |║ ██████  ██    ██ ██      █████   █████      ██    ███████ 
-      |║ ██   ██ ██    ██ ██      ██  ██  ██         ██         ██ 
-      |║ ██   ██  ██████   ██████ ██   ██ ███████    ██    ███████  
-      |║ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      |""".stripMargin
-  }
-
-  def printDashboardFirstRow(): String = {
-    """
-      |║ Category, Numbers                                             
-      |║+---------------------+
-      |""".stripMargin
-  }
-
-  def printLaunches(): String = {
-    """
-      |║ ██       █████  ██    ██ ███    ██  ██████ ██   ██ ███████ ███████ 
-      |║ ██      ██   ██ ██    ██ ████   ██ ██      ██   ██ ██      ██      
-      |║ ██      ███████ ██    ██ ██ ██  ██ ██      ███████ █████   ███████ 
-      |║ ██      ██   ██ ██    ██ ██  ██ ██ ██      ██   ██ ██           ██ 
-      |║ ███████ ██   ██  ██████  ██   ████  ██████ ██   ██ ███████ ███████ 
-      |║ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      |""".stripMargin
-  }
-
-  def printDetails(): String = {
-    """
-      |║ ██████  ███████ ████████  █████  ██ ██      ███████ 
-      |║ ██   ██ ██         ██    ██   ██ ██ ██      ██      
-      |║ ██   ██ █████      ██    ███████ ██ ██      ███████ 
-      |║ ██   ██ ██         ██    ██   ██ ██ ██           ██ 
-      |║ ██████  ███████    ██    ██   ██ ██ ███████ ███████ 
-      |║ - - - - - - - - - - - - - - - - - - - - - - - - - - -
-      |""".stripMargin
-  }
-
-
-
-  def printHelpLine(): String = {
-    """Finished: press enter to show menü..."""
-  }
-
   def showSpaceEntitys(entity: String): Unit = {
     val slct = scala.io.StdIn.readLine("Options - [all, active, inactive]: ")
     var entitylist: List[SpaceEntity] = Nil
@@ -232,26 +150,20 @@ class TUI(controller:SpaceDataController) {
     print(printHelpLine())
   }
 
-def printListInChunks[T](objList: List[T], attribute1Extractor: T => String, attribute2Extractor: T => String, chunkSize: Int, cancelKey: String): Unit = {
-  var continuePrinting = true
+  def printListInChunks[T](objList: List[T], attribute1Extractor: T => String, attribute2Extractor: T => String, chunkSize: Int, cancelKey: String): Unit = {
+    var continuePrinting = true
 
-  objList.grouped(chunkSize).foreach { chunk =>
-    if (continuePrinting) {
-      chunk.foreach(obj => println(s"Name: ${attribute1Extractor(obj)}, ID: ${attribute2Extractor(obj)}"))
-      
-      val userInput = scala.io.StdIn.readLine(s"Press enter for the next page or '$cancelKey' to abort: ")
-      
-      if (userInput.toLowerCase == cancelKey.toLowerCase) {
-        continuePrinting = false
+    objList.grouped(chunkSize).foreach { chunk =>
+      if (continuePrinting) {
+        chunk.foreach(obj => println(s"Name: ${attribute1Extractor(obj)}, ID: ${attribute2Extractor(obj)}"))
+        
+        val userInput = scala.io.StdIn.readLine(s"Press enter for the next page or '$cancelKey' to abort: ")
+        
+        if (userInput.toLowerCase == cancelKey.toLowerCase) {
+          continuePrinting = false
+        }
       }
     }
-  }
-}
-
-
-  def displayResult(result: String): Unit = {
-    // Resultii und so
-    println(result)
   }
 
   def getUserInput(): String = {
