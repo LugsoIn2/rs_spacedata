@@ -1,7 +1,7 @@
 package SpaceData.controller
 
 //import model.StarlinkSat
-import SpaceData.model.StarlinkSat
+import SpaceData.model.Rocket
 // import SpaceData.util.spacexApiClient.SelectorStarlinkSat
 // import SpaceData.util.spacexApiClient.SpaceXApiClient
 // import SpaceData.util.spacexApiClient.Helpers._
@@ -16,7 +16,7 @@ import SpaceData.model.StarlinkSat
 import io.circe.parser._
 import io.circe._
 
-object SpaceDataStarLinkController {
+object SpaceDataRocketController {
 
     /*def starlink(slct: SelectorStarlinkSat): List[StarlinkSat] = {
         //val response: String = 
@@ -31,19 +31,13 @@ object SpaceDataStarLinkController {
         starlinkSats
     } */
 
-    def createInstance(json: io.circe.Json): StarlinkSat = {
-        val starlinkSat = StarlinkSat(
-            name = json.hcursor.downField("spaceTrack").downField("OBJECT_NAME").as[String].getOrElse("Unknown"),
+    def createInstance(json: io.circe.Json): Rocket = {
+        val rocket = Rocket(
+            name = json.hcursor.downField("name").as[String].getOrElse("Unknown"),
             id = json.hcursor.downField("id").as[String].getOrElse("Unknown"),
-            launchDate = json.hcursor.downField("spaceTrack").downField("LAUNCH_DATE").as[String].getOrElse("Unknown"),
-            period = json.hcursor.downField("spaceTrack").downField("PERIOD").as[Double].getOrElse(0),
-            height = json.hcursor.downField("height_km").as[Double].getOrElse(0),
-            latitude = json.hcursor.downField("latitude").as[Double].getOrElse(0),
-            longitude = json.hcursor.downField("longitude").as[Double].getOrElse(0),
-            earthRevolutions = json.hcursor.downField("spaceTrack").downField("REV_AT_EPOCH").as[Int].getOrElse(0),
-            decayed = json.hcursor.downField("spaceTrack").downField("DECAYED").as[Int].getOrElse(0)
+            active = json.hcursor.downField("active").as[Boolean].getOrElse(false)
         )
-        starlinkSat
+        rocket
     }
 
     // def parseToList(json: String): List[io.circe.Json] = {

@@ -65,7 +65,7 @@ class HttpClientActor extends Actor with ActorLogging {
       case "/starlink" =>
           var entityList: List[SpaceEntity] = List.empty
           dataAsList.foreach { item =>
-              entityList = entityList :+ SpaceDataStarLinkController.createInstanceStarlinkSat(item)
+              entityList = entityList :+ SpaceDataStarLinkController.createInstance(item)
           }
           entityList
       case "/rockets" =>

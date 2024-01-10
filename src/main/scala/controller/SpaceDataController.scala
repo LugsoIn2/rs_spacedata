@@ -14,6 +14,7 @@ import scala.concurrent.Future
 import javax.xml.crypto.Data
 import akka.util.Timeout
 import scala.concurrent.ExecutionContextExecutor
+import akka.actor.ActorRef
 
 
 class SpaceDataController() {
@@ -53,21 +54,40 @@ class SpaceDataController() {
               .runWith(Sink.seq)
               .map(_.flatten.toList) // Flatten the result into a single List
           val activeStarlinkSats: List[SpaceEntity] = Await.result(result, 10.seconds)*/
-          val activeStarlinkSats: List[SpaceEntity] = Await.result(getAndfilterSpaceEntities(true), 10.seconds)
+          val activeStarlinkSats: List[SpaceEntity] = Await.result(getAndfilterSpaceEntities(true, httpClientActorStarlinkSats), 10.seconds)
           println(s"Number of activeStarlinkSats: ${activeStarlinkSats.length}")
           activeStarlinkSats
       } case `inactive` => {
-          val inactiveStarlinkSats: List[SpaceEntity] = Await.result(getAndfilterSpaceEntities(false), 10.seconds)
+          val inactiveStarlinkSats: List[SpaceEntity] = Await.result(getAndfilterSpaceEntities(false, httpClientActorStarlinkSats), 10.seconds)
           println(s"Number of inactiveStarlinkSats: ${inactiveStarlinkSats.length}")
           inactiveStarlinkSats
       }
     }
   }
 
-  def getAndfilterSpaceEntities(isActive: Boolean): Future[List[SpaceEntity]] = {
+  def getRocketList(slct: String): List[SpaceEntity] = {
+    val selector = stringToSelecorSpaceEntity(slct)
+    selector match {
+      case `all` => {
+        implicit val timeout: Timeout = Timeout(10.seconds)
+        val futureRockets: Future[Any] = httpClientActorRockets ? GetCurrentState
+        Await.result(futureRockets, timeout.duration).asInstanceOf[List[SpaceEntity]]
+      } case `active` => {
+        val activeRockets: List[SpaceEntity] = Await.result(getAndfilterSpaceEntities(true, httpClientActorRockets), 10.seconds)
+        println(s"Number of activeRockets: ${activeRockets.length}")
+        activeRockets
+      } case `inactive` => {
+        val inactiveRockets: List[SpaceEntity] = Await.result(getAndfilterSpaceEntities(false, httpClientActorRockets), 10.seconds)
+        println(s"Number of inactiveRockets: ${inactiveRockets.length}")
+        inactiveRockets
+      }
+    }
+  }
+
+  def getAndfilterSpaceEntities(isActive: Boolean, httpClientActor: ActorRef): Future[List[SpaceEntity]] = {
     implicit val timeout: Timeout = Timeout(10.seconds)
     Source.single(())
-    .mapAsync(1)(_ => httpClientActorStarlinkSats ? GetCurrentState)
+    .mapAsync(1)(_ => httpClientActor ? GetCurrentState)
     .map {  data => 
       val instances = data.asInstanceOf[List[SpaceEntity]]
       if (isActive) instances.filter(_.asInstanceOf[StarlinkSat].active)
