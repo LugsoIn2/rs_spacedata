@@ -31,12 +31,7 @@ class TUI(controller:SpaceDataController) {
   // DSLMode Functions
   def enterDSLMode(): Unit = {
     val dslCommand = scala.io.StdIn.readLine("Enter DSL command: ")
-    DSLParser.parseCommand(dslCommand) match {
-      case Some(ShowCommand(category, entity)) =>
-          showSpaceEntityDSL(category, entity)
-      case None =>
-        println("Invalid DSL command.")
-    }
+    executeDSLParser(dslCommand)
     print(printHelpLine())
   }
 
@@ -59,32 +54,29 @@ class TUI(controller:SpaceDataController) {
   // DSL FileMode Functions
   def enterDSLModeFile(): Unit = {
     println("Entering DSL mode. Please provide the file path for DSL commands:")
-    val filePath = scala.io.StdIn.readLine()
-    processCommandsFromFile(filePath)
-    print(printHelpLine())
-  }
-
-
-  def processCommandsFromFile(filePath: String): Unit = {
     try {
-      val source = Source.fromFile(filePath)
+      val source = Source.fromFile(scala.io.StdIn.readLine())
       val commands = source.getLines().toList
       source.close()
-      commands.foreach { command =>
-        println(s"Executing DSL command: $command")
-        DSLParser.parseCommand(command) match {
-          case Some(ShowCommand(category, entity)) =>
-              showSpaceEntityDSL(category, entity)
-          case None =>
-            println(s"Invalid DSL command: $command")
-        }
+      commands.foreach { dslcommand =>
+        executeDSLParser(dslcommand)
       }
     } catch {
       case e: Exception =>
         println(s"Error reading or processing DSL commands from file: $e")
     }
+    print(printHelpLine())
   }
 
+  def executeDSLParser(dslCommand: String): Unit = {
+    println(s"Executing DSL command: $dslCommand")
+    DSLParser.parseCommand(dslCommand) match {
+      case Some(ShowCommand(category, entity)) =>
+          showSpaceEntityDSL(category, entity)
+      case None =>
+        println("Invalid DSL command.")
+    }
+  }
 
   def showDashboard(): Unit = {
     val (dashbStarlinkVals, dashbLaunchVals) = controller.getDashboardValues()
