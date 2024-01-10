@@ -5,7 +5,8 @@ import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
 import SpaceData.util.dsl.{DSLParser, ShowCommand}
 import scala.io.Source
 
-class TUI(controller:SpaceDataController) {
+class TUI(var controller:SpaceDataController) extends TUIDSLMode {
+
   print(printHeader())
 
   def processInput(input: String): Unit = {
@@ -25,56 +26,6 @@ class TUI(controller:SpaceDataController) {
         } else {
           println("Incorrect input.")
         }
-    }
-  }
-
-  // DSLMode Functions
-  def enterDSLMode(): Unit = {
-    val dslCommand = scala.io.StdIn.readLine("Enter DSL command: ")
-    executeDSLParser(dslCommand)
-    print(printHelpLine())
-  }
-
-  def showSpaceEntityDSL(category: String, entity: String): Unit = {
-    var entitylist: List[SpaceEntity] = Nil
-    entity match {
-      case "starlinksat" => 
-        print(printStarlink())
-        println(s"Satellites in the $category category are displayed.")
-        entitylist = controller.getStarlinkSatList(category)
-      case "rockets" =>
-        print(printRockets())
-        println(s"Rockets in the $category category are displayed.")
-        entitylist = controller.getRocketList(category)
-    }
-    printListInChunks(entitylist, (entry: SpaceEntity) => entry.name, (entry: SpaceEntity) => entry.id, 15, "q")
-    print(printHelpLine())
-  }
-
-  // DSL FileMode Functions
-  def enterDSLModeFile(): Unit = {
-    println("Entering DSL mode. Please provide the file path for DSL commands:")
-    try {
-      val source = Source.fromFile(scala.io.StdIn.readLine())
-      val commands = source.getLines().toList
-      source.close()
-      commands.foreach { dslcommand =>
-        executeDSLParser(dslcommand)
-      }
-    } catch {
-      case e: Exception =>
-        println(s"Error reading or processing DSL commands from file: $e")
-    }
-    print(printHelpLine())
-  }
-
-  def executeDSLParser(dslCommand: String): Unit = {
-    println(s"Executing DSL command: $dslCommand")
-    DSLParser.parseCommand(dslCommand) match {
-      case Some(ShowCommand(category, entity)) =>
-          showSpaceEntityDSL(category, entity)
-      case None =>
-        println("Invalid DSL command.")
     }
   }
 
