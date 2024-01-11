@@ -2,6 +2,7 @@
 // The simplest possible sbt build file is just one line:
 
 scalaVersion := "2.13.12"
+//scalaVersion := "3.3.1"
 // That is, to create a valid sbt build, all you've got to do is define the
 // version of Scala you'd like your project to use.
 
@@ -32,9 +33,27 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-http" % "10.2.7",
   "org.asynchttpclient" % "async-http-client" % "2.12.3",
   "io.circe" %% "circe-core" % "0.14.1",
-  "io.circe" %% "circe-parser" % "0.14.1"
+  "io.circe" %% "circe-parser" % "0.14.1",
+  "org.scalatest" %% "scalatest" % "3.2.11" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.11"
 )
 
+
+//libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.11"
+//libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.11" % Test
+
+// lazy val root = project
+//     .in(file("."))
+//     .settings(
+//       name := name
+//       version := version
+//       scalaVersion := scalaVersion,
+//       //resolvers += "Akka library repository".at("https://repo.akka.io/maven"),
+//       libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.11",
+//       libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.11" % "test",
+//       libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4"
+//       //libraryDependencies += "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion
+//     )
 
 // Here, `libraryDependencies` is a set of dependencies, and by using `+=`,
 // we're adding the scala-parser-combinators dependency to the set of dependencies
