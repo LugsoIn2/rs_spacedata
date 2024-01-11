@@ -1,0 +1,27 @@
+name: coveralls-ci
+on:
+  push:
+    branches:
+      - main
+      - more-functional
+  pull_request:
+    branches:
+      - main
+      - more-functional
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'sbt'
+      - name: Run tests
+        run: sbt coverage test
+      - name: Coverage Report
+        run: sbt coverageReport
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
