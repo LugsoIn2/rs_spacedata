@@ -1,7 +1,7 @@
 
 // The simplest possible sbt build file is just one line:
 
-scalaVersion := "2.13.12"
+//scalaVersion := "2.13.12"
 //scalaVersion := "3.3.1"
 // That is, to create a valid sbt build, all you've got to do is define the
 // version of Scala you'd like your project to use.
@@ -14,9 +14,9 @@ scalaVersion := "2.13.12"
 
 // It's possible to define many kinds of settings, such as:
 
-name := "rs_spacedata"
-organization := "de.htwg.rs_spacedata"
-version := "1.0"
+//name := "rs_spacedata"
+//organization := "de.htwg.rs_spacedata"
+//version := "1.0"
 
 // Note, it's not required for you to define these three settings. These are
 // mostly only necessary if you intend to publish your library's binaries on a
@@ -27,17 +27,19 @@ version := "1.0"
 // You can define other libraries as dependencies in your build like this:
 
 //libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "2.3.0"
-libraryDependencies ++= Seq(
+//libraryDependencies ++= Seq(
+val dependencies = Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.6.17",
   "com.typesafe.akka" %% "akka-stream" % "2.6.17",
   "com.typesafe.akka" %% "akka-http" % "10.2.7",
   "org.asynchttpclient" % "async-http-client" % "2.12.3",
   "io.circe" %% "circe-core" % "0.14.1",
   "io.circe" %% "circe-parser" % "0.14.1",
-  "org.scalatest" %% "scalatest" % "3.2.11" % Test,
-  "org.scalatest" %% "scalatest" % "3.2.11"
+  "org.scalatest" %% "scalatest" % "3.2.17" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.17",
+  "org.scalatestplus" %% "mockito-5-8" % "3.2.17.0" % "test",
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
 )
-
 
 //libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.11"
 //libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.11" % Test
@@ -54,6 +56,23 @@ libraryDependencies ++= Seq(
 //       libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4"
 //       //libraryDependencies += "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion
 //     )
+
+
+lazy val root = project
+  .in(file("."))
+  .settings(
+    name := "rs_spacedata",
+    version := "1.0",
+    scalaVersion :=  "2.13.12",
+    organization := "de.htwg.rs_spacedata",
+    libraryDependencies ++= dependencies,
+    resolvers += "Akka library repository".at("https://repo.akka.io/maven"),
+    scalacOptions ++= Seq(
+      "-unchecked",         
+      //"-deprecation",      
+      "-feature"
+    )
+  )
 
 // Here, `libraryDependencies` is a set of dependencies, and by using `+=`,
 // we're adding the scala-parser-combinators dependency to the set of dependencies
