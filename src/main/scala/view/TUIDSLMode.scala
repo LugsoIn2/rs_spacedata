@@ -17,14 +17,15 @@ trait TUIDSLMode {
 
   def showSpaceEntityDSL(category: String, entity: String): Unit = {
     println(s"$entity in the $category category are displayed.")
-    val entityList: List[SpaceEntity] = entity match {
-      case "starlinksat" =>
-        controller.getStarlinkSatList(category)
-      case "rockets" =>
-        controller.getRocketList(category)
-      case _ =>
-        Nil
-    }
+    // val entityList: List[SpaceEntity] = entity match {
+    //   case "starlinksat" =>
+    //     controller.getStarlinkSatList(category)
+    //   case "rockets" =>
+    //     controller.getRocketList(category)
+    //   case _ =>
+    //     Nil
+    // }
+    val entityList: List[SpaceEntity] = controller.getSpaceEntitiesList(category, entity)
     printListInChunks(entityList, (entry: SpaceEntity) => entry.name, (entry: SpaceEntity) => entry.id, 15, "q")
     print(printHelpLine())
   }

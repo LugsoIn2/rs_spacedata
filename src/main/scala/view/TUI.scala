@@ -5,6 +5,7 @@ import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
 import SpaceData.util.dsl.{DSLParser, ShowCommand}
 import scala.io.Source
 
+
 class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers {
 
   printHeader()
@@ -12,9 +13,14 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
   def processInput(input: String): Unit = {
     input match {
       case "d" => showDashboard()
-      case "sl" => showSpaceEntitys("starlinksat")
+      case "sl" => 
+        printStarlink()
+        showSpaceEntitys("starlinksat")
       case "la" => showLauches()
-      case "r" => showSpaceEntitys("rocket")
+      case "r" => 
+        printRockets()
+        showSpaceEntitys("rocket")
+      case "rid" => showSpaceEntityDetails("rocket")
       case "slid" => showSpaceEntityDetails("starlinksat")
       case "laid" => showLaucheDetails()
       case "dsl" => enterDSLMode()  
@@ -30,7 +36,7 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
   }
 
   def showDashboard(): Unit = {
-    val (dashbStarlinkVals, dashbLaunchVals) = controller.getDashboardValues()
+    val (dashbStarlinkVals, dashbLaunchVals, dashbRocketsVals) = controller.getDashboardValues()
     def printValues(values: Seq[(String, Int)]): Unit = {
       printDashboardFirstRow()
       values.foreach { case (listName, count) =>
@@ -39,6 +45,8 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
     }
     printStarlink()
     printValues(dashbStarlinkVals)
+    printRockets()
+    printValues(dashbRocketsVals)
     printLaunches()
     printValues(dashbLaunchVals)
     printHelpLine()
@@ -47,16 +55,18 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
   def showSpaceEntitys(entity: String): Unit = {
     val slct = scala.io.StdIn.readLine("Options - [all, active, inactive]: ")
     println(s"$entity in the $slct category are displayed.")
-    val entitylist: List[SpaceEntity] = entity match {
-      case "starlinksat" =>
-        printStarlink()
-        controller.getStarlinkSatList(slct)
-      case "rocket" =>
-        printRockets()
-        controller.getRocketList(slct)
-      case _ =>
-        Nil // default case, an empty list
-    }
+    //val entitylist: List[SpaceEntity] = 
+    // entity match {
+    //   case "starlinksat" =>
+    //     printStarlink()
+    //     //controller.getStarlinkSatList(slct)
+    //   case "rocket" =>
+    //     printRockets()
+    //     //controller.getRocketList(slct)
+    //   case _ =>
+    //     Nil // default case, an empty list
+    // }
+    val entitylist = controller.getSpaceEntitiesList(slct, entity)
     printListInChunks(entitylist, (entry: SpaceEntity) => entry.name, (entry: SpaceEntity) => entry.id, 15, "q")
     printHelpLine()
   }
@@ -68,12 +78,13 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
         printStarlink()
         printDetails()
         println(s"Satellite details with $id are displayed.")
-        controller.getStarlinkSatDetails(id)
+        //controller.getStarlinkSatDetails(id)
+        controller.getSpaceEntitiyDetails(id,entity)
       case "rocket" =>
         printRockets()
         //TODO ROCKET DETAILS
         //controller.getStarlinkSatDetails(id)
-        None
+        controller.getSpaceEntitiyDetails(id,entity)
       case _ =>
         None 
     }
