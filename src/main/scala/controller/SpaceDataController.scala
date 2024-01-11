@@ -156,7 +156,7 @@ class SpaceDataController() {
       case "all" => all: SelectorSpaceEntity
       case "active" => active: SelectorSpaceEntity
       case "inactive" => inactive: SelectorSpaceEntity
-      case _ => throw new IllegalArgumentException("Ungültiger SelectorStarlinkSat")
+      case _ => throw new IllegalArgumentException("Ungültiger SelectorSpaceEntity")
     }
   }
 

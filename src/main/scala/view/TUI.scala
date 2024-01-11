@@ -20,8 +20,14 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
       case "r" => 
         printRockets()
         showSpaceEntitys("rocket")
-      case "rid" => showSpaceEntityDetails("rocket")
-      case "slid" => showSpaceEntityDetails("starlinksat")
+      case "rid" => 
+        printRockets()
+        printDetails()
+        showSpaceEntityDetails("rocket")
+      case "slid" => 
+        printStarlink()
+        printDetails()
+        showSpaceEntityDetails("starlinksat")
       case "laid" => showLaucheDetails()
       case "dsl" => enterDSLMode()  
       case "dslfile" => enterDSLModeFile()
@@ -55,17 +61,6 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
   def showSpaceEntitys(entity: String): Unit = {
     val slct = scala.io.StdIn.readLine("Options - [all, active, inactive]: ")
     println(s"$entity in the $slct category are displayed.")
-    //val entitylist: List[SpaceEntity] = 
-    // entity match {
-    //   case "starlinksat" =>
-    //     printStarlink()
-    //     //controller.getStarlinkSatList(slct)
-    //   case "rocket" =>
-    //     printRockets()
-    //     //controller.getRocketList(slct)
-    //   case _ =>
-    //     Nil // default case, an empty list
-    // }
     val entitylist = controller.getSpaceEntitiesList(slct, entity)
     printListInChunks(entitylist, (entry: SpaceEntity) => entry.name, (entry: SpaceEntity) => entry.id, 15, "q")
     printHelpLine()
@@ -73,21 +68,8 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
 
   def showSpaceEntityDetails(entity: String): Unit = {
     val id = scala.io.StdIn.readLine("ID: ")
-    val entitydetails: Option[SpaceEntity] = entity match {
-      case "starlinksat" =>
-        printStarlink()
-        printDetails()
-        println(s"Satellite details with $id are displayed.")
-        //controller.getStarlinkSatDetails(id)
-        controller.getSpaceEntitiyDetails(id,entity)
-      case "rocket" =>
-        printRockets()
-        //TODO ROCKET DETAILS
-        //controller.getStarlinkSatDetails(id)
-        controller.getSpaceEntitiyDetails(id,entity)
-      case _ =>
-        None 
-    }
+    println(s"$entity details with $id are displayed.")
+    val entitydetails: Option[SpaceEntity] = controller.getSpaceEntitiyDetails(id,entity)
     println(entitydetails.fold(s"$entity not found") { entry => entry.toString()})
     printHelpLine()
   }

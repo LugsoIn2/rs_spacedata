@@ -5,6 +5,7 @@ import SpaceData.model.SpaceEntity
 import SpaceData.util.dsl.{DSLParser, ShowCommand}
 import scala.io.Source
 import SpaceData.view.TUIStrings._
+import SpaceData.util.dsl.DetailCommand
 trait TUIDSLMode {
 
   this: TUI =>
@@ -12,22 +13,31 @@ trait TUIDSLMode {
   def enterDSLMode(): Unit = {
     val dslCommand = scala.io.StdIn.readLine("Enter DSL command: ")
     executeDSLParser(dslCommand)
-    print(printHelpLine())
+    printHelpLine()
   }
 
   def showSpaceEntityDSL(category: String, entity: String): Unit = {
+    printDSLHeaders(entity, false)
     println(s"$entity in the $category category are displayed.")
-    // val entityList: List[SpaceEntity] = entity match {
-    //   case "starlinksat" =>
-    //     controller.getStarlinkSatList(category)
-    //   case "rockets" =>
-    //     controller.getRocketList(category)
-    //   case _ =>
-    //     Nil
-    // }
     val entityList: List[SpaceEntity] = controller.getSpaceEntitiesList(category, entity)
     printListInChunks(entityList, (entry: SpaceEntity) => entry.name, (entry: SpaceEntity) => entry.id, 15, "q")
-    print(printHelpLine())
+    printHelpLine()
+  }
+
+  def DetailSpaceEntityDSL(entity: String, id: String): Unit = {
+    printDSLHeaders(entity, true)
+    println(s"$entity with id $id Details are displayed.")
+    val entitydetails: Option[SpaceEntity] = controller.getSpaceEntitiyDetails(id, entity)
+    println(entitydetails.fold(s"$entity not found") { entry => entry.toString()})
+    printHelpLine()
+  }
+
+  def printDSLHeaders(entity: String, details: Boolean): Unit = {
+    entity match {
+      case "starlinksat" => printStarlink()
+      case "rocket" => printRockets()
+    }
+    if (details) {printDetails()}
   }
 
   def enterDSLModeFile(): Unit = {
@@ -47,7 +57,7 @@ trait TUIDSLMode {
       case e: Exception =>
         println(s"Error reading or processing DSL commands from file: $e")
     }
-    print(printHelpLine())
+    printHelpLine()
   }
 
   def executeDSLParser(dslCommand: String): Unit = {
@@ -55,6 +65,8 @@ trait TUIDSLMode {
     DSLParser.parseCommand(dslCommand) match {
       case Some(ShowCommand(category, entity)) =>
         showSpaceEntityDSL(category, entity)
+      case Some(DetailCommand(entity, id)) =>
+        DetailSpaceEntityDSL(entity,id)
       case None =>
         println("Invalid DSL command.")
     }

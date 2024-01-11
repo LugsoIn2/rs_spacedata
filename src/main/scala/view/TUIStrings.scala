@@ -3,7 +3,7 @@ package SpaceData.view
 object TUIStrings {
 
   def printHeader() : Unit = {
-    print(
+    println(
     """
       |╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
       |║                  ███████ ██████   █████   ██████ ███████       ██████   █████  ████████  █████                    ║
@@ -29,7 +29,7 @@ object TUIStrings {
   }
 
   def printStarlink(): Unit = {
-    print(
+    println(
     """
       |║ ███████ ████████  █████  ██████  ██      ██ ███    ██ ██   ██     
       |║ ██         ██    ██   ██ ██   ██ ██      ██ ████   ██ ██  ██   
@@ -42,7 +42,7 @@ object TUIStrings {
   }
 
   def printRockets(): Unit = {
-    print(
+    println(
     """
       |║ ██████   ██████   ██████ ██   ██ ███████ ████████ ███████ 
       |║ ██   ██ ██    ██ ██      ██  ██  ██         ██    ██      
@@ -55,7 +55,7 @@ object TUIStrings {
   }
 
   def printDashboardFirstRow(): Unit = {
-    print(
+    println(
     """
       |║ Category, Numbers                                             
       |║+---------------------+
@@ -64,7 +64,7 @@ object TUIStrings {
   }
 
   def printLaunches(): Unit = {
-    print(
+    println(
     """
       |║ ██       █████  ██    ██ ███    ██  ██████ ██   ██ ███████ ███████ 
       |║ ██      ██   ██ ██    ██ ████   ██ ██      ██   ██ ██      ██      
@@ -77,7 +77,7 @@ object TUIStrings {
   }
 
   def printDetails(): Unit = {
-    print(
+    println(
     """
       |║ ██████  ███████ ████████  █████  ██ ██      ███████ 
       |║ ██   ██ ██         ██    ██   ██ ██ ██      ██      
@@ -90,7 +90,7 @@ object TUIStrings {
   }
 
   def printHelpLine(): Unit = {
-    print(
+    println(
     """Finished: press enter to show menü..."""
     )
   }

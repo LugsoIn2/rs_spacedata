@@ -1,2 +1,4 @@
 show active starlinksat
-show all rockets
+detail starlinksat 5eed7714096e590006985657
+show all rocket
+detail rocket 5e9d0d95eda69973a809d1ec

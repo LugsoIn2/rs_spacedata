@@ -7,6 +7,8 @@ object DSLParser {
     tokens match {
       case "show" :: category :: entity :: Nil if isValidCategory(category) && isValidEntity(entity) =>
         Some(ShowCommand(category, entity))
+      case "detail" :: entity :: id :: Nil if isValidEntity(entity) =>
+        Some(DetailCommand(entity, id))
       case _ =>
         None
     }
@@ -16,6 +18,9 @@ object DSLParser {
     List("all", "active", "inactive").contains(category)
 
   private def isValidEntity(entity: String): Boolean =
-    List("starlinksat", "rockets").contains(entity.toLowerCase)
+    List("starlinksat", "rocket").contains(entity.toLowerCase)
+
+  // private def isValidID(entity: String): Boolean =
+  //   List("starlinksat", "rockets").contains(entity.toLowerCase)
 }
 
