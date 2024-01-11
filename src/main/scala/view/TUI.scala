@@ -7,7 +7,7 @@ import scala.io.Source
 
 class TUI(var controller:SpaceDataController) extends TUIDSLMode {
 
-  print(printHeader())
+  printHeader()
 
   def processInput(input: String): Unit = {
     input match {
@@ -22,7 +22,7 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode {
       case "exit" => System.exit(0)
       case _ =>
         if (input.trim.isEmpty()) {
-          print(printHeader())
+          printHeader()
         } else {
           println("Incorrect input.")
         }
@@ -31,17 +31,17 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode {
 
   def showDashboard(): Unit = {
     val (dashbStarlinkVals, dashbLaunchVals) = controller.getDashboardValues()
-    print(printStarlink())
-    print(printDashboardFirstRow())
+    printStarlink()
+    printDashboardFirstRow()
     dashbStarlinkVals.foreach { case (listName, count) =>
       println(s"║ $listName, $count")
     }
-    print(printLaunches())
-    print(printDashboardFirstRow())
+    printLaunches()
+    printDashboardFirstRow()
     dashbLaunchVals.foreach { case (listName, count) =>
       println(s"║ $listName, $count")
     }
-    print(printHelpLine())
+    printHelpLine()
   }
 
   def showSpaceEntitys(entity: String): Unit = {
@@ -49,59 +49,56 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode {
     var entitylist: List[SpaceEntity] = Nil
     entity match {
       case "starlinksat" => 
-        print(printStarlink())
+        printStarlink()
         println(s"Satellites in the $slct category are displayed.")
         entitylist = controller.getStarlinkSatList(slct)
       case "rocket" =>
-        print(printRockets())
+        printRockets()
         println(s"Rockets in the $slct category are displayed.")
         entitylist = controller.getRocketList(slct)  
     }
     printListInChunks(entitylist, (entry: SpaceEntity) => entry.name, (entry: SpaceEntity) => entry.id, 15, "q")
-    print(printHelpLine())
+    printHelpLine()
   }
 
   def showLauches(): Unit = {
     val slct = scala.io.StdIn.readLine("Options - [allLaunches, succeeded, failed]: ")
-    print(printLaunches())
+    printLaunches()
     println(s"Launches in the $slct category are displayed.")
     //TODO:
     var launchlist = controller.getLauchesList(slct)
     printListInChunks(launchlist, (launch: Launch) => launch.name, (launch: Launch) => launch.id, 15, "q")
-    print(printHelpLine())
+    printHelpLine()
   }
 
   def showStarlinkSataliteDetails(): Unit = {
     val id = scala.io.StdIn.readLine("Starlink-Satelite-ID: ")
-    print(printStarlink())
-    print(printDetails())
+    printStarlink()
+    printDetails()
     println(s"Satellite details with $id are displayed.")
     var satdetails: Option[SpaceEntity] = controller.getStarlinkSatDetails(id)
     val details: String = satdetails.fold("StarlinkSat not found") { starlinkSat => starlinkSat.toString()}
     println(details)
-    print(printHelpLine())
+    printHelpLine()
   }
 
   def showLaucheDetails(): Unit = {
     val id = scala.io.StdIn.readLine("Launch-ID: ")
-    print(printLaunches())
-    print(printDetails())
+    printLaunches()
+    printDetails()
     println(s"Satellite details with $id are displayed.")
     var launchdetails: Option[Launch]= controller.getLaunchDetails(id)
     val details: String = launchdetails.fold("Launch not found") { launch => launch.toString()}
     println(details)
-    print(printHelpLine())
+    printHelpLine()
   }
 
   def printListInChunks[T](objList: List[T], attribute1Extractor: T => String, attribute2Extractor: T => String, chunkSize: Int, cancelKey: String): Unit = {
     var continuePrinting = true
-
     objList.grouped(chunkSize).foreach { chunk =>
       if (continuePrinting) {
         chunk.foreach(obj => println(s"Name: ${attribute1Extractor(obj)}, ID: ${attribute2Extractor(obj)}"))
-        
         val userInput = scala.io.StdIn.readLine(s"Press enter for the next page or '$cancelKey' to abort: ")
-        
         if (userInput.toLowerCase == cancelKey.toLowerCase) {
           continuePrinting = false
         }

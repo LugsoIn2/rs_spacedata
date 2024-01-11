@@ -2,7 +2,8 @@ package SpaceData.view
 
 object TUIStrings {
 
-  def printHeader() : String = {
+  def printHeader() : Unit = {
+    print(
     """
       |╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
       |║                  ███████ ██████   █████   ██████ ███████       ██████   █████  ████████  █████                    ║
@@ -23,9 +24,11 @@ object TUIStrings {
       |║                                                                                                                   ║
       |╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝
       |""".stripMargin
+    )
   }
 
-  def printStarlink(): String = {
+  def printStarlink(): Unit = {
+    print(
     """
       |║ ███████ ████████  █████  ██████  ██      ██ ███    ██ ██   ██     
       |║ ██         ██    ██   ██ ██   ██ ██      ██ ████   ██ ██  ██   
@@ -34,9 +37,11 @@ object TUIStrings {
       |║ ███████    ██    ██   ██ ██   ██ ███████ ██ ██   ████ ██   ██ 
       |║ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
       |""".stripMargin
+    )
   }
 
-  def printRockets(): String = {
+  def printRockets(): Unit = {
+    print(
     """
       |║ ██████   ██████   ██████ ██   ██ ███████ ████████ ███████ 
       |║ ██   ██ ██    ██ ██      ██  ██  ██         ██    ██      
@@ -45,16 +50,20 @@ object TUIStrings {
       |║ ██   ██  ██████   ██████ ██   ██ ███████    ██    ███████  
       |║ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       |""".stripMargin
+    )
   }
 
-  def printDashboardFirstRow(): String = {
+  def printDashboardFirstRow(): Unit = {
+    print(
     """
       |║ Category, Numbers                                             
       |║+---------------------+
       |""".stripMargin
+    )
   }
 
-  def printLaunches(): String = {
+  def printLaunches(): Unit = {
+    print(
     """
       |║ ██       █████  ██    ██ ███    ██  ██████ ██   ██ ███████ ███████ 
       |║ ██      ██   ██ ██    ██ ████   ██ ██      ██   ██ ██      ██      
@@ -63,9 +72,11 @@ object TUIStrings {
       |║ ███████ ██   ██  ██████  ██   ████  ██████ ██   ██ ███████ ███████ 
       |║ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
       |""".stripMargin
+      )
   }
 
-  def printDetails(): String = {
+  def printDetails(): Unit = {
+    print(
     """
       |║ ██████  ███████ ████████  █████  ██ ██      ███████ 
       |║ ██   ██ ██         ██    ██   ██ ██ ██      ██      
@@ -74,10 +85,13 @@ object TUIStrings {
       |║ ██████  ███████    ██    ██   ██ ██ ███████ ███████ 
       |║ - - - - - - - - - - - - - - - - - - - - - - - - - - -
       |""".stripMargin
+    )
   }
 
-  def printHelpLine(): String = {
+  def printHelpLine(): Unit = {
+    print(
     """Finished: press enter to show menü..."""
+    )
   }
 
 }
