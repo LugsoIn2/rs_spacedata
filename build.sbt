@@ -38,8 +38,10 @@ val dependencies = Seq(
   "org.scalatest" %% "scalatest" % "3.2.17" % Test,
   "org.scalatest" %% "scalatest" % "3.2.17",
   "org.scalatestplus" %% "mockito-5-8" % "3.2.17.0" % "test",
-  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
+  "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
+  "org.apache.kafka" % "kafka-clients" % "3.6.1"
 )
+
 
 //libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.11"
 //libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.11" % Test

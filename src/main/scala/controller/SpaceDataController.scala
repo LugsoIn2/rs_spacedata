@@ -15,6 +15,9 @@ import akka.util.Timeout
 import scala.concurrent.ExecutionContextExecutor
 import akka.actor.ActorRef
 
+import java.util.Properties
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
+
 class SpaceDataController() {
   // Actor System
   implicit val httpActorSystem: ActorSystem = ActorSystem("HttpActorSystem")
@@ -49,7 +52,22 @@ class SpaceDataController() {
         val futureEntities: Future[List[SpaceEntity]] = (httpClientActor ? GetCurrentState)
           .mapTo[List[SpaceEntity]]
           .recover { case _ => Nil }
-        Await.result(futureEntities, 10.seconds)
+        val entities = Await.result(futureEntities, 10.seconds)
+        val props = new Properties()
+        props.put("bootstrap.servers", "localhost:9092")
+        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+
+        val producer = new KafkaProducer[String, String](props)
+
+        val topic = "test-topic"
+        val message = "Hello, Kafka!"
+
+        val record = new ProducerRecord[String, String](topic, message)
+
+        producer.send(record)
+        producer.close()
+        entities
 
       case `active` =>
         Await.result(getAndFilterEntites(true, httpClientActor, entity), 10.seconds)
