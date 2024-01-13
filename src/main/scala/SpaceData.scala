@@ -1,13 +1,13 @@
 package SpaceData
 
 // SpaceData.scala
-import controller.SpaceDataController
+import controller.SpaceDataControllerConsumer
 import model.StarlinkSat
 import view.TUI
 
 object SpaceData extends App {
   // Instances MVC
-  val controller = new SpaceDataController()
+  val controller = new SpaceDataControllerConsumer()
   val tui = new TUI(controller)
 
   var userInput = ""

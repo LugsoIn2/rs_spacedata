@@ -1,12 +1,12 @@
 package SpaceData.view
 import SpaceData.view.TUIStrings._
-import SpaceData.controller.SpaceDataController
+import SpaceData.controller.SpaceDataControllerConsumer
 import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
 import SpaceData.util.dsl.{DSLParser, ShowCommand}
 import scala.io.Source
 
 
-class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers {
+class TUI(var controller:SpaceDataControllerConsumer) extends TUIDSLMode with TUIHelpers {
 
   printHeader()
 

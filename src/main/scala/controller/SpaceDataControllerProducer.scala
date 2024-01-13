@@ -26,7 +26,7 @@ import scala.collection.JavaConverters._
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
 
-class SpaceDataController() {
+class SpaceDataControllerProducer() {
   // Actor System
   implicit val httpActorSystem: ActorSystem = ActorSystem("HttpActorSystem")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
@@ -45,6 +45,8 @@ class SpaceDataController() {
   // val starlinksatlistInactive = SpaceDataStarLinkController.starlink(inactive)
 
   val launcheslist = SpaceDataLaunchController.launches(allLaunches)
+
+  def producerEntityList()
 
   def getSpaceEntitiesList(slct: String, entity: String): List[SpaceEntity] = {
     val selector = stringToSelecorSpaceEntity(slct)
