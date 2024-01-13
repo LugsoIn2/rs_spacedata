@@ -32,6 +32,7 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
       case "dsl" => enterDSLMode()  
       case "dslfile" => enterDSLModeFile()
       case "exit" => System.exit(0)
+      case "fu" => controller.testconsumer()
       case _ =>
         if (input.trim.isEmpty()) {
           printHeader()
