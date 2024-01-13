@@ -1,8 +1,8 @@
-package SpaceData.view
-import SpaceData.view.TUIStrings._
-import SpaceData.controller.SpaceDataController
-import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
-import SpaceData.util.dsl.{DSLParser, ShowCommand}
+package SpaceDataTUI.view
+import SpaceDataTUI.view.TUIStrings._
+import SpaceDataTUI.controller.SpaceDataController
+import SpaceDataTUI.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
+import SpaceDataTUI.util.dsl.{DSLParser, ShowCommand}
 import scala.io.Source
 
 
@@ -16,7 +16,7 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
       case "sl" => 
         printStarlink()
         showSpaceEntitys("starlinksat")
-      case "la" => showLauches()
+      //case "la" => showLauches()
       case "r" => 
         printRockets()
         showSpaceEntitys("rocket")
@@ -28,11 +28,11 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
         printStarlink()
         printDetails()
         showSpaceEntityDetails("starlinksat")
-      case "laid" => showLaucheDetails()
+      //case "laid" => showLaucheDetails()
       case "dsl" => enterDSLMode()  
       case "dslfile" => enterDSLModeFile()
       case "exit" => System.exit(0)
-      case "fu" => controller.testconsumer()
+      //case "fu" => controller.testconsumer()
       case _ =>
         if (input.trim.isEmpty()) {
           printHeader()
@@ -43,7 +43,7 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
   }
 
   def showDashboard(): Unit = {
-    val (dashbStarlinkVals, dashbLaunchVals, dashbRocketsVals) = controller.getDashboardValues()
+    val (dashbStarlinkVals, /*dashbLaunchVals,*/ dashbRocketsVals) = controller.getDashboardValues()
     def printValues(values: Seq[(String, Int)]): Unit = {
       printDashboardFirstRow()
       values.foreach { case (listName, count) =>
@@ -55,8 +55,8 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
     printRockets()
     printValues(dashbRocketsVals)
     printLaunches()
-    printValues(dashbLaunchVals)
-    printHelpLine()
+    //printValues(dashbLaunchVals)
+    //printHelpLine()
   }
 
   def showSpaceEntitys(entity: String): Unit = {
@@ -75,26 +75,26 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
     printHelpLine()
   }
 
-  def showLauches(): Unit = {
-    val slct = scala.io.StdIn.readLine("Options - [allLaunches, succeeded, failed]: ")
-    printLaunches()
-    println(s"Launches in the $slct category are displayed.")
-    val launchlist = controller.getLauchesList(slct)
-    printListInChunks(launchlist, (launch: Launch) => launch.name, (launch: Launch) => launch.id, 15, "q")
-    printHelpLine()
-  }
+  // def showLauches(): Unit = {
+  //   val slct = scala.io.StdIn.readLine("Options - [allLaunches, succeeded, failed]: ")
+  //   printLaunches()
+  //   println(s"Launches in the $slct category are displayed.")
+  //   val launchlist = controller.getLauchesList(slct)
+  //   printListInChunks(launchlist, (launch: Launch) => launch.name, (launch: Launch) => launch.id, 15, "q")
+  //   printHelpLine()
+  // }
 
-  def showLaucheDetails(): Unit = {
-    val id = scala.io.StdIn.readLine("Launch-ID: ")
-    printLaunches()
-    printDetails()
-    println(s"Satellite details with $id are displayed.")
-    val launchdetails: Option[Launch] = controller.getLaunchDetails(id)
-    val details: String = launchdetails.fold("Launch not found") { launch =>
-      launch.toString()
-    }
-    println(details)
-    printHelpLine()
-  }
+  // def showLaucheDetails(): Unit = {
+  //   val id = scala.io.StdIn.readLine("Launch-ID: ")
+  //   printLaunches()
+  //   printDetails()
+  //   println(s"Satellite details with $id are displayed.")
+  //   val launchdetails: Option[Launch] = controller.getLaunchDetails(id)
+  //   val details: String = launchdetails.fold("Launch not found") { launch =>
+  //     launch.toString()
+  //   }
+  //   println(details)
+  //   printHelpLine()
+  // }
 
 }

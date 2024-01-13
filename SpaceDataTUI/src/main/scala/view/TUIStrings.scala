@@ -1,4 +1,4 @@
-package SpaceData.view
+package SpaceDataTUI.view
 
 object TUIStrings {
 

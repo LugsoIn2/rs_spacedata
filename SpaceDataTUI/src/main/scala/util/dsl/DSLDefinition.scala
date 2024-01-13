@@ -1,4 +1,4 @@
-package SpaceData.util.dsl
+package SpaceDataTUI.util.dsl
 
 sealed trait DSLCommand
 case class ShowCommand(category: String, entity: String) extends DSLCommand

@@ -1,0 +1,170 @@
+// SpaceDataController.scala
+package SpaceDataTUI.controller
+import SpaceDataTUI.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
+import SpaceDataTUI.controller.{active, inactive, all}
+//import SpaceDataTUI.util.spacexApiClient._
+import akka.actor.{ActorSystem, Props}
+import akka.stream.ActorMaterializer
+import akka.stream.scaladsl._
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
+import akka.pattern.ask
+import scala.concurrent.Future
+import javax.xml.crypto.Data
+import akka.util.Timeout
+import scala.concurrent.ExecutionContextExecutor
+import akka.actor.ActorRef
+
+import java.util.Properties
+import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
+import org.json4s.DefaultFormats
+import org.json4s.native.Serialization.write
+
+
+import java.util.Properties
+import scala.collection.JavaConverters._
+import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.KafkaConsumer
+
+class SpaceDataController() {
+
+  // Actor System
+  // implicit val httpActorSystem: ActorSystem = ActorSystem("HttpActorSystem")
+  // implicit val materializer: ActorMaterializer = ActorMaterializer()
+  // implicit val executionContext: ExecutionContextExecutor = httpActorSystem.dispatcher
+  
+  // create Actors
+  // val httpClientActorStarlinkSats = httpActorSystem.actorOf(Props(new HttpClientActor))
+  // val httpClientActorRockets = httpActorSystem.actorOf(Props(new HttpClientActor))
+
+  // get data from API
+  // httpClientActorStarlinkSats ! GetSpaceEntities("/starlink")
+  // httpClientActorRockets ! GetSpaceEntities("/rockets")
+
+  //ar starlinksatlist = SpaceDataStarLinkController.starlink(all)
+  // val starlinksatlistActive = SpaceDataStarLinkController.starlink(active)
+  // val starlinksatlistInactive = SpaceDataStarLinkController.starlink(inactive)
+
+  //val launcheslist = SpaceDataLaunchController.launches(allLaunches)
+
+  def getSpaceEntitiesList(slct: String, entity: String): List[SpaceEntity] = {
+    val selector = stringToSelecorSpaceEntity(slct)
+    val result: List[SpaceEntity] = selector match {
+      case `all` => List.empty
+        //TODO KAFKA Consumer
+      case `active` => List.empty
+        //TODO KAFKA Consumer
+      case `inactive` => List.empty
+        //TODO KAFKA Consumer
+    }
+    result
+  }
+
+  // def testconsumer(): Unit{
+  //   val props = new Properties()
+  //   props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+  //   props.put(ConsumerConfig.GROUP_ID_CONFIG, "your-consumer-group-id")
+  //   props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
+  //   props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
+
+  //   val consumer = new KafkaConsumer[String, String](props)
+  //   val topic = "test-topic"
+  //   consumer.subscribe(List(topic).asJava)
+
+  //   while (true) {
+  //     import scala.concurrent.duration._
+  //     import java.time.Duration
+
+  //     val records = consumer.poll(Duration.ofMillis(100))
+  //     records.forEach(record => println(s"Received message: ${record.value()}"))
+  //   }
+  // }
+
+  def getSpaceEntitiyDetails(id: String, entity: String): Option[SpaceEntity] = {
+    val starlinksatlist = getSpaceEntitiesList("all", entity: String)
+    val foundEntitiy: Option[SpaceEntity] = findStarlinkSatById(starlinksatlist,id)
+    foundEntitiy match {
+      case Some(entry) =>
+        Some(entry)
+      case None =>
+        None
+    }
+  }
+
+  def findStarlinkSatById(entity: List[SpaceEntity], targetId: String): Option[SpaceEntity] = {
+    entity.find(_.id == targetId)
+  }
+
+
+  // def getLauchesList(slct: String): List[Launch] = {
+  //   val selector = stringToSelecorLaunch(slct)
+  //   selector match {
+  //       case `allLaunches` => {
+  //         launcheslist
+  //       } case `succeeded` => {
+  //         //TODO
+  //         launcheslist
+  //     } case `failed` => {
+  //         //TODO
+  //         launcheslist
+  //     }
+  //   }
+  // }
+
+  // def getLaunchDetails(id: String): Option[Launch] = {
+  //   val foundLaunch: Option[Launch] = findLaunchById(launcheslist,id)
+  //   foundLaunch match {
+  //     case Some(launch) =>
+  //       Some(launch)
+  //     case None =>
+  //       None
+  //   }
+  // }
+
+  def findLaunchById(lauches: List[Launch], targetId: String): Option[Launch] = {
+    lauches.find(_.id == targetId)
+  }
+
+  def getDashboardValues(): (List[(String, Int)], /*List[(String, Int)],*/ List[(String, Int)]) = {
+    val dashbStarlinkVals: List[(String, Int)] =
+      List(
+        ("all", getSpaceEntitiesList("all", "starlinksat").size),
+        ("active", getSpaceEntitiesList("active", "starlinksat").size),
+        ("inactive", getSpaceEntitiesList("inactive", "starlinksat").size)
+      )
+    val dashbRocketsVals: List[(String, Int)] =
+      List(
+        ("all", getSpaceEntitiesList("all", "rocket").size),
+        ("active", getSpaceEntitiesList("active", "rocket").size),
+        ("inactive", getSpaceEntitiesList("inactive", "rocket").size)
+      )
+    // val dashbLaunchVals: List[(String, Int)] =
+    //   List(
+    //     ("allLaunches", launcheslist.size),
+    //     ("succeeded", launcheslist.size),
+    //     ("failed", launcheslist.size)
+    //   )
+    (dashbStarlinkVals, /*dashbLaunchVals,*/ dashbRocketsVals)
+  }
+
+  def stringToSelecorSpaceEntity(slct: String): SelectorSpaceEntity = {
+      //val selector: Selector
+      slct.toLowerCase match {
+      case "all" => all: SelectorSpaceEntity
+      case "active" => active: SelectorSpaceEntity
+      case "inactive" => inactive: SelectorSpaceEntity
+      case _ => throw new IllegalArgumentException("Ungültiger SelectorSpaceEntity")
+    }
+  }
+
+  // def stringToSelecorLaunch(slct: String): SelectorLaunch = {
+  //     //val selector: Selector
+  //     slct match {
+  //     case "allLaunches" => allLaunches: SelectorLaunch
+  //     case "succeeded" => succeeded: SelectorLaunch
+  //     case "failed" => failed: SelectorLaunch
+  //     case _ => throw new IllegalArgumentException("Ungültiger SelectorLaunch")
+  //   }
+  // }
+
+}

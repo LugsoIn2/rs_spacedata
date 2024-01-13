@@ -1,4 +1,4 @@
-package SpaceData.view
+package SpaceDataTUI.view
 
 trait TUIHelpers {
   def printListInChunks[T](objList: List[T], attribute1Extractor: T => String, attribute2Extractor: T => String, chunkSize: Int, cancelKey: String): Unit = {

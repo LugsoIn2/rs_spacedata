@@ -1,11 +1,11 @@
 // // DSLHandler.scala
-package SpaceData.view
+package SpaceDataTUI.view
 
-import SpaceData.model.SpaceEntity
-import SpaceData.util.dsl.{DSLParser, ShowCommand}
+import SpaceDataTUI.model.SpaceEntity
+import SpaceDataTUI.util.dsl.{DSLParser, ShowCommand}
 import scala.io.Source
-import SpaceData.view.TUIStrings._
-import SpaceData.util.dsl.DetailCommand
+import SpaceDataTUI.view.TUIStrings._
+import SpaceDataTUI.util.dsl.DetailCommand
 trait TUIDSLMode {
 
   this: TUI =>

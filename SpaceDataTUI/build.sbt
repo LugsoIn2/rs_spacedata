@@ -67,10 +67,10 @@ val dependencies = Seq(
 lazy val root = project
   .in(file("."))
   .settings(
-    name := "rs_spacedata",
+    name := "SpaceDataTUI",
     version := "1.0",
     scalaVersion :=  "2.13.12",
-    organization := "de.htwg.rs_spacedata",
+    organization := "de.htwg.rs_spacedata.SpaceDataTUI",
     libraryDependencies ++= dependencies,
     resolvers += "Akka library repository".at("https://repo.akka.io/maven"),
     scalacOptions ++= Seq(

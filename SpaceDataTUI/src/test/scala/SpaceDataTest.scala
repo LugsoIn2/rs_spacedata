@@ -1,4 +1,4 @@
-package SpaceData
+package SpaceDataTUI
 
 import controller.SpaceDataController
 import view.TUI

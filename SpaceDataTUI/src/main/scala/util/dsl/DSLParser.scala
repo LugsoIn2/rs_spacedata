@@ -1,4 +1,4 @@
-package SpaceData.util.dsl
+package SpaceDataTUI.util.dsl
 
 object DSLParser {
   def parseCommand(input: String): Option[DSLCommand] = {
