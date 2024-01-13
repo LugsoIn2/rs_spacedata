@@ -17,8 +17,9 @@ import akka.actor.ActorRef
 
 import java.util.Properties
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
-import org.json4s.DefaultFormats
-import org.json4s.native.Serialization.write
+
+import io.circe._
+import io.circe.parser._
 
 
 import java.util.Properties
@@ -46,9 +47,9 @@ class SpaceDataControllerProducer() {
 
   val launcheslist = SpaceDataLaunchController.launches(allLaunches)
 
-  def producerEntityList()
+  //def producerEntityList()
 
-  def getSpaceEntitiesList(slct: String, entity: String): List[SpaceEntity] = {
+  def produceSpaceEntitiesList(slct: String, entity: String)/*: List[SpaceEntity]*/ = {
     val selector = stringToSelecorSpaceEntity(slct)
     implicit val timeout: Timeout = Timeout(10.seconds)
     val httpClientActor = entity match {
@@ -85,35 +86,19 @@ class SpaceDataControllerProducer() {
           .mapTo[List[SpaceEntity]]
           .recover { case _ => Nil }
         val entities = Await.result(futureEntities, 10.seconds)
-
-        // Kafka Configuration
-        val props = new Properties()
-        props.put("bootstrap.servers", "localhost:9092")
-        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-
-        val producer = new KafkaProducer[String, String](props)
-
-        // Print JSON data before sending to Kafka
-        implicit val formats: DefaultFormats.type = DefaultFormats
-        entities.foreach { entity =>
-          val jsonMessage = write(entity)
-          println(s"JSON Message: $jsonMessage")  // Print JSON data
-          
-          val topic = "test-topic"
-          val record = new ProducerRecord[String, String](topic, jsonMessage)
-          producer.send(record)
-        }
-
-        producer.close()
+        produceEntities(entities, "starlinksats-all")
         entities
 
       
       case `active` =>
-        Await.result(getAndFilterEntites(true, httpClientActor, entity), 10.seconds)
+        val entities = Await.result(getAndFilterEntites(true, httpClientActor, entity), 10.seconds)
+        produceEntities(entities, "starlinksats-aactive")
+        entities
 
       case `inactive` =>
-        Await.result(getAndFilterEntites(false, httpClientActor, entity), 10.seconds)
+        val entities = Await.result(getAndFilterEntites(false, httpClientActor, entity), 10.seconds)
+        produceEntities(entities, "starlinksats-inactive")
+        entities
     }
 
     result
@@ -141,6 +126,27 @@ class SpaceDataControllerProducer() {
       .map(_.flatten.toList)
   }
 
+  def produceEntities(entities: List[SpaceEntity], topicName: String): Unit = {
+    // Kafka Configuration
+    val props = new Properties()
+    props.put("bootstrap.servers", "localhost:9092")
+    props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+    props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+
+    val producer = new KafkaProducer[String, String](props)
+
+    // Print JSON data before sending to Kafka
+    var entitiesList: List[String] = List.empty
+    entities.foreach { entity =>
+      entitiesList = entitiesList :+ entity.toString()
+    }
+    val message: String = entitiesList.mkString("[\"", "\",\"", "\"]")
+    val record = new ProducerRecord[String, String](topicName, message)
+    producer.send(record)
+
+    producer.close()
+  }
+
 
   def testconsumer(){
     val props = new Properties()
@@ -162,16 +168,6 @@ class SpaceDataControllerProducer() {
     }
   }
 
-  def getSpaceEntitiyDetails(id: String, entity: String): Option[SpaceEntity] = {
-    val starlinksatlist = getSpaceEntitiesList("all", entity: String)
-    val foundEntitiy: Option[SpaceEntity] = findStarlinkSatById(starlinksatlist,id)
-    foundEntitiy match {
-      case Some(entry) =>
-        Some(entry)
-      case None =>
-        None
-    }
-  }
 
   def findStarlinkSatById(entity: List[SpaceEntity], targetId: String): Option[SpaceEntity] = {
     entity.find(_.id == targetId)
@@ -205,28 +201,6 @@ class SpaceDataControllerProducer() {
 
   def findLaunchById(lauches: List[Launch], targetId: String): Option[Launch] = {
     lauches.find(_.id == targetId)
-  }
-
-  def getDashboardValues(): (List[(String, Int)], List[(String, Int)], List[(String, Int)]) = {
-    val dashbStarlinkVals: List[(String, Int)] =
-      List(
-        ("all", getSpaceEntitiesList("all", "starlinksat").size),
-        ("active", getSpaceEntitiesList("active", "starlinksat").size),
-        ("inactive", getSpaceEntitiesList("inactive", "starlinksat").size)
-      )
-    val dashbRocketsVals: List[(String, Int)] =
-      List(
-        ("all", getSpaceEntitiesList("all", "rocket").size),
-        ("active", getSpaceEntitiesList("active", "rocket").size),
-        ("inactive", getSpaceEntitiesList("inactive", "rocket").size)
-      )
-    val dashbLaunchVals: List[(String, Int)] =
-      List(
-        ("allLaunches", launcheslist.size),
-        ("succeeded", launcheslist.size),
-        ("failed", launcheslist.size)
-      )
-    (dashbStarlinkVals, dashbLaunchVals, dashbRocketsVals)
   }
 
   def stringToSelecorSpaceEntity(slct: String): SelectorSpaceEntity = {
