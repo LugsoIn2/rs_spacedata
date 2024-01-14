@@ -1,8 +1,9 @@
 package SpaceData.model
 
 import SpaceData.model.SpaceEntity
-
-case class StarlinkSat( 
+import play.api.libs.json._
+case class StarlinkSat(
+    entityType: String,
     name: String,
     id: String,
     launchDate: String,
@@ -21,8 +22,9 @@ case class StarlinkSat(
     }
 
 object StarlinkSat {
-  def apply(name: String, id: String, launchDate: String, period: Double, height: Double, latitude: Double, longitude: Double, earthRevolutions: Int, decayed: Int): StarlinkSat = {
+  def apply(entityType: String, name: String, id: String, launchDate: String, period: Double, height: Double, latitude: Double, longitude: Double, earthRevolutions: Int, decayed: Int): StarlinkSat = {
     val active = decayed != 1
-    new StarlinkSat(name, id, launchDate, period, height, latitude, longitude, earthRevolutions, decayed, active)
+    new StarlinkSat(entityType, name, id, launchDate, period, height, latitude, longitude, earthRevolutions, decayed, active)
   }
+  implicit val starlinkSatFormat: Format[StarlinkSat] = Json.format[StarlinkSat]
 }

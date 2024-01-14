@@ -21,6 +21,14 @@ import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import io.circe._
 import io.circe.parser._
 
+import play.api.libs.json.{Json, Writes}
+
+
+import org.json4s._
+import org.json4s.native.Serialization._
+
+
+
 
 import java.util.Properties
 import scala.collection.JavaConverters._
@@ -53,17 +61,17 @@ class SpaceDataControllerProducer() {
       .recover { case _ => Nil }
     produceEntities(Await.result(futureStarlinkSatsAll, 10.seconds), "starlinksats-all")
 
-    println("futureStarlinkSatsAll")
+    //println("futureStarlinkSatsAll")
 
     val starlinkSatsActive = Await.result(getAndFilterEntites(true, httpClientActorStarlinkSats, "starlinksat"), 10.seconds)
     produceEntities(starlinkSatsActive, "starlinksats-active")
 
-    println("starlinkSatsActive")
+    //println("starlinkSatsActive")
 
     val starlinkSatsInactive = Await.result(getAndFilterEntites(false, httpClientActorStarlinkSats, "starlinksat"), 10.seconds)
     produceEntities(starlinkSatsInactive, "starlinksats-inactive")
 
-    println("starlinkSatsInActive")
+    //println("starlinkSatsInActive")
 
     // Rockets
     val futureRocketsAll: Future[List[SpaceEntity]] = (httpClientActorRockets ? GetCurrentState)
@@ -134,7 +142,7 @@ class SpaceDataControllerProducer() {
   }
 
   def produceEntities(entities: List[SpaceEntity], topicName: String): Unit = {
-    println("produceEntities")
+    //println("produceEntities")
     // Kafka Configuration
     val props = new Properties()
     props.put("bootstrap.servers", "localhost:9092")
@@ -144,11 +152,16 @@ class SpaceDataControllerProducer() {
     val producer = new KafkaProducer[String, String](props)
 
     // Print JSON data before sending to Kafka
+    implicit val formats: DefaultFormats.type = DefaultFormats
     var entitiesList: List[String] = List.empty
     entities.foreach { entity =>
-      entitiesList = entitiesList :+ entity.toString()
+      //entitiesList = entitiesList :+ entity.toString()
+      entitiesList = entitiesList :+ write(entity)
+
     }
-    val message: String = entitiesList.mkString("[\"", "\",\"", "\"]")
+    //val message: String = entitiesList.mkString("[\"", "\",\"", "\"]")
+    val message: String = entitiesList.mkString("[", ",", "]")
+
     val record = new ProducerRecord[String, String](topicName, message)
     producer.send(record)
 

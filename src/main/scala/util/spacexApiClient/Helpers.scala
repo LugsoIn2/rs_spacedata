@@ -16,7 +16,7 @@ object  Helpers {
         parsedJson match {
             case Right(json) =>
                 val items: List[Json] = json.asArray.getOrElse(Vector.empty).toList
-                println(s"Found ${items.length} items")
+                //println(s"Found ${items.length} items")
                 return items
 
             case Left(error) =>

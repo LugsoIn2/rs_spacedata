@@ -17,14 +17,23 @@ import akka.actor.ActorRef
 
 import java.util.Properties
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
-import org.json4s.DefaultFormats
-import org.json4s.native.Serialization.write
+// import org.json4s.DefaultFormats._
+// import org.json4s.native.Serialization.write
+// import org.json4s._
+// import org.json4s.native.JsonMethods._
+// import org.json4s.native.Serialization.read
 
+import play.api.libs.json._
 
 import java.util.Properties
 import scala.collection.JavaConverters._
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
+import scala.concurrent.duration._
+import java.time.Duration
+import org.apache.kafka.clients.consumer.ConsumerRecord
+
+
 
 class SpaceDataControllerConsumer() {
   // Actor System
@@ -45,8 +54,84 @@ class SpaceDataControllerConsumer() {
   // val starlinksatlistInactive = SpaceDataStarLinkController.starlink(inactive)
 
   val launcheslist = SpaceDataLaunchController.launches(allLaunches)
+  var deserializedEntities: List[SpaceEntity] = List.empty
 
-  //def producerEntityList()
+
+  val consumerLoopFuture: Future[Unit] = Future {
+      consumeFromKafka("rockets-all")
+    }
+  
+
+  def consumeFromKafka(topicName: String): Unit = {
+    // Kafka Configuration
+    val props = new Properties()
+    props.put("bootstrap.servers", "localhost:9092")
+    props.put("group.id", "space-data-group") // Use a unique group id for the consumer
+    props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")
+    props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")
+
+    val consumer = new KafkaConsumer[String, String](props)
+
+    //var deserializedEntities: List[SpaceEntity] = List.empty
+
+    // Subscribe to the topic
+    consumer.subscribe(List(topicName).asJava)
+
+    try {
+      while (true) {
+        val records = consumer.poll(Duration.ofMillis(100))
+        records.forEach(record => 
+          //println(s"Received message: ${record.value()}")
+          processRecord(record)
+        )
+      }
+    } finally {
+      consumer.close()
+    }
+  }
+
+
+  // def processRecord(record: ConsumerRecord[String, String]): Unit = {
+  //   println(s"Processing record: ${record.value()}")
+  // }
+
+  def processRecord(record: ConsumerRecord[String, String]): Unit = {
+  println(s"Processing record: ${record.value()}")
+  deserializedEntities = List.empty
+  val json = Json.parse(record.value())
+
+  json.validate[SpaceEntity] match {
+    case JsSuccess(spaceEntity, _) =>
+      // Hier haben Sie das deserialisierte SpaceEntity-Objekt
+      println(s"Deserialized SpaceEntity: $spaceEntity")
+      // Fügen Sie das deserialisierte Objekt zu Ihrer Liste hinzu oder tun Sie, was immer Sie benötigen.
+      deserializedEntities = deserializedEntities :+ spaceEntity
+    case JsError(errors) =>
+      println(s"Error parsing JSON: $errors")
+  }
+}
+
+
+
+  //   def  consumerLoop(){
+  //   val props = new Properties()
+  //   props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+  //   props.put(ConsumerConfig.GROUP_ID_CONFIG, "your-consumer-group-id")
+  //   props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
+  //   props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
+
+  //   val consumer = new KafkaConsumer[String, String](props)
+  //   val topic = "rockets-all"
+  //   consumer.subscribe(List(topic).asJava)
+
+  //   while (true) {
+  //     val records = consumer.poll(Duration.ofMillis(100))
+  //     records.forEach(record => println(s"Received message: ${record.value()}"))
+  //     //println(s"consumed $records.length")
+  //   }
+  // }
+
+
 
   def getSpaceEntitiesList(slct: String, entity: String): List[SpaceEntity] = {
     val selector = stringToSelecorSpaceEntity(slct)
@@ -95,15 +180,15 @@ class SpaceDataControllerConsumer() {
         val producer = new KafkaProducer[String, String](props)
 
         // Print JSON data before sending to Kafka
-        implicit val formats: DefaultFormats.type = DefaultFormats
-        entities.foreach { entity =>
-          val jsonMessage = write(entity)
-          println(s"JSON Message: $jsonMessage")  // Print JSON data
+        // implicit val formats: DefaultFormats.type = DefaultFormats
+        // entities.foreach { entity =>
+        //   val jsonMessage = write(entity)
+        //   println(s"JSON Message: $jsonMessage")  // Print JSON data
           
-          val topic = "test-topic"
-          val record = new ProducerRecord[String, String](topic, jsonMessage)
-          producer.send(record)
-        }
+        //   val topic = "test-topic"
+        //   val record = new ProducerRecord[String, String](topic, jsonMessage)
+        //   producer.send(record)
+        // }
 
         producer.close()
         entities
@@ -154,9 +239,6 @@ class SpaceDataControllerConsumer() {
     consumer.subscribe(List(topic).asJava)
 
     while (true) {
-      import scala.concurrent.duration._
-      import java.time.Duration
-
       val records = consumer.poll(Duration.ofMillis(100))
       records.forEach(record => println(s"Received message: ${record.value()}"))
     }

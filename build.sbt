@@ -41,6 +41,9 @@ val dependencies = Seq(
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
   "org.apache.kafka" % "kafka-clients" % "3.6.1",
   "org.json4s" %% "json4s-native" % "3.6.11",
+  "io.circe" %% "circe-core" % "0.14.6",
+  "io.circe" %% "circe-parser" % "0.14.6",
+  "org.playframework" %% "play-json" % "3.0.1",
   //"com.typesafe.scala-logging" %% "scala-logging" % "3.9.5"
   //  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5", 
   //  "ch.qos.logback" % "logback-classic" % "1.4.7",
