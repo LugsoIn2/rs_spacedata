@@ -68,7 +68,7 @@ object SpaceData extends App {
 
   // Instances MVC
   val controller = new SpaceDataControllerConsumer()
-  controller.consumeOnce()
+  //controller.consumeOnce()
   val tui = new TUI(controller)
 
   var userInput = ""
