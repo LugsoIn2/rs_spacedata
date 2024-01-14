@@ -32,7 +32,7 @@ class TUI(var controller:SpaceDataControllerConsumer) extends TUIDSLMode with TU
       case "dsl" => enterDSLMode()  
       case "dslfile" => enterDSLModeFile()
       case "exit" => System.exit(0)
-      //case "fu" => controller.consumeOnce()
+      //case "fu" => mallurge()
       //case "fu2" => controller.consumerLoop()
       case _ =>
         if (input.trim.isEmpty()) {
@@ -42,6 +42,10 @@ class TUI(var controller:SpaceDataControllerConsumer) extends TUIDSLMode with TU
         }
     }
   }
+
+  // def mallurge(): Unit = {
+  //   printListInChunks(controller.rocketsAll, (entry: SpaceEntity) => entry.name, (entry: SpaceEntity) => entry.id, 15, "q")
+  // }
 
   def showDashboard(): Unit = {
     val (dashbStarlinkVals, dashbLaunchVals, dashbRocketsVals) = controller.getDashboardValues()

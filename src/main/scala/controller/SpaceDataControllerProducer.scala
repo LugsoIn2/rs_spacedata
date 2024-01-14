@@ -107,7 +107,7 @@ class SpaceDataControllerProducer() {
       
       case `active` =>
         val entities = Await.result(getAndFilterEntites(true, httpClientActor, entity), 10.seconds)
-        produceEntities(entities, "starlinksats-aactive")
+        produceEntities(entities, "starlinksats-active")
         entities
 
       case `inactive` =>

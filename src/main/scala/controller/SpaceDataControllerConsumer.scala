@@ -17,11 +17,9 @@ import akka.actor.ActorRef
 
 import java.util.Properties
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
-// import org.json4s.DefaultFormats._
-// import org.json4s.native.Serialization.write
-// import org.json4s._
-// import org.json4s.native.JsonMethods._
-// import org.json4s.native.Serialization.read
+
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import play.api.libs.json._
 
@@ -36,31 +34,33 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 
 
 class SpaceDataControllerConsumer() {
-  // Actor System
-  implicit val httpActorSystem: ActorSystem = ActorSystem("HttpActorSystem")
-  implicit val materializer: ActorMaterializer = ActorMaterializer()
-  implicit val executionContext: ExecutionContextExecutor = httpActorSystem.dispatcher
-  
-  // create Actors
-  val httpClientActorStarlinkSats = httpActorSystem.actorOf(Props(new HttpClientActor))
-  val httpClientActorRockets = httpActorSystem.actorOf(Props(new HttpClientActor))
-
-  // get data from API
-  httpClientActorStarlinkSats ! GetSpaceEntities("/starlink")
-  httpClientActorRockets ! GetSpaceEntities("/rockets")
-
-  //ar starlinksatlist = SpaceDataStarLinkController.starlink(all)
-  // val starlinksatlistActive = SpaceDataStarLinkController.starlink(active)
-  // val starlinksatlistInactive = SpaceDataStarLinkController.starlink(inactive)
-
   val launcheslist = SpaceDataLaunchController.launches(allLaunches)
-  var deserializedEntities: List[SpaceEntity] = List.empty
-
-
-  val consumerLoopFuture: Future[Unit] = Future {
+  //var deserializedEntities: List[SpaceEntity] = List.empty
+  var rocketslistAll: List[SpaceEntity] = List.empty
+  val rocketslistAllFuture: Future[Unit] = Future {
       consumeFromKafka("rockets-all")
     }
-  
+  var rocketslisActive: List[SpaceEntity] = List.empty
+  val rocketslisActiveFuture: Future[Unit] = Future {
+      consumeFromKafka("rockets-active")
+    }
+  var rocketslisInactive: List[SpaceEntity] = List.empty
+  val rocketslisInactiveFuture: Future[Unit] = Future {
+      consumeFromKafka("rockets-inactive")
+    }
+  var starlinksatlistAll: List[SpaceEntity] = List.empty
+  // val starlinksatlistAllFuture: Future[Unit] = Future {
+  //     consumeFromKafka("starlinksats-all")
+  //   }
+    var starlinksatlistActive: List[SpaceEntity] = List.empty
+  // val starlinksatlistActiveFuture: Future[Unit] = Future {
+  //     consumeFromKafka("starlinksats-active")
+  //   }
+  var starlinksatlistInactive: List[SpaceEntity] = List.empty
+  // val starlinksatlistInactiveFuture: Future[Unit] = Future {
+  //     consumeFromKafka("starlinksats-inactive")
+  //   }
+
 
   def consumeFromKafka(topicName: String): Unit = {
     // Kafka Configuration
@@ -72,17 +72,18 @@ class SpaceDataControllerConsumer() {
 
     val consumer = new KafkaConsumer[String, String](props)
 
-    //var deserializedEntities: List[SpaceEntity] = List.empty
+    var deserializedEntities: List[SpaceEntity] = List.empty
 
     // Subscribe to the topic
     consumer.subscribe(List(topicName).asJava)
 
     try {
+      //var deserializedEntities: List[SpaceEntity] = List.empty
       while (true) {
         val records = consumer.poll(Duration.ofMillis(100))
         records.forEach(record => 
           //println(s"Received message: ${record.value()}")
-          processRecord(record)
+         processRecord(record, topicName)
         )
       }
     } finally {
@@ -90,159 +91,80 @@ class SpaceDataControllerConsumer() {
     }
   }
 
+  def processRecord(record: ConsumerRecord[String, String],listidentifier: String): Unit= {
+    //println(s"Processing record: ${record.value()}")
+    val json = Json.parse(record.value())
+    var deserializedEntities: List[SpaceEntity] = List.empty
+    //println(s"Parsed JSON: $json")
 
-  // def processRecord(record: ConsumerRecord[String, String]): Unit = {
-  //   println(s"Processing record: ${record.value()}")
-  // }
-
-  def processRecord(record: ConsumerRecord[String, String]): Unit = {
-  println(s"Processing record: ${record.value()}")
-  deserializedEntities = List.empty
-  val json = Json.parse(record.value())
-
-  json.validate[SpaceEntity] match {
-    case JsSuccess(spaceEntity, _) =>
-      // Hier haben Sie das deserialisierte SpaceEntity-Objekt
-      println(s"Deserialized SpaceEntity: $spaceEntity")
-      // Fügen Sie das deserialisierte Objekt zu Ihrer Liste hinzu oder tun Sie, was immer Sie benötigen.
-      deserializedEntities = deserializedEntities :+ spaceEntity
-    case JsError(errors) =>
-      println(s"Error parsing JSON: $errors")
+    json.validate[List[SpaceEntity]] match {
+      case JsSuccess(spaceEntities, _) =>
+        // Hier haben Sie die deserialisierte Liste von SpaceEntity-Objekten
+        spaceEntities.foreach { spaceEntity =>
+          //println(s"Deserialized SpaceEntity: $spaceEntity")
+          deserializedEntities = deserializedEntities :+ spaceEntity
+        }
+        updateGlobalLists(deserializedEntities, listidentifier)
+      case JsError(errors) =>
+        println(s"Error parsing JSON: $errors")
+        deserializedEntities
+    }
   }
-}
 
 
 
-  //   def  consumerLoop(){
-  //   val props = new Properties()
-  //   props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
-  //   props.put(ConsumerConfig.GROUP_ID_CONFIG, "your-consumer-group-id")
-  //   props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
-  //   props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
-
-  //   val consumer = new KafkaConsumer[String, String](props)
-  //   val topic = "rockets-all"
-  //   consumer.subscribe(List(topic).asJava)
-
-  //   while (true) {
-  //     val records = consumer.poll(Duration.ofMillis(100))
-  //     records.forEach(record => println(s"Received message: ${record.value()}"))
-  //     //println(s"consumed $records.length")
-  //   }
-  // }
-
+  def updateGlobalLists(deserializedEntities: List[SpaceEntity], listidentifier: String): Unit = {
+    listidentifier match {
+      case "rockets-all" => 
+        rocketslistAll = deserializedEntities
+      case "rockets-active" => 
+        rocketslisActive = deserializedEntities
+      case "rockets-inactive" => 
+        rocketslisInactive= deserializedEntities
+      case "starlinksats-all" => 
+        starlinksatlistAll = deserializedEntities
+      case "starlinksats-active" => 
+        starlinksatlistActive = deserializedEntities
+      case "starlinksats-inactive" => 
+        starlinksatlistInactive = deserializedEntities
+    }
+  }
 
 
   def getSpaceEntitiesList(slct: String, entity: String): List[SpaceEntity] = {
     val selector = stringToSelecorSpaceEntity(slct)
-    implicit val timeout: Timeout = Timeout(10.seconds)
-    val httpClientActor = entity match {
-      case "starlinksat" => httpClientActorStarlinkSats
-      case "rocket" => httpClientActorRockets
+    val EntityList = entity match {
+      case "starlinksat" => getRocketList(selector)
+      case "rocket" => getRocketList(selector)
       case _ => throw new IllegalArgumentException(s"Unsupported entity type: $entity")
     }
+    EntityList
+  }
 
+  def getRocketList(selector: SelectorSpaceEntity): List[SpaceEntity] = {
     val result: List[SpaceEntity] = selector match {
-      // case `all` =>
-      //   val futureEntities: Future[List[SpaceEntity]] = (httpClientActor ? GetCurrentState)
-      //     .mapTo[List[SpaceEntity]]
-      //     .recover { case _ => Nil }
-      //   val entities = Await.result(futureEntities, 10.seconds)
-      //   val props = new Properties()
-      //   props.put("bootstrap.servers", "localhost:9092")
-      //   props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-      //   props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-
-      //   val producer = new KafkaProducer[String, String](props)
-
-      //   val topic = "test-topic"
-      //   val message = "Hello, Kafka!"
-
-      //   val record = new ProducerRecord[String, String](topic, message)
-
-      //   producer.send(record)
-      //   producer.close()
-      //   entities
-
-
       case `all` =>
-        val futureEntities: Future[List[SpaceEntity]] = (httpClientActor ? GetCurrentState)
-          .mapTo[List[SpaceEntity]]
-          .recover { case _ => Nil }
-        val entities = Await.result(futureEntities, 10.seconds)
-
-        // Kafka Configuration
-        val props = new Properties()
-        props.put("bootstrap.servers", "localhost:9092")
-        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-
-        val producer = new KafkaProducer[String, String](props)
-
-        // Print JSON data before sending to Kafka
-        // implicit val formats: DefaultFormats.type = DefaultFormats
-        // entities.foreach { entity =>
-        //   val jsonMessage = write(entity)
-        //   println(s"JSON Message: $jsonMessage")  // Print JSON data
-          
-        //   val topic = "test-topic"
-        //   val record = new ProducerRecord[String, String](topic, jsonMessage)
-        //   producer.send(record)
-        // }
-
-        producer.close()
-        entities
-
-      
+        rocketslistAll
       case `active` =>
-        Await.result(getAndFilterEntites(true, httpClientActor, entity), 10.seconds)
-
+        rocketslisActive
       case `inactive` =>
-        Await.result(getAndFilterEntites(false, httpClientActor, entity), 10.seconds)
+        rocketslisInactive
     }
-
     result
   }
 
-  def getAndFilterEntites(isActive: Boolean, httpClientActor: ActorRef, entityType: String): Future[List[SpaceEntity]] = {
-    implicit val timeout: Timeout = Timeout(10.seconds)
-    Source.single(())
-      .mapAsync(1)(_ => httpClientActor ? GetCurrentState)
-      .map { data =>
-        val instances = data.asInstanceOf[List[SpaceEntity]]
-        entityType match {
-          case "starlinksat" =>
-            if (isActive) instances.collect { case sat: StarlinkSat if sat.active => sat }
-            else instances.collect { case sat: StarlinkSat if !sat.active => sat }
-
-          case "rocket" =>
-            if (isActive) instances.collect { case rocket: Rocket if rocket.active => rocket }
-            else instances.collect { case rocket: Rocket if !rocket.active => rocket }
-
-          case _ => Nil // Handle other types or provide a default case
-        }
-      }
-      .runWith(Sink.seq)
-      .map(_.flatten.toList)
-  }
-
-
-  def testconsumer(){
-    val props = new Properties()
-    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
-    props.put(ConsumerConfig.GROUP_ID_CONFIG, "your-consumer-group-id")
-    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
-    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
-
-    val consumer = new KafkaConsumer[String, String](props)
-    val topic = "test-topic"
-    consumer.subscribe(List(topic).asJava)
-
-    while (true) {
-      val records = consumer.poll(Duration.ofMillis(100))
-      records.forEach(record => println(s"Received message: ${record.value()}"))
+  def getStarlinkList(selector: SelectorSpaceEntity): List[SpaceEntity] = {
+    val result: List[SpaceEntity] = selector match {
+      case `all` =>
+        starlinksatlistAll
+      case `active` =>
+        starlinksatlistActive
+      case `inactive` =>
+        starlinksatlistInactive
     }
+    result
   }
+
 
   def getSpaceEntitiyDetails(id: String, entity: String): Option[SpaceEntity] = {
     val starlinksatlist = getSpaceEntitiesList("all", entity: String)

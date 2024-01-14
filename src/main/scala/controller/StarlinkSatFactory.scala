@@ -33,7 +33,7 @@ object StarlinkSatFactory {
 
     def createInstance(json: io.circe.Json): StarlinkSat = {
         val starlinkSat = StarlinkSat(
-            entityType = "starlinksat",
+            entityType = "StarlinkSat",
             name = json.hcursor.downField("spaceTrack").downField("OBJECT_NAME").as[String].getOrElse("Unknown"),
             id = json.hcursor.downField("id").as[String].getOrElse("Unknown"),
             launchDate = json.hcursor.downField("spaceTrack").downField("LAUNCH_DATE").as[String].getOrElse("Unknown"),
