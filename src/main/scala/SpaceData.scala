@@ -10,38 +10,36 @@ object SpaceData extends App {
   // Creating and starting a new thread using java.lang.Thread
   val thread = new Thread(new Runnable {
     def run(): Unit = {
+      println("run producer")
       val controllerProducer = new SpaceDataControllerProducer()
-      // Code to be executed in the new thread
-      controllerProducer.produceSpaceEntitiesList("all", "starlinksat")
-      println("all StarlinkSats produced")
-      controllerProducer.produceSpaceEntitiesList("active", "starlinksat")
-      println("active StarlinkSats produced")
-      controllerProducer.produceSpaceEntitiesList("inactive", "starlinksat")
-      println("inactive StarlinkSats produced")
-      //Thread.sleep(500)
+      while(Thread.currentThread().isAlive) {
+        controllerProducer.producerLoop()
+        Thread.sleep(5000)
+      }
     }
   })
 
   thread.start()
-
-  // Code in the main thread
-  for (i <- 1 to 5) {
-    println(s"Main: $i")
-    Thread.sleep(500)
-  }
-
+  
   // Wait for the new thread to finish
-  thread.join()
+  //thread.join()
+  
 
+  println("producerLoop started. Let's start the consumerLoop.")
+  val consumer = new SpaceDataControllerProducer()
+  consumer.consumerLoop()
+
+  thread.interrupt()
 
   // Instances MVC
-  val controller = new SpaceDataControllerConsumer()
+  /*val controller = new SpaceDataControllerConsumer()
   val tui = new TUI(controller)
 
   var userInput = ""
   while (userInput != "exit") {
     userInput = tui.getUserInput()
     tui.processInput(userInput)
-  }
+  }*/
 
 }
+

@@ -46,7 +46,7 @@ class SpaceDataControllerConsumer() {
 
   val launcheslist = SpaceDataLaunchController.launches(allLaunches)
 
-  def producerEntityList()
+  //def producerEntityList()
 
   def getSpaceEntitiesList(slct: String, entity: String): List[SpaceEntity] = {
     val selector = stringToSelecorSpaceEntity(slct)

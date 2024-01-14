@@ -37,17 +37,46 @@ class SpaceDataControllerProducer() {
   val httpClientActorStarlinkSats = httpActorSystem.actorOf(Props(new HttpClientActor))
   val httpClientActorRockets = httpActorSystem.actorOf(Props(new HttpClientActor))
 
-  // get data from API
-  httpClientActorStarlinkSats ! GetSpaceEntities("/starlink")
-  httpClientActorRockets ! GetSpaceEntities("/rockets")
+  def producerLoop() = {
 
-  //ar starlinksatlist = SpaceDataStarLinkController.starlink(all)
-  // val starlinksatlistActive = SpaceDataStarLinkController.starlink(active)
-  // val starlinksatlistInactive = SpaceDataStarLinkController.starlink(inactive)
+    println("producerLoop")
 
-  val launcheslist = SpaceDataLaunchController.launches(allLaunches)
+    // get data from API
+    httpClientActorStarlinkSats ! GetSpaceEntities("/starlink")
+    httpClientActorRockets ! GetSpaceEntities("/rockets")
+    
+    implicit val timeout: Timeout = Timeout(10.seconds)
 
-  //def producerEntityList()
+    // StarlinkSats
+    val futureStarlinkSatsAll: Future[List[SpaceEntity]] = (httpClientActorStarlinkSats ? GetCurrentState)
+      .mapTo[List[SpaceEntity]]
+      .recover { case _ => Nil }
+    produceEntities(Await.result(futureStarlinkSatsAll, 10.seconds), "starlinksats-all")
+
+    println("futureStarlinkSatsAll")
+
+    val starlinkSatsActive = Await.result(getAndFilterEntites(true, httpClientActorStarlinkSats, "starlinksat"), 10.seconds)
+    produceEntities(starlinkSatsActive, "starlinksats-active")
+
+    println("starlinkSatsActive")
+
+    val starlinkSatsInactive = Await.result(getAndFilterEntites(false, httpClientActorStarlinkSats, "starlinksat"), 10.seconds)
+    produceEntities(starlinkSatsInactive, "starlinksats-inactive")
+
+    println("starlinkSatsInActive")
+
+    // Rockets
+    val futureRocketsAll: Future[List[SpaceEntity]] = (httpClientActorRockets ? GetCurrentState)
+      .mapTo[List[SpaceEntity]]
+      .recover { case _ => Nil }
+    produceEntities(Await.result(futureRocketsAll, 10.seconds), "rockets-all")
+
+    val rocketsActive = Await.result(getAndFilterEntites(true, httpClientActorRockets, "rocket"), 10.seconds)
+    produceEntities(rocketsActive, "rockets-active")
+
+    val rocketsInactive = Await.result(getAndFilterEntites(false, httpClientActorRockets, "rocket"), 10.seconds)
+    produceEntities(rocketsInactive, "rockets-inactive")
+  }
 
   def produceSpaceEntitiesList(slct: String, entity: String)/*: List[SpaceEntity]*/ = {
     val selector = stringToSelecorSpaceEntity(slct)
@@ -59,27 +88,6 @@ class SpaceDataControllerProducer() {
     }
 
     val result: List[SpaceEntity] = selector match {
-      // case `all` =>
-      //   val futureEntities: Future[List[SpaceEntity]] = (httpClientActor ? GetCurrentState)
-      //     .mapTo[List[SpaceEntity]]
-      //     .recover { case _ => Nil }
-      //   val entities = Await.result(futureEntities, 10.seconds)
-      //   val props = new Properties()
-      //   props.put("bootstrap.servers", "localhost:9092")
-      //   props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-      //   props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer")
-
-      //   val producer = new KafkaProducer[String, String](props)
-
-      //   val topic = "test-topic"
-      //   val message = "Hello, Kafka!"
-
-      //   val record = new ProducerRecord[String, String](topic, message)
-
-      //   producer.send(record)
-      //   producer.close()
-      //   entities
-
 
       case `all` =>
         val futureEntities: Future[List[SpaceEntity]] = (httpClientActor ? GetCurrentState)
@@ -88,7 +96,6 @@ class SpaceDataControllerProducer() {
         val entities = Await.result(futureEntities, 10.seconds)
         produceEntities(entities, "starlinksats-all")
         entities
-
       
       case `active` =>
         val entities = Await.result(getAndFilterEntites(true, httpClientActor, entity), 10.seconds)
@@ -127,6 +134,7 @@ class SpaceDataControllerProducer() {
   }
 
   def produceEntities(entities: List[SpaceEntity], topicName: String): Unit = {
+    println("produceEntities")
     // Kafka Configuration
     val props = new Properties()
     props.put("bootstrap.servers", "localhost:9092")
@@ -148,7 +156,8 @@ class SpaceDataControllerProducer() {
   }
 
 
-  def testconsumer(){
+  // TODO: Delete this method later
+  def  consumerLoop(){
     val props = new Properties()
     props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
     props.put(ConsumerConfig.GROUP_ID_CONFIG, "your-consumer-group-id")
@@ -156,7 +165,7 @@ class SpaceDataControllerProducer() {
     props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
 
     val consumer = new KafkaConsumer[String, String](props)
-    val topic = "test-topic"
+    val topic = "rockets-all"
     consumer.subscribe(List(topic).asJava)
 
     while (true) {
@@ -165,42 +174,8 @@ class SpaceDataControllerProducer() {
 
       val records = consumer.poll(Duration.ofMillis(100))
       records.forEach(record => println(s"Received message: ${record.value()}"))
+      //println(s"consumed $records.length")
     }
-  }
-
-
-  def findStarlinkSatById(entity: List[SpaceEntity], targetId: String): Option[SpaceEntity] = {
-    entity.find(_.id == targetId)
-  }
-
-
-  def getLauchesList(slct: String): List[Launch] = {
-    val selector = stringToSelecorLaunch(slct)
-    selector match {
-        case `allLaunches` => {
-          launcheslist
-        } case `succeeded` => {
-          //TODO
-          launcheslist
-      } case `failed` => {
-          //TODO
-          launcheslist
-      }
-    }
-  }
-
-  def getLaunchDetails(id: String): Option[Launch] = {
-    val foundLaunch: Option[Launch] = findLaunchById(launcheslist,id)
-    foundLaunch match {
-      case Some(launch) =>
-        Some(launch)
-      case None =>
-        None
-    }
-  }
-
-  def findLaunchById(lauches: List[Launch], targetId: String): Option[Launch] = {
-    lauches.find(_.id == targetId)
   }
 
   def stringToSelecorSpaceEntity(slct: String): SelectorSpaceEntity = {
@@ -210,16 +185,6 @@ class SpaceDataControllerProducer() {
       case "active" => active: SelectorSpaceEntity
       case "inactive" => inactive: SelectorSpaceEntity
       case _ => throw new IllegalArgumentException("Ungültiger SelectorSpaceEntity")
-    }
-  }
-
-  def stringToSelecorLaunch(slct: String): SelectorLaunch = {
-      //val selector: Selector
-      slct match {
-      case "allLaunches" => allLaunches: SelectorLaunch
-      case "succeeded" => succeeded: SelectorLaunch
-      case "failed" => failed: SelectorLaunch
-      case _ => throw new IllegalArgumentException("Ungültiger SelectorLaunch")
     }
   }
 
