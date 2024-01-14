@@ -166,7 +166,7 @@ class SpaceDataControllerConsumer() {
 
 
       case `all` =>
-        val futureEntities: Future[List[SpaceEntity]] = (httpClientActor ? GetCurrentState)
+        val futureEntities: Future[List[SpaceEntity]] = (httpClientActor ? GetSpaceEntities(entity))
           .mapTo[List[SpaceEntity]]
           .recover { case _ => Nil }
         val entities = Await.result(futureEntities, 10.seconds)
@@ -207,7 +207,7 @@ class SpaceDataControllerConsumer() {
   def getAndFilterEntites(isActive: Boolean, httpClientActor: ActorRef, entityType: String): Future[List[SpaceEntity]] = {
     implicit val timeout: Timeout = Timeout(10.seconds)
     Source.single(())
-      .mapAsync(1)(_ => httpClientActor ? GetCurrentState)
+      .mapAsync(1)(_ => httpClientActor ? GetSpaceEntities(entityType))
       .map { data =>
         val instances = data.asInstanceOf[List[SpaceEntity]]
         entityType match {

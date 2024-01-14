@@ -61,13 +61,14 @@ object SpaceData extends App {
     println("run producer")
     val controllerProducer = new SpaceDataControllerProducer()
     while (true) {
+      println("producerLoop")
       controllerProducer.producerLoop()
       Thread.sleep(5000)
     }
   }
 
   // Instances MVC
-  val controller = new SpaceDataControllerConsumer()
+  /*val controller = new SpaceDataControllerConsumer()
   //controller.consumeOnce()
   val tui = new TUI(controller)
 
@@ -80,7 +81,7 @@ object SpaceData extends App {
   // Interrupting the producer Future
   producerFuture.onComplete(_ => println("Producer Future completed"))
   producerFuture.foreach(_ => ())
-  Await.result(producerFuture, Duration.Inf)
+  Await.result(producerFuture, Duration.Inf)*/
 
 }
 

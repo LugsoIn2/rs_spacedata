@@ -27,9 +27,6 @@ import play.api.libs.json.{Json, Writes}
 import org.json4s._
 import org.json4s.native.Serialization._
 
-
-
-
 import java.util.Properties
 import scala.collection.JavaConverters._
 import org.apache.kafka.clients.consumer.ConsumerConfig
@@ -37,20 +34,33 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 
 class SpaceDataControllerProducer() {
   // Actor System
-  implicit val httpActorSystem: ActorSystem = ActorSystem("HttpActorSystem")
+  implicit val actorSystem: ActorSystem = ActorSystem("ActorSystem")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
-  implicit val executionContext: ExecutionContextExecutor = httpActorSystem.dispatcher
+  implicit val executionContext: ExecutionContextExecutor = actorSystem.dispatcher
   
-  // create Actors
-  val httpClientActorStarlinkSats = httpActorSystem.actorOf(Props(new HttpClientActor))
-  val httpClientActorRockets = httpActorSystem.actorOf(Props(new HttpClientActor))
+  // create HTTP Actors
+  //val httpClientActorStarlinkSats = actorSystem.actorOf(Props(new HttpClientActor))
+  //val httpClientActorRockets = actorSystem.actorOf(Props(new HttpClientActor))
+
+  val starlinkEntityProducerActorAll = actorSystem.actorOf(Props(new SpaceEntityProducerActor))
+  val starlinkEntityProducerActorActive = actorSystem.actorOf(Props(new SpaceEntityProducerActor))
+  val starlinkEntityProducerActorInactive = actorSystem.actorOf(Props(new SpaceEntityProducerActor))
+  val rocketEntityProducerActorAll = actorSystem.actorOf(Props(new SpaceEntityProducerActor))
+  val rocketEntityProducerActorActive = actorSystem.actorOf(Props(new SpaceEntityProducerActor))
+  val rocketEntityProducerActorInactive = actorSystem.actorOf(Props(new SpaceEntityProducerActor))
 
   def producerLoop() = {
 
     println("producerLoop")
+    starlinkEntityProducerActorAll ! ProduceEntities("starlink", all)
+    starlinkEntityProducerActorActive ! ProduceEntities("starlink", active)
+    starlinkEntityProducerActorInactive ! ProduceEntities("starlink", inactive)
+    rocketEntityProducerActorAll ! ProduceEntities("rockets", all)
+    rocketEntityProducerActorActive ! ProduceEntities("rockets", active)
+    rocketEntityProducerActorInactive ! ProduceEntities("rockets", inactive)
 
     // get data from API
-    httpClientActorStarlinkSats ! GetSpaceEntities("/starlink")
+    /*httpClientActorStarlinkSats ! GetSpaceEntities("/starlink")
     httpClientActorRockets ! GetSpaceEntities("/rockets")
     
     implicit val timeout: Timeout = Timeout(10.seconds)
@@ -83,10 +93,10 @@ class SpaceDataControllerProducer() {
     produceEntities(rocketsActive, "rockets-active")
 
     val rocketsInactive = Await.result(getAndFilterEntites(false, httpClientActorRockets, "rocket"), 10.seconds)
-    produceEntities(rocketsInactive, "rockets-inactive")
+    produceEntities(rocketsInactive, "rockets-inactive")*/
   }
 
-  def produceSpaceEntitiesList(slct: String, entity: String)/*: List[SpaceEntity]*/ = {
+  /*def produceSpaceEntitiesList(slct: String, entity: String)/*: List[SpaceEntity]*/ = {
     val selector = stringToSelecorSpaceEntity(slct)
     implicit val timeout: Timeout = Timeout(10.seconds)
     val httpClientActor = entity match {
@@ -166,7 +176,7 @@ class SpaceDataControllerProducer() {
     producer.send(record)
 
     producer.close()
-  }
+  }*/
 
 
   // TODO: Delete this method later

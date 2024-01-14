@@ -16,10 +16,10 @@ import akka.http.scaladsl.unmarshalling.Unmarshal
 import io.circe.Json
 
 // Message to trigger HTTP request in actor
-case class GetSpaceEntities(endpoint: String)
+case class GetSpaceEntities(entityType: String)
 
 // Message to return actor's current state as a response
-case object GetCurrentState //():List[SpaceEntity]
+//case object GetCurrentState //():List[SpaceEntity]
 
 // Actor responsible for making HTTP requests and maintaining state
 class HttpClientActor extends Actor with ActorLogging {
@@ -29,11 +29,11 @@ class HttpClientActor extends Actor with ActorLogging {
   val hostUrl: String = "https://api.spacexdata.com/v4"
 
   // Initial state
-  var spaceEntities: List[SpaceEntity] = List.empty
+  //var spaceEntities: List[SpaceEntity] = List.empty
 
   def receive: Receive = {
-    case GetSpaceEntities(endpoint) =>
-      val request = HttpRequest(uri = hostUrl + endpoint)
+    case GetSpaceEntities(entityType) =>
+      val request = HttpRequest(uri = hostUrl + "/" + entityType)
       val responseFuture = Http().singleRequest(request)
 
       responseFuture.onComplete {
@@ -41,33 +41,34 @@ class HttpClientActor extends Actor with ActorLogging {
             val data = Unmarshal(response.entity).to[String] //response.entity.toString()
             data.onComplete {
                 case Success(body) =>
-                  spaceEntitiesDiff(endpoint, body)
+                  val spaceEntities = createSpaceEntitiesInstances(entityType, body)
+                  sender() ! spaceEntities
                 case Failure(ex) =>
                     println(s"Failed to unmarshal response body: $ex")
             }
             
             
         case Failure(ex) =>
-          println(s"Request to $endpoint failed: $ex")
+          println(s"Request to /$entityType failed: $ex")
       }
 
-    case GetCurrentState =>
+    /*case GetCurrentState =>
       // Respond with the current state
-      sender() ! spaceEntities
+      sender() ! spaceEntities*/
   }
 
 
   
-  def spaceEntitiesDiff(endpoint: String, body: String) {
+  def createSpaceEntitiesInstances(entityType: String, body: String): List[SpaceEntity] = {
     val dataAsList: List[Json] = SpaceData.util.spacexApiClient.Helpers.parseToList(body, "get")
     var entityList: List[SpaceEntity] = List.empty
-    spaceEntities = endpoint match {
-      case "/starlink" =>
+    entityType match {
+      case "starlink" =>
           dataAsList.foreach { item =>
               entityList = entityList :+ StarlinkSatFactory.createInstance(item)
           }
           entityList
-      case "/rockets" =>
+      case "rockets" =>
           dataAsList.foreach { item =>
               entityList = entityList :+ RocketFactory.createInstance(item)
           }
