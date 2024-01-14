@@ -35,31 +35,31 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
 
 class SpaceDataControllerConsumer() {
   val launcheslist = SpaceDataLaunchController.launches(allLaunches)
-  //var deserializedEntities: List[SpaceEntity] = List.empty
   var rocketslistAll: List[SpaceEntity] = List.empty
+  var rocketslisActive: List[SpaceEntity] = List.empty
+  var rocketslisInactive: List[SpaceEntity] = List.empty
+  var starlinksatlistAll: List[SpaceEntity] = List.empty
+  var starlinksatlistActive: List[SpaceEntity] = List.empty
+  var starlinksatlistInactive: List[SpaceEntity] = List.empty
+
   val rocketslistAllFuture: Future[Unit] = Future {
       consumeFromKafka("rockets-all")
     }
-  var rocketslisActive: List[SpaceEntity] = List.empty
   val rocketslisActiveFuture: Future[Unit] = Future {
       consumeFromKafka("rockets-active")
     }
-  var rocketslisInactive: List[SpaceEntity] = List.empty
   val rocketslisInactiveFuture: Future[Unit] = Future {
       consumeFromKafka("rockets-inactive")
     }
-  var starlinksatlistAll: List[SpaceEntity] = List.empty
-  // val starlinksatlistAllFuture: Future[Unit] = Future {
-  //     consumeFromKafka("starlinksats-all")
-  //   }
-    var starlinksatlistActive: List[SpaceEntity] = List.empty
-  // val starlinksatlistActiveFuture: Future[Unit] = Future {
-  //     consumeFromKafka("starlinksats-active")
-  //   }
-  var starlinksatlistInactive: List[SpaceEntity] = List.empty
-  // val starlinksatlistInactiveFuture: Future[Unit] = Future {
-  //     consumeFromKafka("starlinksats-inactive")
-  //   }
+  val starlinksatlistAllFuture: Future[Unit] = Future {
+      consumeFromKafka("starlinksats-all")
+    }
+  val starlinksatlistActiveFuture: Future[Unit] = Future {
+      consumeFromKafka("starlinksats-active")
+    }
+  val starlinksatlistInactiveFuture: Future[Unit] = Future {
+      consumeFromKafka("starlinksats-inactive")
+    }
 
 
   def consumeFromKafka(topicName: String): Unit = {
@@ -82,7 +82,7 @@ class SpaceDataControllerConsumer() {
       while (true) {
         val records = consumer.poll(Duration.ofMillis(100))
         records.forEach(record => 
-          //println(s"Received message: ${record.value()}")
+        //  println(s"Received message: ${record.value()}")
          processRecord(record, topicName)
         )
       }
@@ -101,7 +101,7 @@ class SpaceDataControllerConsumer() {
       case JsSuccess(spaceEntities, _) =>
         // Hier haben Sie die deserialisierte Liste von SpaceEntity-Objekten
         spaceEntities.foreach { spaceEntity =>
-          //println(s"Deserialized SpaceEntity: $spaceEntity")
+          // println(s"Deserialized SpaceEntity: $spaceEntity")
           deserializedEntities = deserializedEntities :+ spaceEntity
         }
         updateGlobalLists(deserializedEntities, listidentifier)
@@ -134,7 +134,7 @@ class SpaceDataControllerConsumer() {
   def getSpaceEntitiesList(slct: String, entity: String): List[SpaceEntity] = {
     val selector = stringToSelecorSpaceEntity(slct)
     val EntityList = entity match {
-      case "starlinksat" => getRocketList(selector)
+      case "starlinksat" => getStarlinkList(selector)
       case "rocket" => getRocketList(selector)
       case _ => throw new IllegalArgumentException(s"Unsupported entity type: $entity")
     }
@@ -154,6 +154,7 @@ class SpaceDataControllerConsumer() {
   }
 
   def getStarlinkList(selector: SelectorSpaceEntity): List[SpaceEntity] = {
+
     val result: List[SpaceEntity] = selector match {
       case `all` =>
         starlinksatlistAll

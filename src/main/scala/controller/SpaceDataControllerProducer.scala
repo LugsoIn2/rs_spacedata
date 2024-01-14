@@ -47,7 +47,7 @@ class SpaceDataControllerProducer() {
 
   def producerLoop() = {
 
-    println("producerLoop")
+    // println("producerLoop")
 
     // get data from API
     httpClientActorStarlinkSats ! GetSpaceEntities("/starlink")
@@ -157,7 +157,6 @@ class SpaceDataControllerProducer() {
     entities.foreach { entity =>
       //entitiesList = entitiesList :+ entity.toString()
       entitiesList = entitiesList :+ write(entity)
-
     }
     //val message: String = entitiesList.mkString("[\"", "\",\"", "\"]")
     val message: String = entitiesList.mkString("[", ",", "]")
