@@ -79,7 +79,7 @@ class SpaceDataControllerConsumer() {
 
     json.validate[List[SpaceEntity]] match {
       case JsSuccess(spaceEntities, _) =>
-        // Hier haben Sie die deserialisierte Liste von SpaceEntity-Objekten
+        // Deserialisierung
         spaceEntities.foreach { spaceEntity =>
           // println(s"Deserialized SpaceEntity: $spaceEntity")
           deserializedEntities = deserializedEntities :+ spaceEntity
