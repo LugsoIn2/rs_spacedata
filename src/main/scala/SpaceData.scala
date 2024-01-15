@@ -60,7 +60,7 @@ object SpaceData extends App {
     println("run producer")
     val controllerProducer = new SpaceDataControllerProducer()
     while (true) {
-      controllerProducer.producerLoop()
+      controllerProducer.produceEntityToKafka()
       Thread.sleep(5000)
     }
   }

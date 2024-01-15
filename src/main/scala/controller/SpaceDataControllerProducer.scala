@@ -45,14 +45,12 @@ class SpaceDataControllerProducer() {
   val httpClientActorStarlinkSats = httpActorSystem.actorOf(Props(new HttpClientActor))
   val httpClientActorRockets = httpActorSystem.actorOf(Props(new HttpClientActor))
 
-  def producerLoop() = {
-
+  def produceEntityToKafka() = {
     // println("producerLoop")
-
     // get data from API
     httpClientActorStarlinkSats ! GetSpaceEntities("/starlink")
     httpClientActorRockets ! GetSpaceEntities("/rockets")
-    
+
     implicit val timeout: Timeout = Timeout(10.seconds)
 
     // StarlinkSats
@@ -61,17 +59,11 @@ class SpaceDataControllerProducer() {
       .recover { case _ => Nil }
     produceEntities(Await.result(futureStarlinkSatsAll, 10.seconds), "starlinksats-all")
 
-    //println("futureStarlinkSatsAll")
-
     val starlinkSatsActive = Await.result(getAndFilterEntites(true, httpClientActorStarlinkSats, "starlinksat"), 10.seconds)
     produceEntities(starlinkSatsActive, "starlinksats-active")
 
-    //println("starlinkSatsActive")
-
     val starlinkSatsInactive = Await.result(getAndFilterEntites(false, httpClientActorStarlinkSats, "starlinksat"), 10.seconds)
     produceEntities(starlinkSatsInactive, "starlinksats-inactive")
-
-    //println("starlinkSatsInActive")
 
     // Rockets
     val futureRocketsAll: Future[List[SpaceEntity]] = (httpClientActorRockets ? GetCurrentState)
@@ -84,39 +76,6 @@ class SpaceDataControllerProducer() {
 
     val rocketsInactive = Await.result(getAndFilterEntites(false, httpClientActorRockets, "rocket"), 10.seconds)
     produceEntities(rocketsInactive, "rockets-inactive")
-  }
-
-  def produceSpaceEntitiesList(slct: String, entity: String)/*: List[SpaceEntity]*/ = {
-    val selector = stringToSelecorSpaceEntity(slct)
-    implicit val timeout: Timeout = Timeout(10.seconds)
-    val httpClientActor = entity match {
-      case "starlinksat" => httpClientActorStarlinkSats
-      case "rocket" => httpClientActorRockets
-      case _ => throw new IllegalArgumentException(s"Unsupported entity type: $entity")
-    }
-
-    val result: List[SpaceEntity] = selector match {
-
-      case `all` =>
-        val futureEntities: Future[List[SpaceEntity]] = (httpClientActor ? GetCurrentState)
-          .mapTo[List[SpaceEntity]]
-          .recover { case _ => Nil }
-        val entities = Await.result(futureEntities, 10.seconds)
-        produceEntities(entities, "starlinksats-all")
-        entities
-      
-      case `active` =>
-        val entities = Await.result(getAndFilterEntites(true, httpClientActor, entity), 10.seconds)
-        produceEntities(entities, "starlinksats-active")
-        entities
-
-      case `inactive` =>
-        val entities = Await.result(getAndFilterEntites(false, httpClientActor, entity), 10.seconds)
-        produceEntities(entities, "starlinksats-inactive")
-        entities
-    }
-
-    result
   }
 
   def getAndFilterEntites(isActive: Boolean, httpClientActor: ActorRef, entityType: String): Future[List[SpaceEntity]] = {
@@ -155,10 +114,8 @@ class SpaceDataControllerProducer() {
     implicit val formats: DefaultFormats.type = DefaultFormats
     var entitiesList: List[String] = List.empty
     entities.foreach { entity =>
-      //entitiesList = entitiesList :+ entity.toString()
       entitiesList = entitiesList :+ write(entity)
     }
-    //val message: String = entitiesList.mkString("[\"", "\",\"", "\"]")
     val message: String = entitiesList.mkString("[", ",", "]")
 
     val record = new ProducerRecord[String, String](topicName, message)
@@ -167,31 +124,7 @@ class SpaceDataControllerProducer() {
     producer.close()
   }
 
-
-  // TODO: Delete this method later
-  def  consumerLoop(){
-    val props = new Properties()
-    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
-    props.put(ConsumerConfig.GROUP_ID_CONFIG, "your-consumer-group-id")
-    props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
-    props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringDeserializer")
-
-    val consumer = new KafkaConsumer[String, String](props)
-    val topic = "rockets-all"
-    consumer.subscribe(List(topic).asJava)
-
-    while (true) {
-      import scala.concurrent.duration._
-      import java.time.Duration
-
-      val records = consumer.poll(Duration.ofMillis(100))
-      records.forEach(record => println(s"Received message: ${record.value()}"))
-      //println(s"consumed $records.length")
-    }
-  }
-
   def stringToSelecorSpaceEntity(slct: String): SelectorSpaceEntity = {
-      //val selector: Selector
       slct.toLowerCase match {
       case "all" => all: SelectorSpaceEntity
       case "active" => active: SelectorSpaceEntity
