@@ -35,7 +35,7 @@ import scala.collection.JavaConverters._
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.consumer.KafkaConsumer
 
-class SpaceDataControllerProducer() {
+class SpaceDataProducer() {
   // Actor System
   implicit val httpActorSystem: ActorSystem = ActorSystem("HttpActorSystem")
   implicit val materializer: ActorMaterializer = ActorMaterializer()

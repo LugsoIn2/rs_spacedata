@@ -3,10 +3,10 @@ package SpaceData.controller
 import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
 import SpaceData.controller.{active, inactive, all}
 import SpaceData.util.spacexApiClient._
-import SpaceData.controller.SpaceDataControllerConsumer
+import SpaceData.controller.SpaceDataConsumer
 
 class SpaceDataController() {
-  val consumerController = new SpaceDataControllerConsumer()
+  val consumerController = new SpaceDataConsumer()
   val launcheslist = SpaceDataLaunchController.launches(allLaunches)
 
   def checkListsNotEmpty(): Boolean = {

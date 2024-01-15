@@ -5,7 +5,7 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import controller.SpaceDataController
-import controller.SpaceDataControllerProducer
+import controller.SpaceDataProducer
 import view.TUI
 
 object SpaceData extends App {
@@ -13,7 +13,7 @@ object SpaceData extends App {
   // Creating and starting a new Future for the producer
   val producerFuture: Future[Unit] = Future {
     println("run producer")
-    val controllerProducer = new SpaceDataControllerProducer()
+    val controllerProducer = new SpaceDataProducer()
     while (true) {
       controllerProducer.produceEntityToKafka()
       Thread.sleep(5000)

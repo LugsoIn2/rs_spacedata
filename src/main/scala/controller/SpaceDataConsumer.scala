@@ -10,7 +10,7 @@ import java.time.Duration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class SpaceDataControllerConsumer() {
+class SpaceDataConsumer() {
   var rocketslistAll: List[SpaceEntity] = List.empty
   var rocketslisActive: List[SpaceEntity] = List.empty
   var rocketslisInactive: List[SpaceEntity] = List.empty
