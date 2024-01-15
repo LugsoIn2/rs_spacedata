@@ -49,11 +49,8 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-// import controller.SpaceDataControllerConsumer
 import controller.SpaceDataController
-
 import controller.SpaceDataControllerProducer
-import model.StarlinkSat
 import view.TUI
 
 object SpaceData extends App {

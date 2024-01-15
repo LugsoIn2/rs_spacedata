@@ -1,6 +1,5 @@
 package SpaceData.view
 import SpaceData.view.TUIStrings._
-// import SpaceData.controller.SpaceDataControllerConsumer
 import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
 import SpaceData.util.dsl.{DSLParser, ShowCommand}
 import scala.io.Source
