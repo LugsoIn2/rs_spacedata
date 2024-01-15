@@ -46,13 +46,29 @@ val dependencies = Seq(
   "io.circe" %% "circe-core" % "0.14.6",
   "io.circe" %% "circe-parser" % "0.14.6",
   "org.playframework" %% "play-json" % "3.0.1",
-  "org.apache.spark" %% "spark-sql" % "3.2.0"
+
+
+  // "org.apache.spark" %% "spark-sql" % "3.2.0",
+  // "org.apache.spark" %% "spark-core" % "3.2.0"
+
+
+  "org.apache.spark" %% "spark-sql" % "3.0.1",
+  // "org.apache.spark" %% "spark-core" % "3.3.4",
+  // "org.apache.spark" %% "spark-streaming" % "3.3.4",
+  "org.apache.spark" %% "spark-streaming-kafka-0-10" % "3.0.1",
+  "org.apache.spark" %% "spark-sql-kafka-0-10" % "3.0.1",
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.4",
+  // "org.apache.spark" %% "spark-streaming-kafka-0-10" % "3.3.4" exclude("com.fasterxml.jackson.module", "jackson-module-scala"),
+  // "org.elasticsearch" %% "elasticsearch-spark-30" % "8.11.4",
+
+
+
   // "org.apache.spark" %% "spark-core" % "3.3.4",
   // "org.scalatest" %% "scalatest" % "3.2.15",
   // "org.apache.spark" %% "park-streaming" % "3.3.4",
   // "org.apache.spark" %% "spark-streaming-kafka" % "3.3.4",
   // "org.apache.spark" %% "spark-sql" % "3.3.4"
-  //"com.typesafe.scala-logging" %% "scala-logging" % "3.9.5"
+  //  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
   //  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5", 
   //  "ch.qos.logback" % "logback-classic" % "1.4.7",
 )
@@ -74,13 +90,13 @@ val dependencies = Seq(
 //       //libraryDependencies += "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion
 //     )
 
-
 lazy val root = project
   .in(file("."))
   .settings(
     name := "rs_spacedata",
     version := "1.0",
-    scalaVersion :=  "2.13.12",
+    // scalaVersion :=  "2.13.12",
+    scalaVersion:= "2.12.18",
     organization := "de.htwg.rs_spacedata",
     libraryDependencies ++= dependencies,
     resolvers += "Akka library repository".at("https://repo.akka.io/maven"),

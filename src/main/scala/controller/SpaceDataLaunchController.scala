@@ -9,17 +9,17 @@ import SpaceData.util.spacexApiClient.Helpers._
 
 object SpaceDataLaunchController {
 
-    def launches(slct: SelectorLaunch): List[Launch] = {
-        val launchesListJson: List[io.circe.Json] = SpaceXApiClient.getLaunches(slct)
-        var launches: List[Launch] = List().empty
-        if (launchesListJson.nonEmpty) {
-            launchesListJson.foreach { item =>
-                val launch: Launch = createInstanceLaunch(item)
-                launches = launches :+ launch
-            }
-        }
-        launches
-    }
+    // def launches(slct: SelectorLaunch): List[Launch] = {
+    //     val launchesListJson: List[io.circe.Json] = SpaceXApiClient.getLaunches(slct)
+    //     // var launches: List[Launch] = List().empty
+    //     if (launchesListJson.nonEmpty) {
+    //         launchesListJson.foreach { item =>
+    //             val launch: Launch = createInstanceLaunch(item)
+    //             // launches = launches :+ launch
+    //         }
+    //     }
+    //     // launches
+    // }
 
     def createInstanceLaunch(json: io.circe.Json): Launch = {
         val launch = Launch(

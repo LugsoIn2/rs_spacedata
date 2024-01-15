@@ -13,9 +13,29 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
+import org.apache.spark.{SparkConf, SparkContext}
+// import org.apache.spark.streaming.{Seconds, StreamingContext}
+import org.apache.spark.streaming.kafka010
+// import org.apache.spark.sql.kafka010
+import org.apache.log4j.{Level, Logger}
+import org.apache.kafka.common.serialization.StringDeserializer
+// import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
+
+import java.time.Duration
+import scala.collection.JavaConverters._
+import org.apache.log4j.LogManager
+
 
 class SpaceDataConsumer() {
   val kafkaBroker = "localhost:9092"
+  Logger.getLogger("org").setLevel(Level.WARN)
+  // Logger.getLogger("akka").setLevel(Level.WARN)
+  // Logger.getLogger("play").setLevel(Level.WARN)
+  // Logger.getLogger("play").setLevel(Level.WARN)
+  LogManager.getRootLogger.setLevel(Level.WARN)
+
+    // Set the logging level for Kafka logger to a specific level
+  Logger.getLogger("org.apache.kafka").setLevel(Level.WARN)
 
   var rocketslistAll: List[SpaceEntity] = List.empty
   var rocketslisActive: List[SpaceEntity] = List.empty
@@ -53,11 +73,49 @@ class SpaceDataConsumer() {
     }
   }
 
-  def consumeFromKafkaWithSpark(topicName: String) {
+  // def consumeFromKafkaWithSpark2(topicName: String): Unit = {
+  //   val sparkConf = new SparkConf().setAppName("KafkaSparkIntegration").setMaster("local[*]")
+  //   val sc = new SparkContext(sparkConf)
+  //   val ssc = new StreamingContext(sc, Seconds(5))
+
+  //   val kafkaBroker = "your_kafka_broker"
+  //   // val topicName = "your_kafka_topic"
+
+  //   val kafkaParams = Map(
+  //     "bootstrap.servers" -> kafkaBroker,
+  //     "key.deserializer" -> classOf[StringDeserializer].getName,
+  //     "value.deserializer" -> classOf[StringDeserializer].getName,
+  //     "group.id" -> "space-data-group",
+  //     "auto.offset.reset" -> "earliest",
+  //     "enable.auto.commit" -> "false"
+  //   )
+
+  //   val topics = Set(topicName)
+
+  //   val kafkaStream = KafkaUtils.createDirectStream[String, String](
+  //     ssc,
+  //     LocationStrategies.PreferConsistent,
+  //     ConsumerStrategies.Subscribe[String, String](topics, kafkaParams)
+  //   )
+    
+  //   kafkaStream.foreachRDD { rdd =>
+  //     // Hier kannst du deine bestehende Logik für die Verarbeitung der Daten einfügen
+  //     rdd.foreach(record => print(record))
+  //   }
+
+  //   ssc.start()
+  //   ssc.awaitTermination()
+  // }
+
+
+    def consumeFromKafkaWithSpark(topicName: String) {
     // Create a Spark session
+
     val spark = SparkSession.builder()
       .appName("SpaceDataSparkConsumer")
       .master("local[*]") // Use a local Spark cluster for testing
+      .config("spark.master", "local")
+      .config("spark.jars.packages", "com.fasterxml.jackson.module:jackson-module-scala_2.13:2.13.4")
       .getOrCreate()
 
     import spark.implicits._
@@ -80,28 +138,50 @@ class SpaceDataConsumer() {
       .load()
       .selectExpr("CAST(value AS STRING)") // Assuming the JSON data is in the 'value' field
 
+
+      // kafkaStreamDF.writeStream.start()
+
+    // val kafkaStreamDF = spark
+    //   .readStream
+    //   .format("kafka")
+    //   .option("kafka.bootstrap.servers", kafkaBroker)
+    //   .option("subscribe", topicName)
+    //   .load()
+    // kafkaStreamDF.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
+    //   .as[(String, String)]
+
+    // df.show()
+    print("MOTHERFUCKER")
     // Parse JSON data using schema
     val parsedDF = kafkaStreamDF
-      .select(from_json($"value", schema).as("data"))
-      .select("data.*")
+      // .select(from_json($"value", schema).as("data"))
+      // .select("data.*")
 
     // Perform any additional transformations as needed
     val transformedDF = parsedDF
-      .filter("age > 25")
-      .select("name", "age")
+      // .filter("age > 25")
+      // .select("name", "age")
 
     // Write the results to the console (you can modify this to write to another sink)
+    print("FUUUUUUUUUUUUUUUUU")
     val query = transformedDF.writeStream
       .outputMode("append")
       .format("console")
       .start()
 
-    // Await termination of the streaming query
+    // // Await termination of the streaming query
     query.awaitTermination()
 
     // Stop the Spark session
     spark.stop()
   }
+
+  private def processRecord2(recordValue: String, updateFunction: List[SpaceEntity] => Unit): Unit = {
+    // Füge hier deine Logik zur Verarbeitung eines Kafka-Records ein
+    // Du kannst `updateFunction` aufrufen und die `recordValue` übergeben
+    // um deine bestehende Logik beizubehalten
+  }
+
 
   private def processRecord(record: ConsumerRecord[String, String], updateFunction: List[SpaceEntity] => Unit): Unit = {
     val json = Json.parse(record.value())
@@ -136,7 +216,7 @@ class SpaceDataConsumer() {
     starlinksatlistInactive = entities
   }
 
-  private val futures: Map[String, Future[Unit]] = topicMappings.map {
-    case (topic, updateFunction) => topic -> consumeFromKafka(topic, updateFunction)
-  }
+  // private val futures: Map[String, Future[Unit]] = topicMappings.map {
+  //   case (topic, updateFunction) => topic -> consumeFromKafka(topic, updateFunction)
+  // }
 }
