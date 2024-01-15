@@ -16,7 +16,7 @@ import org.apache.spark.sql.types._
 import org.apache.spark.{SparkConf, SparkContext}
 // import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.streaming.kafka010
-// import org.apache.spark.sql.kafka010
+import org.apache.spark.sql.kafka010
 import org.apache.log4j.{Level, Logger}
 import org.apache.kafka.common.serialization.StringDeserializer
 // import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
@@ -114,21 +114,21 @@ class SpaceDataConsumer() {
     val spark = SparkSession.builder()
       .appName("SpaceDataSparkConsumer")
       .master("local[*]") // Use a local Spark cluster for testing
-      .config("spark.master", "local")
-      .config("spark.jars.packages", "com.fasterxml.jackson.module:jackson-module-scala_2.13:2.13.4")
+      // .config("spark.master", "local")
+      // .config("spark.jars.packages", "com.fasterxml.jackson.module:jackson-module-scala_2.13:2.13.4")
       .getOrCreate()
 
     import spark.implicits._
 
     // Define the schema for the JSON data
-    val schema = StructType(
-      Seq(
-        StructField("name", StringType),
-        StructField("id", StringType),
-        StructField("active", BooleanType)
-        // Add more fields based on your JSON structure
-      )
-    )
+    // val schema = StructType(
+    //   Seq(
+    //     StructField("name", StringType),
+    //     StructField("id", StringType),
+    //     StructField("active", BooleanType)
+    //     // Add more fields based on your JSON structure
+    //   )
+    // )
 
     // Read data from Kafka topic using Spark Structured Streaming
     val kafkaStreamDF = spark.readStream

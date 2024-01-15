@@ -18,7 +18,10 @@ class SpaceDataController() {
     consumerController.starlinksatlistInactive.isEmpty
     false
   }
-
+  
+  def bla(): Unit = {
+    consumerController.consumeFromKafkaWithSpark("rockets-all")
+  }
 
   def getSpaceEntitiesList(slct: String, entity: String): List[SpaceEntity] = {
     val selector = stringToSelecorSpaceEntity(slct)
@@ -30,11 +33,12 @@ class SpaceDataController() {
     EntityList
   }
 
+
   def getRocketList(selector: SelectorSpaceEntity): List[SpaceEntity] = {
     val result: List[SpaceEntity] = selector match {
       case `all` =>
         // consumerController.consumeFromKafkaWithSpark2("rockets-all")
-        consumerController.consumeFromKafkaWithSpark("rockets-all")
+        // consumerController.consumeFromKafkaWithSpark("rockets-all")
         consumerController.rocketslistAll
       case `active` =>
         consumerController.rocketslisActive
