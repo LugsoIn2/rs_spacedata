@@ -5,7 +5,7 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import controller.SpaceDataController
-import controller.SpaceDataProducer
+import controller.kafka.SpaceDataProducer
 import view.TUI
 
 object SpaceData extends App {

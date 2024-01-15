@@ -1,4 +1,4 @@
-package SpaceData.controller
+package SpaceData.controller.factories
 
 import SpaceData.model.Rocket
 

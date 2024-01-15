@@ -1,4 +1,4 @@
-package SpaceData.controller
+package SpaceData.controller.kafka
 
 import SpaceData.model.SpaceEntity
 import SpaceData.util.spacexApiClient._

@@ -1,4 +1,4 @@
-package SpaceData.controller
+package SpaceData.controller.factories
 
 //import model.StarlinkSat
 import SpaceData.model.StarlinkSat

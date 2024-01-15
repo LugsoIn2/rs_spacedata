@@ -1,8 +1,12 @@
 // SpaceDataController.scala
-package SpaceData.controller
+package SpaceData.controller.kafka
 import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
 import SpaceData.controller.{active, inactive, all}
 import SpaceData.util.spacexApiClient._
+import SpaceData.controller.HttpClientActor
+import SpaceData.controller.GetSpaceEntities
+import SpaceData.controller.GetCurrentState
+import SpaceData.controller.SelectorSpaceEntity
 import akka.actor.{ActorSystem, Props}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl._

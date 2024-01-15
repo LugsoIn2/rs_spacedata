@@ -4,6 +4,7 @@ import akka.actor.{Actor, ActorSystem, Props, ActorLogging}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
+import SpaceData.controller.factories.{StarlinkSatFactory, RocketFactory}
 
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}

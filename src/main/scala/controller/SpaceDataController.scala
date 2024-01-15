@@ -3,7 +3,7 @@ package SpaceData.controller
 import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
 import SpaceData.controller.{active, inactive, all}
 import SpaceData.util.spacexApiClient._
-import SpaceData.controller.SpaceDataConsumer
+import SpaceData.controller.kafka.SpaceDataConsumer
 
 class SpaceDataController() {
   val consumerController = new SpaceDataConsumer()
