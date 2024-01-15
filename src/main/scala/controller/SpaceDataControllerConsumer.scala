@@ -1,15 +1,14 @@
-// SpaceDataController.scala
 package SpaceData.controller
-import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
+
+import SpaceData.model.SpaceEntity
 import SpaceData.util.spacexApiClient._
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.libs.json._
 import java.util.Properties
 import scala.collection.JavaConverters._
 import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer, ConsumerRecord}
 import java.time.Duration
-
+import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class SpaceDataControllerConsumer() {
   var rocketslistAll: List[SpaceEntity] = List.empty
@@ -19,92 +18,69 @@ class SpaceDataControllerConsumer() {
   var starlinksatlistActive: List[SpaceEntity] = List.empty
   var starlinksatlistInactive: List[SpaceEntity] = List.empty
 
-  val rocketslistAllFuture: Future[Unit] = Future {
-      consumeFromKafka("rockets-all")
-    }
-  val rocketslisActiveFuture: Future[Unit] = Future {
-      consumeFromKafka("rockets-active")
-    }
-  val rocketslisInactiveFuture: Future[Unit] = Future {
-      consumeFromKafka("rockets-inactive")
-    }
-  val starlinksatlistAllFuture: Future[Unit] = Future {
-      consumeFromKafka("starlinksats-all")
-    }
-  val starlinksatlistActiveFuture: Future[Unit] = Future {
-      consumeFromKafka("starlinksats-active")
-    }
-  val starlinksatlistInactiveFuture: Future[Unit] = Future {
-      consumeFromKafka("starlinksats-inactive")
-    }
+  private val topicMappings = Map(
+    "rockets-all" -> this.updateRocketsListAll _,
+    "rockets-active" -> this.updateRocketsListActive _,
+    "rockets-inactive" -> this.updateRocketsListInactive _,
+    "starlinksats-all" -> this.updateStarlinkSatListAll _,
+    "starlinksats-active" -> this.updateStarlinkSatListActive _,
+    "starlinksats-inactive" -> this.updateStarlinkSatListInactive _
+  )
 
-
-  def consumeFromKafka(topicName: String): Unit = {
-    // Kafka Configuration
+  private def consumeFromKafka(topicName: String, updateFunction: List[SpaceEntity] => Unit): Future[Unit] = Future {
     val props = new Properties()
     props.put("bootstrap.servers", "localhost:9092")
-    props.put("group.id", "space-data-group") // Use a unique group id for the consumer
+    props.put("group.id", "space-data-group")
     props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")
     props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")
 
     val consumer = new KafkaConsumer[String, String](props)
-
-    var deserializedEntities: List[SpaceEntity] = List.empty
-
-    // Subscribe to the topic
     consumer.subscribe(List(topicName).asJava)
 
     try {
-      //var deserializedEntities: List[SpaceEntity] = List.empty
       while (true) {
         val records = consumer.poll(Duration.ofMillis(100))
-        records.forEach(record => 
-        //  println(s"Received message: ${record.value()}")
-         processRecord(record, topicName)
-        )
+        records.forEach(record => processRecord(record, updateFunction))
       }
     } finally {
       consumer.close()
     }
   }
 
-  def processRecord(record: ConsumerRecord[String, String],listidentifier: String): Unit= {
-    //println(s"Processing record: ${record.value()}")
+    private def processRecord(record: ConsumerRecord[String, String], updateFunction: List[SpaceEntity] => Unit): Unit = {
     val json = Json.parse(record.value())
-    var deserializedEntities: List[SpaceEntity] = List.empty
-    //println(s"Parsed JSON: $json")
 
     json.validate[List[SpaceEntity]] match {
-      case JsSuccess(spaceEntities, _) =>
-        // Deserialisierung
-        spaceEntities.foreach { spaceEntity =>
-          // println(s"Deserialized SpaceEntity: $spaceEntity")
-          deserializedEntities = deserializedEntities :+ spaceEntity
-        }
-        updateGlobalLists(deserializedEntities, listidentifier)
-      case JsError(errors) =>
-        println(s"Error parsing JSON: $errors")
-        deserializedEntities
+      case JsSuccess(spaceEntities, _) => updateFunction(spaceEntities)
+      case JsError(errors) => println(s"Error parsing JSON: $errors")
     }
   }
 
-
-
-  def updateGlobalLists(deserializedEntities: List[SpaceEntity], listidentifier: String): Unit = {
-    listidentifier match {
-      case "rockets-all" => 
-        rocketslistAll = deserializedEntities
-      case "rockets-active" => 
-        rocketslisActive = deserializedEntities
-      case "rockets-inactive" => 
-        rocketslisInactive= deserializedEntities
-      case "starlinksats-all" => 
-        starlinksatlistAll = deserializedEntities
-      case "starlinksats-active" => 
-        starlinksatlistActive = deserializedEntities
-      case "starlinksats-inactive" => 
-        starlinksatlistInactive = deserializedEntities
-    }
+  private def updateRocketsListAll(entities: List[SpaceEntity]): Unit = {
+    rocketslistAll = entities
   }
 
+  private def updateRocketsListActive(entities: List[SpaceEntity]): Unit = {
+    rocketslisActive = entities
+  }
+
+  private def updateRocketsListInactive(entities: List[SpaceEntity]): Unit = {
+    rocketslisInactive = entities
+  }
+
+  private def updateStarlinkSatListAll(entities: List[SpaceEntity]): Unit = {
+    starlinksatlistAll = entities
+  }
+
+  private def updateStarlinkSatListActive(entities: List[SpaceEntity]): Unit = {
+    starlinksatlistActive = entities
+  }
+
+  private def updateStarlinkSatListInactive(entities: List[SpaceEntity]): Unit = {
+    starlinksatlistInactive = entities
+  }
+
+  private val futures: Map[String, Future[Unit]] = topicMappings.map {
+    case (topic, updateFunction) => topic -> consumeFromKafka(topic, updateFunction)
+  }
 }

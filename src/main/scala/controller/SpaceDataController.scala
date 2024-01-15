@@ -18,6 +18,7 @@ class SpaceDataController() {
     consumerController.starlinksatlistInactive.isEmpty
   }
 
+
   def getSpaceEntitiesList(slct: String, entity: String): List[SpaceEntity] = {
     val selector = stringToSelecorSpaceEntity(slct)
     val EntityList = entity match {
