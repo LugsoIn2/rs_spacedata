@@ -36,7 +36,7 @@ object StarlinkSat {
       val id = (json \ "id").as[String]
       val launchDate = (json \ "launchDate").as[String]
       val period = (json \ "period").as[Double]
-      val height = (json \ "height").asOpt[Double].getOrElse(0.0) // Hier wird der Standardwert gesetzt
+      val height = (json \ "height").asOpt[Double].getOrElse(0.0) 
       val latitude = (json \ "latitude").asOpt[Double].getOrElse(0.0)
       val longitude = (json \ "longitude").asOpt[Double].getOrElse(0.0)
       val earthRevolutions = (json \ "earthRevolutions").as[Int]
