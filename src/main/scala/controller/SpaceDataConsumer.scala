@@ -47,7 +47,7 @@ class SpaceDataConsumer() {
     }
   }
 
-    private def processRecord(record: ConsumerRecord[String, String], updateFunction: List[SpaceEntity] => Unit): Unit = {
+  private def processRecord(record: ConsumerRecord[String, String], updateFunction: List[SpaceEntity] => Unit): Unit = {
     val json = Json.parse(record.value())
 
     json.validate[List[SpaceEntity]] match {
