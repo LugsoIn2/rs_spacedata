@@ -17,6 +17,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 // import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.streaming.kafka010
 import org.apache.spark.sql.kafka010
+import org.apache.spark.sql.Column
 import org.apache.log4j.{Level, Logger}
 import org.apache.kafka.common.serialization.StringDeserializer
 // import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
@@ -24,6 +25,9 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import java.time.Duration
 import scala.collection.JavaConverters._
 import org.apache.log4j.LogManager
+import SpaceData.model.Rocket
+import scala.util.Success
+import scala.util.Failure
 
 
 class SpaceDataConsumer() {
@@ -73,62 +77,21 @@ class SpaceDataConsumer() {
     }
   }
 
-  // def consumeFromKafkaWithSpark2(topicName: String): Unit = {
-  //   val sparkConf = new SparkConf().setAppName("KafkaSparkIntegration").setMaster("local[*]")
-  //   val sc = new SparkContext(sparkConf)
-  //   val ssc = new StreamingContext(sc, Seconds(5))
-
-  //   val kafkaBroker = "your_kafka_broker"
-  //   // val topicName = "your_kafka_topic"
-
-  //   val kafkaParams = Map(
-  //     "bootstrap.servers" -> kafkaBroker,
-  //     "key.deserializer" -> classOf[StringDeserializer].getName,
-  //     "value.deserializer" -> classOf[StringDeserializer].getName,
-  //     "group.id" -> "space-data-group",
-  //     "auto.offset.reset" -> "earliest",
-  //     "enable.auto.commit" -> "false"
-  //   )
-
-  //   val topics = Set(topicName)
-
-  //   val kafkaStream = KafkaUtils.createDirectStream[String, String](
-  //     ssc,
-  //     LocationStrategies.PreferConsistent,
-  //     ConsumerStrategies.Subscribe[String, String](topics, kafkaParams)
-  //   )
-    
-  //   kafkaStream.foreachRDD { rdd =>
-  //     // Hier kannst du deine bestehende Logik für die Verarbeitung der Daten einfügen
-  //     rdd.foreach(record => print(record))
-  //   }
-
-  //   ssc.start()
-  //   ssc.awaitTermination()
-  // }
-
-
-    def consumeFromKafkaWithSpark(topicName: String) {
+  def consumeFromKafkaWithSpark(topicName: String) {
     // Create a Spark session
 
     val spark = SparkSession.builder()
       .appName("SpaceDataSparkConsumer")
       .master("local[*]") // Use a local Spark cluster for testing
-      // .config("spark.master", "local")
-      // .config("spark.jars.packages", "com.fasterxml.jackson.module:jackson-module-scala_2.13:2.13.4")
       .getOrCreate()
 
     import spark.implicits._
-
-    // Define the schema for the JSON data
-    // val schema = StructType(
-    //   Seq(
-    //     StructField("name", StringType),
-    //     StructField("id", StringType),
-    //     StructField("active", BooleanType)
-    //     // Add more fields based on your JSON structure
-    //   )
-    // )
+    val playJsonSchemaRocket = StructType(Array(
+      StructField("entityType", StringType, true),
+      StructField("name", StringType, true),
+      StructField("id", StringType, true),
+      StructField("active", BooleanType, true)
+    ))
 
     // Read data from Kafka topic using Spark Structured Streaming
     val kafkaStreamDF = spark.readStream
@@ -136,45 +99,34 @@ class SpaceDataConsumer() {
       .option("kafka.bootstrap.servers", kafkaBroker)
       .option("subscribe", topicName)
       .load()
-      .selectExpr("CAST(value AS STRING)") // Assuming the JSON data is in the 'value' field
+      // .selectExpr("CAST(value AS STRING)") // Assuming the JSON data is in the 'value' field
+    val valuesDF = kafkaStreamDF.selectExpr("CAST(value AS STRING)")
 
+    val explodedDF = valuesDF.select(from_json($"value", ArrayType(playJsonSchemaRocket)).as("data")).select(explode($"data").as("data"))
+    val parsedDF = explodedDF.select("data.*")
+    val rocketDF = parsedDF.as[Rocket]
+    
+    // val transformedDF = parsedDF
 
-      // kafkaStreamDF.writeStream.start()
-
-    // val kafkaStreamDF = spark
-    //   .readStream
-    //   .format("kafka")
-    //   .option("kafka.bootstrap.servers", kafkaBroker)
-    //   .option("subscribe", topicName)
-    //   .load()
-    // kafkaStreamDF.selectExpr("CAST(key AS STRING)", "CAST(value AS STRING)")
-    //   .as[(String, String)]
-
-    // df.show()
-    print("MOTHERFUCKER")
-    // Parse JSON data using schema
-    val parsedDF = kafkaStreamDF
-      // .select(from_json($"value", schema).as("data"))
-      // .select("data.*")
-
-    // Perform any additional transformations as needed
-    val transformedDF = parsedDF
-      // .filter("age > 25")
-      // .select("name", "age")
 
     // Write the results to the console (you can modify this to write to another sink)
     print("FUUUUUUUUUUUUUUUUU")
-    val query = transformedDF.writeStream
+    val query = parsedDF.writeStream
+      .queryName("RocketProcessing")
       .outputMode("append")
-      .format("console")
+      // .format("console")
+      .format("memory")
       .start()
 
+    print(rocketDF.toString())
     // // Await termination of the streaming query
     query.awaitTermination()
+    // parsedDF.show(false)
 
     // Stop the Spark session
     spark.stop()
   }
+
 
   private def processRecord2(recordValue: String, updateFunction: List[SpaceEntity] => Unit): Unit = {
     // Füge hier deine Logik zur Verarbeitung eines Kafka-Records ein
