@@ -8,6 +8,13 @@ import scala.io.Source
 
 class TUI(var controller:SpaceDataControllerConsumer) extends TUIDSLMode with TUIHelpers {
 
+  while (
+    controller.checkListsNotEmpty()
+  ) {
+    Thread.sleep(1000)
+    println("SpaceData is Loading, please wait...")
+  }
+
   printHeader()
 
   def processInput(input: String): Unit = {

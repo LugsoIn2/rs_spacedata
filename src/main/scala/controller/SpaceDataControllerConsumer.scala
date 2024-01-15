@@ -130,6 +130,15 @@ class SpaceDataControllerConsumer() {
     }
   }
 
+  def checkListsNotEmpty(): Boolean = {
+    rocketslistAll.isEmpty &&
+    rocketslisActive.isEmpty &&
+    rocketslisInactive.isEmpty &&
+    starlinksatlistAll.isEmpty &&
+    starlinksatlistActive.isEmpty &&
+    starlinksatlistInactive.isEmpty
+  }
+
 
   def getSpaceEntitiesList(slct: String, entity: String): List[SpaceEntity] = {
     val selector = stringToSelecorSpaceEntity(slct)
