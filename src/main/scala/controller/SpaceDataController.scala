@@ -32,6 +32,7 @@ class SpaceDataController() {
   def getRocketList(selector: SelectorSpaceEntity): List[SpaceEntity] = {
     val result: List[SpaceEntity] = selector match {
       case `all` =>
+        //consumerController.consumeFromKafkaWithSpark("rockets-all")
         consumerController.rocketslistAll
       case `active` =>
         consumerController.rocketslisActive

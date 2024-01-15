@@ -53,7 +53,7 @@ class SpaceDataConsumer() {
     }
   }
 
-  private def consumeFromKafkaWithSpark(topicName: String, schema: StructType) {
+  def consumeFromKafkaWithSpark(topicName: String) {
     // Create a Spark session
     val spark = SparkSession.builder()
       .appName("SpaceDataSparkConsumer")
@@ -66,7 +66,8 @@ class SpaceDataConsumer() {
     val schema = StructType(
       Seq(
         StructField("name", StringType),
-        StructField("age", IntegerType),
+        StructField("id", StringType),
+        StructField("active", BooleanType)
         // Add more fields based on your JSON structure
       )
     )
@@ -75,7 +76,7 @@ class SpaceDataConsumer() {
     val kafkaStreamDF = spark.readStream
       .format("kafka")
       .option("kafka.bootstrap.servers", kafkaBroker)
-      .option("subscribe", "your_kafka_topic")
+      .option("subscribe", topicName)
       .load()
       .selectExpr("CAST(value AS STRING)") // Assuming the JSON data is in the 'value' field
 
