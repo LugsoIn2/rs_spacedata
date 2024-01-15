@@ -3,34 +3,14 @@ package SpaceData.controller
 import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
 import SpaceData.controller.{active, inactive, all}
 import SpaceData.util.spacexApiClient._
-import akka.actor.{ActorSystem, Props}
-import akka.stream.ActorMaterializer
-import akka.stream.scaladsl._
-import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
-import akka.pattern.ask
-import scala.concurrent.Future
-import javax.xml.crypto.Data
-import akka.util.Timeout
 import scala.concurrent.ExecutionContextExecutor
-import akka.actor.ActorRef
-
-import java.util.Properties
-import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
-
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import play.api.libs.json._
-
 import java.util.Properties
 import scala.collection.JavaConverters._
-import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.clients.consumer.KafkaConsumer
-import scala.concurrent.duration._
+import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer, ConsumerRecord}
 import java.time.Duration
-import org.apache.kafka.clients.consumer.ConsumerRecord
-
 
 
 class SpaceDataControllerConsumer() {
