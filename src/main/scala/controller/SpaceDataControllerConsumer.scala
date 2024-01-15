@@ -12,7 +12,6 @@ import java.time.Duration
 
 
 class SpaceDataControllerConsumer() {
-  val launcheslist = SpaceDataLaunchController.launches(allLaunches)
   var rocketslistAll: List[SpaceEntity] = List.empty
   var rocketslisActive: List[SpaceEntity] = List.empty
   var rocketslisInactive: List[SpaceEntity] = List.empty
