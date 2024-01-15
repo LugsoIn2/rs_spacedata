@@ -10,7 +10,13 @@ import java.time.Duration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types._
+
 class SpaceDataConsumer() {
+  val kafkaBroker = "localhost:9092"
+
   var rocketslistAll: List[SpaceEntity] = List.empty
   var rocketslisActive: List[SpaceEntity] = List.empty
   var rocketslisInactive: List[SpaceEntity] = List.empty
@@ -29,7 +35,7 @@ class SpaceDataConsumer() {
 
   private def consumeFromKafka(topicName: String, updateFunction: List[SpaceEntity] => Unit): Future[Unit] = Future {
     val props = new Properties()
-    props.put("bootstrap.servers", "localhost:9092")
+    props.put("bootstrap.servers", kafkaBroker)
     props.put("group.id", "space-data-group")
     props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")
     props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer")
@@ -45,6 +51,55 @@ class SpaceDataConsumer() {
     } finally {
       consumer.close()
     }
+  }
+
+  private def consumeFromKafkaWithSpark(topicName: String, schema: StructType) {
+    // Create a Spark session
+    val spark = SparkSession.builder()
+      .appName("SpaceDataSparkConsumer")
+      .master("local[*]") // Use a local Spark cluster for testing
+      .getOrCreate()
+
+    import spark.implicits._
+
+    // Define the schema for the JSON data
+    val schema = StructType(
+      Seq(
+        StructField("name", StringType),
+        StructField("age", IntegerType),
+        // Add more fields based on your JSON structure
+      )
+    )
+
+    // Read data from Kafka topic using Spark Structured Streaming
+    val kafkaStreamDF = spark.readStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", kafkaBroker)
+      .option("subscribe", "your_kafka_topic")
+      .load()
+      .selectExpr("CAST(value AS STRING)") // Assuming the JSON data is in the 'value' field
+
+    // Parse JSON data using schema
+    val parsedDF = kafkaStreamDF
+      .select(from_json($"value", schema).as("data"))
+      .select("data.*")
+
+    // Perform any additional transformations as needed
+    val transformedDF = parsedDF
+      .filter("age > 25")
+      .select("name", "age")
+
+    // Write the results to the console (you can modify this to write to another sink)
+    val query = transformedDF.writeStream
+      .outputMode("append")
+      .format("console")
+      .start()
+
+    // Await termination of the streaming query
+    query.awaitTermination()
+
+    // Stop the Spark session
+    spark.stop()
   }
 
   private def processRecord(record: ConsumerRecord[String, String], updateFunction: List[SpaceEntity] => Unit): Unit = {

@@ -35,8 +35,10 @@ val dependencies = Seq(
   "org.asynchttpclient" % "async-http-client" % "2.12.3",
   "io.circe" %% "circe-core" % "0.14.1",
   "io.circe" %% "circe-parser" % "0.14.1",
-  "org.scalatest" %% "scalatest" % "3.2.17" % Test,
-  "org.scalatest" %% "scalatest" % "3.2.17",
+  // "org.scalatest" %% "scalatest" % "3.2.17" % Test,
+  // "org.scalatest" %% "scalatest" % "3.2.17",
+  "org.scalatest" %% "scalatest" % "3.2.10" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.10",
   "org.scalatestplus" %% "mockito-5-8" % "3.2.17.0" % "test",
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
   "org.apache.kafka" % "kafka-clients" % "3.6.1",
@@ -44,6 +46,12 @@ val dependencies = Seq(
   "io.circe" %% "circe-core" % "0.14.6",
   "io.circe" %% "circe-parser" % "0.14.6",
   "org.playframework" %% "play-json" % "3.0.1",
+  "org.apache.spark" %% "spark-sql" % "3.2.0"
+  // "org.apache.spark" %% "spark-core" % "3.3.4",
+  // "org.scalatest" %% "scalatest" % "3.2.15",
+  // "org.apache.spark" %% "park-streaming" % "3.3.4",
+  // "org.apache.spark" %% "spark-streaming-kafka" % "3.3.4",
+  // "org.apache.spark" %% "spark-sql" % "3.3.4"
   //"com.typesafe.scala-logging" %% "scala-logging" % "3.9.5"
   //  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5", 
   //  "ch.qos.logback" % "logback-classic" % "1.4.7",
