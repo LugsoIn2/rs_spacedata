@@ -54,8 +54,7 @@ val dependencies = Seq(
   "org.apache.spark" %% "spark-sql-kafka-0-10" % "3.3.4",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.13.4",
   "com.fasterxml.jackson.core" % "jackson-annotations" % "2.13.4",
-  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.4",
-  "org.apache.hadoop" % "hadoop-client" % "3.3.4"
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.4"
 )
 
 
