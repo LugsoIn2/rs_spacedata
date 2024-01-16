@@ -13,8 +13,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
-import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.{Await, Future, ExecutionContextExecutor}
 
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 import org.json4s._
@@ -100,25 +99,15 @@ class SpaceDataProducer() {
 
     // Print JSON data before sending to Kafka
     implicit val formats: DefaultFormats.type = DefaultFormats
-    var entitiesList: List[String] = List.empty
-    entities.foreach { entity =>
-      entitiesList = entitiesList :+ write(entity)
-    }
-    val message: String = entitiesList.mkString("[", ",", "]")
+
+    val entityJsonStrings: List[String] = entities.map(entity => write(entity))
+
+    // Create a single JSON array string
+    val message: String = entityJsonStrings.mkString("[", ",", "]")
 
     val record = new ProducerRecord[String, String](topicName, message)
     producer.send(record)
 
     producer.close()
   }
-
-  def stringToSelecorSpaceEntity(slct: String): SelectorSpaceEntity = {
-      slct.toLowerCase match {
-      case "all" => all: SelectorSpaceEntity
-      case "active" => active: SelectorSpaceEntity
-      case "inactive" => inactive: SelectorSpaceEntity
-      case _ => throw new IllegalArgumentException("Ungültiger SelectorSpaceEntity")
-    }
-  }
-
 }

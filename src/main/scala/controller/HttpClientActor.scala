@@ -37,12 +37,13 @@ class HttpClientActor extends Actor with ActorLogging {
 
       responseFuture.onComplete {
         case Success(response) =>
-            val data = Unmarshal(response.entity).to[String] //response.entity.toString()
+            val data = Unmarshal(response.entity).to[String]
             data.onComplete {
                 case Success(body) =>
-                  spaceEntitiesDiff(endpoint, body)
+                  spaceEntities = createSpaceEntitiesInstances(endpoint, body)
                 case Failure(ex) =>
-                    println(s"Failed to unmarshal response body: $ex")
+                  println(s"Failed to unmarshal response body: $ex")
+                  spaceEntities = List.empty
             }
             
             
@@ -55,23 +56,16 @@ class HttpClientActor extends Actor with ActorLogging {
       sender() ! spaceEntities
   }
 
-
   
-  def spaceEntitiesDiff(endpoint: String, body: String) {
+  def createSpaceEntitiesInstances(endpoint: String, body: String): List[SpaceEntity] = {
     val dataAsList: List[Json] = SpaceData.util.spacexApiClient.Helpers.parseToList(body, "get")
-    var entityList: List[SpaceEntity] = List.empty
-    spaceEntities = endpoint match {
-      case "/starlink" =>
-          dataAsList.foreach { item =>
-              entityList = entityList :+ StarlinkSatFactory.createInstance(item)
-          }
-          entityList
-      case "/rockets" =>
-          dataAsList.foreach { item =>
-              entityList = entityList :+ RocketFactory.createInstance(item)
-          }
-          entityList
-    }   
+
+    val entityList: List[SpaceEntity] = endpoint match {
+      case "/starlink" => dataAsList.map(item => StarlinkSatFactory.createInstance(item))
+      case "/rockets"  => dataAsList.map(item => RocketFactory.createInstance(item))
+      case _           => List.empty
+    }
+    entityList
   }
 }
 
