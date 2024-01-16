@@ -26,6 +26,7 @@ import java.time.Duration
 import scala.collection.JavaConverters._
 import org.apache.log4j.LogManager
 import SpaceData.model.Rocket
+import SpaceData.model.StarlinkSat
 import scala.util.Success
 import scala.util.Failure
 
@@ -33,11 +34,7 @@ import scala.util.Failure
 class SpaceDataConsumer() {
   val kafkaBroker = "localhost:9092"
   Logger.getLogger("org").setLevel(Level.WARN)
-  // Logger.getLogger("akka").setLevel(Level.WARN)
-  // Logger.getLogger("play").setLevel(Level.WARN)
-  // Logger.getLogger("play").setLevel(Level.WARN)
   LogManager.getRootLogger.setLevel(Level.WARN)
-
     // Set the logging level for Kafka logger to a specific level
   Logger.getLogger("org.apache.kafka").setLevel(Level.WARN)
 
@@ -77,121 +74,229 @@ class SpaceDataConsumer() {
     }
   }
 
-  def consumeFromKafkaWithSpark(topicName: String, updateFunction: List[SpaceEntity] => Unit) {
-    // Create a Spark session
+  // def consumeFromKafkaWithSpark(topicName: String): Unit = {
+  //   // Create a Spark session
 
+  //   val spark = SparkSession.builder()
+  //     .appName("SpaceDataSparkConsumer")
+  //     .master("local[*]") // Use a local Spark cluster for testing
+  //     .getOrCreate()
+
+  //   import spark.implicits._
+  //   val playJsonSchemaRocket = StructType(Array(
+  //     StructField("entityType", StringType, true),
+  //     StructField("name", StringType, true),
+  //     StructField("id", StringType, true),
+  //     StructField("active", BooleanType, true)
+  //   ))
+
+  //   // Read data from Kafka topic using Spark Structured Streaming
+  //   val kafkaStreamDF = spark.readStream
+  //     .format("kafka")
+  //     .option("kafka.bootstrap.servers", kafkaBroker)
+  //     .option("subscribe", topicName)
+  //     .load()
+  //     // .selectExpr("CAST(value AS STRING)") // Assuming the JSON data is in the 'value' field
+  //   val valuesDF = kafkaStreamDF.selectExpr("CAST(value AS STRING)")
+
+  //   val explodedDF = valuesDF.select(from_json($"value", ArrayType(playJsonSchemaRocket)).as("data")).select(explode($"data").as("data"))
+  //   val parsedDF = explodedDF.select("data.*")
+  //   val rocketDF = parsedDF.as[Rocket]
+    
+  //   // val transformedDF = parsedDF
+
+
+  //   // Write the results to the console (you can modify this to write to another sink)
+  //   print("FUUUUUUUUUUUUUUUUU")
+  //   val query = parsedDF.writeStream
+  //     .queryName("RocketProcessing")
+  //     .outputMode("append")
+  //     // .format("console")
+  //     .format("memory")
+  //     .start()
+
+  //   print(rocketDF.toString())
+  //   // // Await termination of the streaming query
+  //   query.awaitTermination()
+  //   // parsedDF.show(false)
+
+  //   // Stop the Spark session
+  //   spark.stop()
+  // }
+
+
+  def consumeFromKafkaWithSpark(topicName: String): Unit = {
+    // Create a Spark session
     val spark = SparkSession.builder()
       .appName("SpaceDataSparkConsumer")
       .master("local[*]") // Use a local Spark cluster for testing
       .getOrCreate()
 
     import spark.implicits._
-    val playJsonSchemaRocket = StructType(Array(
+    val rocketSchema = StructType(Array(
       StructField("entityType", StringType, true),
       StructField("name", StringType, true),
       StructField("id", StringType, true),
       StructField("active", BooleanType, true)
     ))
 
+    val starlinkSchema = StructType(Array(
+      StructField("entityType", StringType, true),
+      StructField("name", StringType, true),
+      StructField("id", StringType, true),
+      StructField("active", BooleanType, true),
+      StructField("launchDate", StringType, true),
+      StructField("period", DoubleType, true),
+      StructField("height", DoubleType, true),
+      StructField("latitude", DoubleType, true),
+      StructField("longitude", DoubleType, true),
+      StructField("earthRevolutions", IntegerType, true),
+      StructField("decayed", IntegerType, true)
+    ))
+
+    val topicSchemas = Map(
+      "rockets-all" -> rocketSchema,
+      "rockets-active" -> rocketSchema,
+      "rockets-inactive" -> rocketSchema,
+      "starlinksats-all" -> starlinkSchema,
+      "starlinksats-active" -> starlinkSchema,
+      "starlinksats-inactive" -> starlinkSchema,
+    )
+
+    import org.apache.spark.sql.functions._
+    // Get the schema and query name for the current topic
+    val jsonSchema = topicSchemas(topicName)
+    // val queryName = queryNames(topicName)
+
     // Read data from Kafka topic using Spark Structured Streaming
     val kafkaStreamDF = spark.readStream
       .format("kafka")
       .option("kafka.bootstrap.servers", kafkaBroker)
       .option("subscribe", topicName)
       .load()
-      // .selectExpr("CAST(value AS STRING)") // Assuming the JSON data is in the 'value' field
     val valuesDF = kafkaStreamDF.selectExpr("CAST(value AS STRING)")
-
-    val explodedDF = valuesDF.select(from_json($"value", ArrayType(playJsonSchemaRocket)).as("data")).select(explode($"data").as("data"))
-    val parsedDF = explodedDF.select("data.*")
-    val rocketDF = parsedDF.as[Rocket]
     
-    // val transformedDF = parsedDF
+    val explodedDF = valuesDF.select(from_json($"value", ArrayType(jsonSchema)).as("data")).select(explode($"data").as("data"))
+    val parsedDF = explodedDF.select("data.*")
 
+    val tDF = topicName match {
+      case "rockets-all" | "rockets-active" | "rockets-inactive" => parsedDF.as[Rocket]
+      case "starlinksats-all" | "starlinksats-active" | "starlinksats-inactive" => parsedDF.as[StarlinkSat]
+    }
+
+    // tDF.collect().foreach(_ => print("FFFFFFUUUUUUUSSSSSSSS"))
+    // val tDF = parsedDF.as[Rocket]
+    // val dataList = tDF.collect()
+    // updateFunction(dataList)
+    val array = tDF.collect()
+    array.foreach(println)
+
+    // array.foreach(println)
 
     // Write the results to the console (you can modify this to write to another sink)
-    print("FUUUUUUUUUUUUUUUUU")
-    val query = parsedDF.writeStream
-      .queryName("RocketProcessing")
+    val query = tDF.writeStream
+      .queryName(topicName)
       .outputMode("append")
-      // .format("console")
-      .format("memory")
+      .format("console")
+      // .format("memory")
       .start()
 
-    print(rocketDF.toString())
-    // // Await termination of the streaming query
-    query.awaitTermination()
-    // parsedDF.show(false)
+    
+    
 
+    // Collect the data into a list and call the update function
+    // val dataList = tDF.collect().toList
+    // dataList.foreach(println)
+  
+
+    query.awaitTermination()
     // Stop the Spark session
     spark.stop()
   }
+
+
 
 //consumeFromKafkaWithSparkGeneric[Rocket]("topicName", playJsonSchemaRocket)
 //consumeFromKafkaWithSparkGeneric[StarlinkSat]("topicName", playJsonSchemaStarlinkSat)
 
-  def consumeFromKafkaWithSparkGeneric[T <: SpaceEntity : Encoder](topicName: String)(implicit tag: TypeTag[T]) {
-    // Create a Spark session
+  // def consumeFromKafkaWithSparkGeneric(topicName: String, updateFunction: List[SpaceEntity] => Unit): Future[Unit] = Future {
+  //   // Create a Spark session
+  //   val spark = SparkSession.builder()
+  //     .appName("SpaceDataSparkConsumer")
+  //     .master("local[*]") // Use a local Spark cluster for testing
+  //     .getOrCreate()
 
-    val spark = SparkSession.builder()
-      .appName("SpaceDataSparkConsumer")
-      .master("local[*]") // Use a local Spark cluster for testing
-      .getOrCreate()
+  //   import spark.implicits._
+  //   val rocketSchema = StructType(Array(
+  //     StructField("entityType", StringType, true),
+  //     StructField("name", StringType, true),
+  //     StructField("id", StringType, true),
+  //     StructField("active", BooleanType, true)
+  //   ))
 
-    // Define the schemas and query names for each topic
-    val topicSchemas = Map(
-      "rocketTopic" -> StructType(Array(
-        StructField("entityType", StringType, true),
-        StructField("name", StringType, true),
-        StructField("id", StringType, true),
-        StructField("active", BooleanType, true)
-      )),
-      "starlinkSatTopic" -> StructType(Array(
-        // Define the schema for StarlinkSat
-      ))
-    )
-    val queryNames = Map(
-      "rocketTopic" -> "RocketProcessing",
-      "starlinkSatTopic" -> "StarlinkSatProcessing"
-    )
+  //   val starlinkSchema = StructType(Array(
+  //     StructField("entityType", StringType, true),
+  //     StructField("name", StringType, true),
+  //     StructField("id", StringType, true),
+  //     //StructField("active", BooleanType, true)
+  //     StructField("launchDate", StringType, true),
+  //     StructField("period", DoubleType, true),
+  //     StructField("height", DoubleType, true),
+  //     StructField("latitude", DoubleType, true),
+  //     StructField("longitude", DoubleType, true),
+  //     StructField("earthRevolutions", IntegerType, true),
+  //     StructField("decayed", IntegerType, true)
+  //   ))
 
-    // Get the schema and query name for the current topic
-    val jsonSchema = topicSchemas(topicName)
-    val queryName = queryNames(topicName)
+  //   val topicSchemas = Map(
+  //     "rockets-all" -> rocketSchema,
+  //     "rockets-active" -> rocketSchema,
+  //     "rockets-inactive" -> rocketSchema,
+  //     "starlinksats-all" -> starlinkSchema,
+  //     "starlinksats-active" -> starlinkSchema,
+  //     "starlinksats-inactive" -> starlinkSchema,
+  //   )
 
-    // Read data from Kafka topic using Spark Structured Streaming
-    val kafkaStreamDF = spark.readStream
-      .format("kafka")
-      .option("kafka.bootstrap.servers", kafkaBroker)
-      .option("subscribe", topicName)
-      .load()
-    val valuesDF = kafkaStreamDF.selectExpr("CAST(value AS STRING)")
-    val explodedDF = valuesDF.select(from_json($"value", ArrayType(JsonShema)).as("data")).select(explode($"data").as("data"))
-    val parsedDF = explodedDF.select("data.*")
-    val tDF = parsedDF.as[T]
+  //   import org.apache.spark.sql.functions._
+  //   // Get the schema and query name for the current topic
+  //   val jsonSchema = topicSchemas(topicName)
+  //   // val queryName = queryNames(topicName)
 
-    // Write the results to the console (you can modify this to write to another sink)
-    val query = parsedDF.writeStream
-      .queryName("RocketProcessing")
-      .outputMode("append")
-      // .format("console")
-      .format("memory")
-      .start()
+  //   // Read data from Kafka topic using Spark Structured Streaming
+  //   val kafkaStreamDF = spark.readStream
+  //     .format("kafka")
+  //     .option("kafka.bootstrap.servers", kafkaBroker)
+  //     .option("subscribe", topicName)
+  //     .load()
+  //   val valuesDF = kafkaStreamDF.selectExpr("CAST(value AS STRING)")
+    
+  //   val explodedDF = valuesDF.select(from_json($"value", ArrayType(jsonSchema)).as("data")).select(explode($"data").as("data"))
+  //   val parsedDF = explodedDF.select("data.*")
 
-    // Await termination of the streaming query
-    query.awaitTermination()
+  //   val tDF = topicName match {
+  //     case "rockets-all" | "rockets-active" | "rockets-inactive" => parsedDF.as[Rocket]
+  //     case "starlinksats-all" | "starlinksats-active" | "starlinksats-inactive" => parsedDF.as[StarlinkSat]
+  //   }
 
-    // Stop the Spark session
-    spark.stop()
-  }
+  //   // val tDF = parsedDF.as[Rocket]
 
+  //   // Collect the data into a list and call the update function
+  //   val dataList = tDF.collect().toList
+  //   dataList.foreach(println)
+  //   // updateFunction(dataList)
 
+  //   // Write the results to the console (you can modify this to write to another sink)
+  //   val query = parsedDF.writeStream
+  //     .queryName(topicName)
+  //     .outputMode("append")
+  //     .format("console")
+  //     // .format("memory")
+  //     .start()
 
-  private def processRecord2(recordValue: String, updateFunction: List[SpaceEntity] => Unit): Unit = {
-    // Füge hier deine Logik zur Verarbeitung eines Kafka-Records ein
-    // Du kannst `updateFunction` aufrufen und die `recordValue` übergeben
-    // um deine bestehende Logik beizubehalten
-  }
+  //   query.awaitTermination()
+  //   // Stop the Spark session
+  //   spark.stop()
+  // }
 
 
   private def processRecord(record: ConsumerRecord[String, String], updateFunction: List[SpaceEntity] => Unit): Unit = {
@@ -231,11 +336,13 @@ class SpaceDataConsumer() {
   //   case (topic, updateFunction) => topic -> consumeFromKafka(topic, updateFunction)
   // }
 
-//private val futures: Map[String, Future[Unit]] = topicMappings.map {
-//  case (topic, updateFunction) => topic -> Future {
-//    consumeFromKafkaWithSparkGeneric[SpaceEntity](topic, updateFunction)
-//     //updateFunction()
-//   }
-// }
+  // private val futures: Map[String, Future[Unit]] = topicMappings.map {
+  //   case (topic, updateFunction) => topic -> consumeFromKafkaWithSparkGeneric(topic, updateFunction)
+  //       //updateFunction()
+  // }
 
 }
+
+
+// consumeFromKafkaWithSparkGeneric[Rocket]("topicName", playJsonSchemaRocket)
+// consumeFromKafkaWithSparkGeneric[StarlinkSat]("topicName", playJsonSchemaStarlinkSat)
