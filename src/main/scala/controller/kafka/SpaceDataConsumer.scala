@@ -127,7 +127,7 @@ class SpaceDataConsumer() {
   // }
 
 
-  def consumeFromKafkaWithSpark(topicName: String): Future[Unit] = Future {
+  def consumeFromKafkaWithSpark(topicName: String): Unit = {
     // Create a Spark session
     val spark = SparkSession.builder()
       .appName("SpaceDataSparkConsumer")
@@ -391,9 +391,13 @@ def processBatch(dataList: List[Rocket]): Unit = {
   //   case (topic, updateFunction) => topic -> consumeFromKafka(topic, updateFunction)
   // }
 
-  private val futures: Map[String, Future[Unit]] = topicMappings.map {
-    case (topic, updateFunction) => topic -> consumeFromKafkaWithSpark(topic)
-        //updateFunction()
+  // private val futures: Map[String, Future[Unit]] = topicMappings.map {
+  //   case (topic, updateFunction) => topic -> consumeFromKafkaWithSpark(topic)
+  //       //updateFunction()
+  // }
+
+  val kafkaConsumerFuture: Future[Unit] = Future {
+    consumeFromKafkaWithSpark("rockets-all")
   }
 
 }
