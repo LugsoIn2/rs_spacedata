@@ -1,13 +1,11 @@
-// SpaceDataController.scala
 package SpaceData.controller
+
 import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
 import SpaceData.controller.{active, inactive, all}
-import SpaceData.util.spacexApiClient._
 import SpaceData.controller.kafka.SpaceDataConsumer
 
 class SpaceDataController() {
   val consumerController = new SpaceDataConsumer()
-  // val launcheslist = SpaceDataLaunchController.launches(allLaunches)
 
   def checkListsNotEmpty(): Boolean = {
     consumerController.rocketslistAll.isEmpty &&
@@ -77,37 +75,7 @@ class SpaceDataController() {
     entity.find(_.id == targetId)
   }
 
-
-  // def getLauchesList(slct: String): List[Launch] = {
-  //   val selector = stringToSelecorLaunch(slct)
-  //   selector match {
-  //       case `allLaunches` => {
-  //         launcheslist
-  //       } case `succeeded` => {
-  //         //TODO
-  //         launcheslist
-  //     } case `failed` => {
-  //         //TODO
-  //         launcheslist
-  //     }
-  //   }
-  // }
-
-  // def getLaunchDetails(id: String): Option[Launch] = {
-  //   val foundLaunch: Option[Launch] = findLaunchById(launcheslist,id)
-  //   foundLaunch match {
-  //     case Some(launch) =>
-  //       Some(launch)
-  //     case None =>
-  //       None
-  //   }
-  // }
-
-  def findLaunchById(lauches: List[Launch], targetId: String): Option[Launch] = {
-    lauches.find(_.id == targetId)
-  }
-
-  def getDashboardValues(): (List[(String, Int)], /* List[(String, Int)], */ List[(String, Int)]) = {
+  def getDashboardValues(): (List[(String, Int)], List[(String, Int)]) = {
     val dashbStarlinkVals: List[(String, Int)] =
       List(
         ("all", getSpaceEntitiesList("all", "starlinksat").size),
@@ -120,32 +88,15 @@ class SpaceDataController() {
         ("active", getSpaceEntitiesList("active", "rocket").size),
         ("inactive", getSpaceEntitiesList("inactive", "rocket").size)
       )
-    // val dashbLaunchVals: List[(String, Int)] =
-    //   List(
-    //     ("allLaunches", launcheslist.size),
-    //     ("succeeded", launcheslist.size),
-    //     ("failed", launcheslist.size)
-    //   )
-    (dashbStarlinkVals, /* dashbLaunchVals, */ dashbRocketsVals)
+    (dashbStarlinkVals,  dashbRocketsVals)
   }
 
   def stringToSelecorSpaceEntity(slct: String): SelectorSpaceEntity = {
-      //val selector: Selector
       slct.toLowerCase match {
       case "all" => all: SelectorSpaceEntity
       case "active" => active: SelectorSpaceEntity
       case "inactive" => inactive: SelectorSpaceEntity
       case _ => throw new IllegalArgumentException("Ungültiger SelectorSpaceEntity")
-    }
-  }
-
-  def stringToSelecorLaunch(slct: String): SelectorLaunch = {
-      //val selector: Selector
-      slct match {
-      case "allLaunches" => allLaunches: SelectorLaunch
-      case "succeeded" => succeeded: SelectorLaunch
-      case "failed" => failed: SelectorLaunch
-      case _ => throw new IllegalArgumentException("Ungültiger SelectorLaunch")
     }
   }
 

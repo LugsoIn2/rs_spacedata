@@ -1,43 +1,27 @@
-// SpaceDataController.scala
 package SpaceData.controller.kafka
+
 import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
 import SpaceData.controller.{active, inactive, all}
-import SpaceData.util.spacexApiClient._
 import SpaceData.controller.HttpClientActor
 import SpaceData.controller.GetSpaceEntities
 import SpaceData.controller.GetCurrentState
 import SpaceData.controller.SelectorSpaceEntity
-import akka.actor.{ActorSystem, Props}
+import akka.actor.{ActorSystem, Props, ActorRef}
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl._
+import akka.pattern.ask
+import akka.util.Timeout
+
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
-import akka.pattern.ask
-import scala.concurrent.Future
-import javax.xml.crypto.Data
-import akka.util.Timeout
 import scala.concurrent.ExecutionContextExecutor
-import akka.actor.ActorRef
 
-import java.util.Properties
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
-
-import io.circe._
-import io.circe.parser._
-
-import play.api.libs.json.{Json, Writes}
-
-
 import org.json4s._
 import org.json4s.native.Serialization._
 
-
-
-
 import java.util.Properties
-import scala.collection.JavaConverters._
-import org.apache.kafka.clients.consumer.ConsumerConfig
-import org.apache.kafka.clients.consumer.KafkaConsumer
+
 
 class SpaceDataProducer() {
   // Actor System
@@ -50,7 +34,7 @@ class SpaceDataProducer() {
   val httpClientActorRockets = httpActorSystem.actorOf(Props(new HttpClientActor))
 
   def produceEntityToKafka() = {
-    // println("producerLoop")
+
     // get data from API
     httpClientActorStarlinkSats ! GetSpaceEntities("/starlink")
     httpClientActorRockets ! GetSpaceEntities("/rockets")
@@ -105,7 +89,7 @@ class SpaceDataProducer() {
   }
 
   def produceEntities(entities: List[SpaceEntity], topicName: String): Unit = {
-    //println("produceEntities")
+
     // Kafka Configuration
     val props = new Properties()
     props.put("bootstrap.servers", "localhost:9092")

@@ -43,36 +43,15 @@ val dependencies = Seq(
   "org.json4s" %% "json4s-native" % "3.6.11",
   "io.circe" %% "circe-core" % "0.14.6",
   "io.circe" %% "circe-parser" % "0.14.6",
-  // "org.playframework" %% "play-json" % "3.0.1",
   "com.typesafe.play" %% "play-json" % "2.9.4",
 
   "org.apache.spark" %% "spark-sql" % "3.3.4",
-  // "org.apache.spark" %% "spark-core" % "3.3.4",
-  // "org.apache.spark" %% "spark-streaming" % "3.3.4",
-  // "org.apache.spark" %% "spark-streaming-kafka-0-10" % "3.0.1",
   "org.apache.spark" %% "spark-streaming-kafka-0-10" % "3.3.4",
   "org.apache.spark" %% "spark-sql-kafka-0-10" % "3.3.4",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.13.4",
   "com.fasterxml.jackson.core" % "jackson-annotations" % "2.13.4",
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.4"
 )
-
-
-//libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.11"
-//libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.11" % Test
-
-// lazy val root = project
-//     .in(file("."))
-//     .settings(
-//       name := name
-//       version := version
-//       scalaVersion := scalaVersion,
-//       //resolvers += "Akka library repository".at("https://repo.akka.io/maven"),
-//       libraryDependencies += "org.scalactic" %% "scalactic" % "3.2.11",
-//       libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.11" % "test",
-//       libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.4"
-//       //libraryDependencies += "com.typesafe.akka" %% "akka-actor-typed" % AkkaVersion
-//     )
 
 lazy val root = project
   .in(file("."))

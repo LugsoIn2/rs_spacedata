@@ -3,6 +3,7 @@ package SpaceData.controller
 import akka.actor.{Actor, ActorSystem, Props, ActorLogging}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
+import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
 import SpaceData.controller.factories.{StarlinkSatFactory, RocketFactory}
 
@@ -11,16 +12,13 @@ import scala.util.{Failure, Success}
 
 import SpaceData.model.{Launch, StarlinkSat, SpaceEntity}
 
-import akka.stream.StreamRefMessages
-import akka.http.scaladsl.unmarshalling.Unmarshal
-
 import io.circe.Json
 
 // Message to trigger HTTP request in actor
 case class GetSpaceEntities(endpoint: String)
 
 // Message to return actor's current state as a response
-case object GetCurrentState //():List[SpaceEntity]
+case object GetCurrentState
 
 // Actor responsible for making HTTP requests and maintaining state
 class HttpClientActor extends Actor with ActorLogging {
@@ -75,30 +73,8 @@ class HttpClientActor extends Actor with ActorLogging {
           entityList
     }   
   }
-
 }
 
 object HttpClientActor {
   def props: Props = Props[HttpClientActor]
 }
-
-// object ParallelHttpCalls {
-//   def main(args: Array[String]): Unit = {
-//     implicit val actorSystem: ActorSystem = ActorSystem("ParallelHttpCalls")
-//     implicit val materializer: ActorMaterializer = ActorMaterializer()
-//     val httpClientActor = actorSystem.actorOf(Props(new HttpClientActor))
-    
-//     val urls = List(
-//       "https://api.example.com/endpoint1",
-//       "https://api.example.com/endpoint2",
-//       "https://api.example.com/endpoint3"
-//       // Add more URLs as needed
-//     )
-
-//     // Trigger HTTP requests using actors
-//     urls.foreach(url => httpClientActor ! HttpRequestMessage(url))
-
-//     // Get the current state of the actor
-//     httpClientActor ! GetCurrentState
-//   }
-// }
