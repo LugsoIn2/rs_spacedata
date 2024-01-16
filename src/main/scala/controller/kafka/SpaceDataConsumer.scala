@@ -77,7 +77,7 @@ class SpaceDataConsumer() {
     }
   }
 
-  def consumeFromKafkaWithSpark(topicName: String) {
+  def consumeFromKafkaWithSpark(topicName: String, updateFunction: List[SpaceEntity] => Unit) {
     // Create a Spark session
 
     val spark = SparkSession.builder()
@@ -127,6 +127,65 @@ class SpaceDataConsumer() {
     spark.stop()
   }
 
+//consumeFromKafkaWithSparkGeneric[Rocket]("topicName", playJsonSchemaRocket)
+//consumeFromKafkaWithSparkGeneric[StarlinkSat]("topicName", playJsonSchemaStarlinkSat)
+
+  def consumeFromKafkaWithSparkGeneric[T <: SpaceEntity : Encoder](topicName: String)(implicit tag: TypeTag[T]) {
+    // Create a Spark session
+
+    val spark = SparkSession.builder()
+      .appName("SpaceDataSparkConsumer")
+      .master("local[*]") // Use a local Spark cluster for testing
+      .getOrCreate()
+
+    // Define the schemas and query names for each topic
+    val topicSchemas = Map(
+      "rocketTopic" -> StructType(Array(
+        StructField("entityType", StringType, true),
+        StructField("name", StringType, true),
+        StructField("id", StringType, true),
+        StructField("active", BooleanType, true)
+      )),
+      "starlinkSatTopic" -> StructType(Array(
+        // Define the schema for StarlinkSat
+      ))
+    )
+    val queryNames = Map(
+      "rocketTopic" -> "RocketProcessing",
+      "starlinkSatTopic" -> "StarlinkSatProcessing"
+    )
+
+    // Get the schema and query name for the current topic
+    val jsonSchema = topicSchemas(topicName)
+    val queryName = queryNames(topicName)
+
+    // Read data from Kafka topic using Spark Structured Streaming
+    val kafkaStreamDF = spark.readStream
+      .format("kafka")
+      .option("kafka.bootstrap.servers", kafkaBroker)
+      .option("subscribe", topicName)
+      .load()
+    val valuesDF = kafkaStreamDF.selectExpr("CAST(value AS STRING)")
+    val explodedDF = valuesDF.select(from_json($"value", ArrayType(JsonShema)).as("data")).select(explode($"data").as("data"))
+    val parsedDF = explodedDF.select("data.*")
+    val tDF = parsedDF.as[T]
+
+    // Write the results to the console (you can modify this to write to another sink)
+    val query = parsedDF.writeStream
+      .queryName("RocketProcessing")
+      .outputMode("append")
+      // .format("console")
+      .format("memory")
+      .start()
+
+    // Await termination of the streaming query
+    query.awaitTermination()
+
+    // Stop the Spark session
+    spark.stop()
+  }
+
+
 
   private def processRecord2(recordValue: String, updateFunction: List[SpaceEntity] => Unit): Unit = {
     // Füge hier deine Logik zur Verarbeitung eines Kafka-Records ein
@@ -171,4 +230,12 @@ class SpaceDataConsumer() {
   // private val futures: Map[String, Future[Unit]] = topicMappings.map {
   //   case (topic, updateFunction) => topic -> consumeFromKafka(topic, updateFunction)
   // }
+
+//private val futures: Map[String, Future[Unit]] = topicMappings.map {
+//  case (topic, updateFunction) => topic -> Future {
+//    consumeFromKafkaWithSparkGeneric[SpaceEntity](topic, updateFunction)
+//     //updateFunction()
+//   }
+// }
+
 }
