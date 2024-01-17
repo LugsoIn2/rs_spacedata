@@ -18,7 +18,7 @@ class SpaceDataController() {
   }
   
   def bla(): Unit = {
-    consumerController.consumeFromKafkaWithSpark("rockets-all")
+    consumerController.consumeFromKafkaWithSpark("starlinksats-active")
   }
 
   def getSpaceEntitiesList(slct: String, entity: String): List[SpaceEntity] = {
