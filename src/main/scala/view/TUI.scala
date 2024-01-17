@@ -83,7 +83,7 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
     printValues(dashbStarlinkVals)
     printRockets()
     printValues(dashbRocketsVals)
-    printLaunches()
+    // printLaunches()
     // printValues(dashbLaunchVals)
     // printHelpLine()
   }
