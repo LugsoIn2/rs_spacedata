@@ -1,6 +1,6 @@
 package SpaceData.controller
 
-import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
+import SpaceData.model.{StarlinkSat, Rocket, SpaceEntity}
 import SpaceData.controller.{active, inactive, all}
 import SpaceData.controller.kafka.SpaceDataConsumer
 

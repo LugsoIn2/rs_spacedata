@@ -11,7 +11,7 @@ import SpaceData.util._
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
 
-import SpaceData.model.{Launch, StarlinkSat, SpaceEntity}
+import SpaceData.model.{SpaceEntity}
 
 import io.circe.Json
 import io.circe.parser._

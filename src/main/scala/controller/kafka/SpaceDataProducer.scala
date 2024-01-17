@@ -1,6 +1,6 @@
 package SpaceData.controller.kafka
 
-import SpaceData.model.{StarlinkSat, Launch, Rocket, SpaceEntity}
+import SpaceData.model.{StarlinkSat, Rocket, SpaceEntity}
 import SpaceData.controller.{active, inactive, all}
 import SpaceData.controller.HttpClientActor
 import SpaceData.controller.GetSpaceEntities
