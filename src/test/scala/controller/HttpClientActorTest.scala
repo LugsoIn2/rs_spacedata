@@ -13,7 +13,7 @@ import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.BeforeAndAfterAll
 import SpaceData.controller.actor.{GetSpaceEntities, GetCurrentState, HttpClientActor}
-import SpaceData.model.{SpaceEntity, StarlinkSat}
+import SpaceData.model.{SpaceEntity, StarlinkSat, Rocket}
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
 
@@ -30,7 +30,7 @@ class HttpClientActorSpec extends TestKit(ActorSystem("HttpClientActorSpec"))
     PatienceConfig(timeout = scaled(Span(5000, Millis)), interval = scaled(Span(100, Millis)))
 
   "HttpClientActor" should {
-    "return space entities on GetSpaceEntities message" in {
+    "return space entities on GetSpaceEntities(\"/starlink\") message" in {
       val actorRef = system.actorOf(HttpClientActor.props)
       val futureSpaceEntities: Future[List[SpaceEntity]] = (actorRef ? GetSpaceEntities("/starlink"))
         .mapTo[List[SpaceEntity]]
@@ -40,6 +40,42 @@ class HttpClientActorSpec extends TestKit(ActorSystem("HttpClientActorSpec"))
         futureSpaceEntities.onComplete { entities =>
           entities.asInstanceOf[List[SpaceEntity]] should not be empty 
           entities.asInstanceOf[List[SpaceEntity]].head shouldBe a[StarlinkSat]
+        }
+      }
+    }
+
+    "GetCurrentState of HattpClientActorRockets" in {
+      val actorRef = system.actorOf(HttpClientActor.props)
+      actorRef ! GetSpaceEntities("/rockets")
+      // Wait a couple of seconds to allow the actor to process the message
+      Thread.sleep(5000)
+      
+      val futureSpaceEntities: Future[List[SpaceEntity]] = (actorRef ? GetCurrentState)
+        .mapTo[List[SpaceEntity]]
+
+      // Using ScalaTest's built-in eventually to handle asynchronous assertions
+      eventually {
+        futureSpaceEntities.onComplete { entities =>
+          entities.asInstanceOf[List[SpaceEntity]] should not be empty 
+          entities.asInstanceOf[List[SpaceEntity]].head shouldBe a[Rocket]
+        }
+      }
+    }
+
+    "GetCurrentState of HattpClientActorStarlinkSats" in {
+      val actorRef = system.actorOf(HttpClientActor.props)
+      actorRef ! GetSpaceEntities("/starlink")
+      // Wait a couple of seconds to allow the actor to process the message
+      Thread.sleep(5000)
+      
+      val futureSpaceEntities: Future[List[SpaceEntity]] = (actorRef ? GetCurrentState)
+        .mapTo[List[SpaceEntity]]
+
+      // Using ScalaTest's built-in eventually to handle asynchronous assertions
+      eventually {
+        futureSpaceEntities.onComplete { entities =>
+          entities.asInstanceOf[List[SpaceEntity]] should not be empty 
+          entities.asInstanceOf[List[SpaceEntity]].head shouldBe a[Rocket]
         }
       }
     }
@@ -60,8 +96,21 @@ class HttpClientActorSpec extends TestKit(ActorSystem("HttpClientActorSpec"))
         .run()
         .flatMap(_ => (actorRef ? GetCurrentState).mapTo[List[SpaceEntity]])
 
-    whenReady(result/*.asInstanceOf[Future[List[SpaceEntity]]]*/) { entities =>
+      whenReady(result/*.asInstanceOf[Future[List[SpaceEntity]]]*/) { entities =>
         entities shouldBe empty
+      }
+    }
+    "return space entities on GetSpaceEntities(\"/rockets\") message" in {
+      val actorRef = system.actorOf(HttpClientActor.props)
+      val futureSpaceEntities: Future[List[SpaceEntity]] = (actorRef ? GetSpaceEntities("/rockets"))
+        .mapTo[List[SpaceEntity]]
+
+      // Using ScalaTest's built-in eventually to handle asynchronous assertions
+      eventually {
+        futureSpaceEntities.onComplete { entities =>
+          entities.asInstanceOf[List[SpaceEntity]] should not be empty 
+          entities.asInstanceOf[List[SpaceEntity]].head shouldBe a[StarlinkSat]
+        }
       }
     }
   }
