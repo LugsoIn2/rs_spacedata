@@ -1,7 +1,7 @@
 package SpaceData.controller.kafka
 
 import SpaceData.model.SpaceEntity
-import SpaceData.util.spacexApiClient._
+// import SpaceData.util.spacexApiClient._
 import play.api.libs.json._
 import java.util.Properties
 import scala.collection.JavaConverters._
