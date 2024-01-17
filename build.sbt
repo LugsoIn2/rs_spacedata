@@ -55,7 +55,7 @@ val dependencies = Seq(
   "org.scalatestplus" %% "mockito-5-8" % "3.2.17.0" % "test",
   "com.typesafe.akka" %% "akka-testkit" % "2.6.17" % Test,
   "com.typesafe.akka" %% "akka-stream-testkit" % "2.6.17" % Test,
-  "com.typesafe.akka" %% "akka-http-testkit" % "10.2.7" % Test
+  "com.typesafe.akka" %% "akka-http-testkit" % "10.2.7" % Test,
 )
 
 lazy val root = project
