@@ -1,7 +1,6 @@
 package SpaceData.controller.kafka
 
 import SpaceData.model.SpaceEntity
-// import SpaceData.util.spacexApiClient._
 import play.api.libs.json._
 import java.util.Properties
 import scala.collection.JavaConverters._
@@ -12,8 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import org.apache.log4j.{Level, Logger}
-import org.apache.log4j.LogManager
+import org.apache.log4j.{Level, Logger, LogManager}
 import SpaceData.model.StarlinkSat
 import org.apache.spark.sql.streaming.Trigger
 import scala.collection.mutable.ListBuffer
