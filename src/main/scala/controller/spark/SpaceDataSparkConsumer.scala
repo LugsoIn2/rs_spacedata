@@ -44,35 +44,35 @@ class SpaceDataSparkConsumer() {
       .option("kafka.group.id", "space-data-group-spark")
       .option("subscribe", topicName)
       .option("startingOffsets", "earliest")
-      .load()
+      .load().selectExpr("CAST(value AS STRING)")
     
-    val valuesDF = kafkaStreamDF.selectExpr("CAST(value AS STRING)")
     import spark.implicits._
-    val explodedDF = valuesDF.select(from_json($"value", ArrayType(starlinkSchema)).as("data")).select(explode($"data").as("data"))
-    val parsedDF = explodedDF.select("data.*")
-    val yearToFilter = "2020" 
-    val filteredDF = parsedDF.filter(year(col("launchDate")) === yearToFilter).limit(100)
+    val parsedDF = kafkaStreamDF.select(from_json($"value", ArrayType(starlinkSchema))
+        .as("data"))
+        .select(explode($"data")
+        .as("data"))
+        .select("data.*")
+
+    val filteredDF = parsedDF.filter(year(col("launchDate")) === "2020").limit(80)
 
     val query = filteredDF.writeStream
       .queryName(topicName)
-      // .outputMode("update")
       .outputMode("append")
-      // .format("foreach")
       .trigger(Trigger.Once()) 
       .foreachBatch { (batchDF: DataFrame, batchId: Long) =>
-        val periodColumn = batchDF("period")
-        val heightColumn = batchDF("height")
-        val speedDF = batchDF.withColumn("speed", ((heightColumn + 6000) * 2 * 3.14)/periodColumn)
-        // speedDF.show()
+        val speedDF = calculateSpeed(batchDF)
         starlinksatlistSpeeds ++= speedDF.as[StarlinkSat].collect()
-        // println("Liste: " + starlinksatlistSpeeds)
         println()
       }
       .start()
-
     query.awaitTermination()
-    // Stop the Spark session
     spark.stop()
     starlinksatlistSpeeds.toList
   }
+
+  private def calculateSpeed(df: DataFrame): DataFrame = {
+    df.withColumn("speed", ((col("height") + 6000) * 2 * 3.14)/col("period"))
+  }
 }
+
+
