@@ -35,9 +35,7 @@ val dependencies = Seq(
   "org.asynchttpclient" % "async-http-client" % "2.12.3",
   "io.circe" %% "circe-core" % "0.14.1",
   "io.circe" %% "circe-parser" % "0.14.1",
-  "org.scalatest" %% "scalatest" % "3.2.10" % Test,
-  "org.scalatest" %% "scalatest" % "3.2.10",
-  "org.scalatestplus" %% "mockito-5-8" % "3.2.17.0" % "test",
+  
   "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2",
   "org.apache.kafka" % "kafka-clients" % "3.6.1",
   "org.json4s" %% "json4s-native" % "3.6.11",
@@ -50,7 +48,14 @@ val dependencies = Seq(
   "org.apache.spark" %% "spark-sql-kafka-0-10" % "3.3.4",
   "com.fasterxml.jackson.core" % "jackson-databind" % "2.13.4",
   "com.fasterxml.jackson.core" % "jackson-annotations" % "2.13.4",
-  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.4"
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.13.4",
+
+  "org.scalatest" %% "scalatest" % "3.2.10" % Test,
+  "org.scalatest" %% "scalatest" % "3.2.10",
+  "org.scalatestplus" %% "mockito-5-8" % "3.2.17.0" % "test",
+  "com.typesafe.akka" %% "akka-testkit" % "2.6.17" % Test,
+  "com.typesafe.akka" %% "akka-stream-testkit" % "2.6.17" % Test,
+  "com.typesafe.akka" %% "akka-http-testkit" % "10.2.7" % Test
 )
 
 lazy val root = project
