@@ -44,11 +44,11 @@ class HttpClientActor extends Actor with ActorLogging {
             data.onComplete {
                 case Success(body) =>
                   spaceEntities = createSpaceEntitiesInstances(endpoint, body)
-                  sender() ! spaceEntities
+                  // sender() ! spaceEntities
                 case Failure(ex) =>
                   println(s"Failed to unmarshal response body: $ex")
                   spaceEntities = List.empty
-                  sender() ! spaceEntities
+                  // sender() ! spaceEntities
             }
 
         case Failure(ex) =>

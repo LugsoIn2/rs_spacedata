@@ -35,11 +35,14 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
         printStarlink()
         printDetails()
         showSpaceEntityDetails("starlinksat")
+      case "slspeed" =>
+        printStarlink()
+        showStarlinSpeed()
       // case "laid" => showLaucheDetails()
       case "dsl" => enterDSLMode()  
       case "dslfile" => enterDSLModeFile()
       case "exit" => System.exit(0)
-      case "fu" => controller.bla()
+      // case "fu" => showfu()
       //case "fu2" => controller.consumerLoop()
       case _ =>
         if (input.trim.isEmpty()) {
@@ -50,9 +53,23 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
     }
   }
 
-  // def mallurge(): Unit = {
-  //   printListInChunks(controller.rocketsAll, (entry: SpaceEntity) => entry.name, (entry: SpaceEntity) => entry.id, 15, "q")
-  // }
+
+  def showStarlinSpeed(): Unit = {
+    val starlinksatlistSpeed = controller.getStarlinkSpeedList()
+    printListInChunks(
+      starlinksatlistSpeed,
+      (entry: StarlinkSat) => entry.name,
+      (entry: StarlinkSat) => entry.id,
+      Some((entry: StarlinkSat) => entry.launchDate),
+      Some((entry: StarlinkSat) => entry.speed.map(_.toString).getOrElse("")),
+      15,
+      "q",
+      "Name",
+      "ID",
+      "Launch Date",
+      "Speed (km/min)"
+    )
+  }
 
   def showDashboard(): Unit = {
     val (dashbStarlinkVals, /* dashbLaunchVals, */ dashbRocketsVals) = controller.getDashboardValues()
@@ -75,7 +92,15 @@ class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers
     val slct = scala.io.StdIn.readLine("Options - [all, active, inactive]: ")
     println(s"$entity in the $slct category are displayed.")
     val entitylist = controller.getSpaceEntitiesList(slct, entity)
-    printListInChunks(entitylist, (entry: SpaceEntity) => entry.name, (entry: SpaceEntity) => entry.id, 15, "q")
+    printListInChunks(
+      entitylist,
+      (entry: SpaceEntity) => entry.name,
+      (entry: SpaceEntity) => entry.id,
+      chunkSize = 15,
+      cancelKey = "q",
+      attributeName1 = "Name",
+      attributeName2 = "ID"
+    )
     printHelpLine()
   }
 

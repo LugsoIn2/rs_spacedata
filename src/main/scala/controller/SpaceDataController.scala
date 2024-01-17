@@ -17,8 +17,9 @@ class SpaceDataController() {
     false
   }
   
-  def bla(): Unit = {
-    consumerController.consumeFromKafkaWithSpark("starlinksats-active")
+  def getStarlinkSpeedList(): List[StarlinkSat] = {
+    val starlinksatlistSpeed = consumerController.consumeFromKafkaWithSpark("starlinksats-active")
+    starlinksatlistSpeed
   }
 
   def getSpaceEntitiesList(slct: String, entity: String): List[SpaceEntity] = {
