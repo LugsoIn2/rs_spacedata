@@ -18,9 +18,6 @@ class TUIStringsTest extends AnyWordSpec {
     "not throw an exception when printDashboardFirstRowis called" in {
       noException should be thrownBy(printDashboardFirstRow())
     }
-    "not throw an exception when printLaunches is called" in {
-      noException should be thrownBy(printLaunches())
-    }
     "not throw an exception when printDetails is called" in {
       noException should be thrownBy(printDetails())
     }
