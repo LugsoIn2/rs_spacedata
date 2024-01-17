@@ -20,7 +20,15 @@ trait TUIDSLMode {
     printDSLHeaders(entity, false)
     println(s"$entity in the $category category are displayed.")
     val entityList: List[SpaceEntity] = controller.getSpaceEntitiesList(category, entity)
-    printListInChunks(entityList, (entry: SpaceEntity) => entry.name, (entry: SpaceEntity) => entry.id, 15, "q")
+    printListInChunks(
+      entityList,
+      (entry: SpaceEntity) => entry.name,
+      (entry: SpaceEntity) => entry.id,
+      chunkSize = 15,
+      cancelKey = "q",
+      attributeName1 = "Name",
+      attributeName2 = "ID"
+      )
     printHelpLine()
   }
 

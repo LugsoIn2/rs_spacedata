@@ -74,7 +74,7 @@ class HttpClientActorSpec extends TestKit(ActorSystem("HttpClientActorSpec"))
       // Using ScalaTest's built-in eventually to handle asynchronous assertions
       eventually {
         futureSpaceEntities.onComplete { entities =>
-          entities.asInstanceOf[List[SpaceEntity]] should not be empty 
+          entities.asInstanceOf[List[SpaceEntity]].length should not be 0 
           entities.asInstanceOf[List[SpaceEntity]].head shouldBe a[Rocket]
         }
       }

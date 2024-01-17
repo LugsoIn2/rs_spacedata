@@ -34,7 +34,8 @@ class SpaceEntitySpec extends AnyWordSpec with Matchers {
         "latitude" -> 40.0,
         "longitude" -> -120.0,
         "earthRevolutions" -> 500,
-        "decayed" -> 0
+        "decayed" -> 0,
+        "speed" -> None
       )
       val expectedStarlinkSat = StarlinkSat(
         entityType = "StarlinkSat",
@@ -46,7 +47,8 @@ class SpaceEntitySpec extends AnyWordSpec with Matchers {
         latitude = 40.0,
         longitude = -120.0,
         earthRevolutions = 500,
-        decayed = 0
+        decayed = 0,
+        speed = None
       )
 
       json.as[SpaceEntity] shouldEqual expectedStarlinkSat
@@ -94,7 +96,8 @@ class SpaceEntitySpec extends AnyWordSpec with Matchers {
         latitude = 40.0,
         longitude = -120.0,
         earthRevolutions = 500,
-        decayed = 0
+        decayed = 0,
+        speed = Some(456.3)
       )
       val expectedJson = Json.obj(
         "entityType" -> "StarlinkSat",
@@ -106,7 +109,8 @@ class SpaceEntitySpec extends AnyWordSpec with Matchers {
         "latitude" -> 40.0,
         "longitude" -> -120.0,
         "earthRevolutions" -> 500,
-        "decayed" -> 0
+        "decayed" -> 0,
+        "speed" -> 456.3
       )
 
       Json.toJson(starlinkSat) shouldEqual expectedJson

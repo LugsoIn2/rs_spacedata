@@ -22,6 +22,7 @@ object TUIStrings {
       |||                                     Press "rid" to show Rockets                                                 ||
       |||                                     Press "slid" to show specific Starlink Satalite details via the id          ||
       |||                                     Press "laid" to show specific Launch details via the id                     ||
+      |||                                     Press "slspeed" to calculate Starlink Sat speed                             ||
       |||                                     Type "dsl" to enter DSL mode                                                ||
       |||                                     Type "dslfile" to enter DSL-File mode                                       ||
       |||                                     Type "exit" to exit the tool                                                ||

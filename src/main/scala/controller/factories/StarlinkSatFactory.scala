@@ -18,7 +18,8 @@ object StarlinkSatFactory {
             latitude = Option(json.hcursor.downField("latitude").as[Double].getOrElse(null.asInstanceOf[Double])).getOrElse(0.0),
             longitude = Option(json.hcursor.downField("longitude").as[Double].getOrElse(null.asInstanceOf[Double])).getOrElse(0.0),
             earthRevolutions = json.hcursor.downField("spaceTrack").downField("REV_AT_EPOCH").as[Int].getOrElse(0),
-            decayed = json.hcursor.downField("spaceTrack").downField("DECAYED").as[Int].getOrElse(0)
+            decayed = json.hcursor.downField("spaceTrack").downField("DECAYED").as[Int].getOrElse(0),
+            speed = None
         )
         starlinkSat
     }

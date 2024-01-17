@@ -3,9 +3,11 @@ package SpaceData.controller
 import SpaceData.model.{StarlinkSat, Rocket, SpaceEntity}
 import SpaceData.controller.{active, inactive, all}
 import SpaceData.controller.kafka.SpaceDataConsumer
+import SpaceData.controller.spark.SpaceDataSparkConsumer
 
 class SpaceDataController() {
   val consumerController = new SpaceDataConsumer()
+  val sparkConsumer = new SpaceDataSparkConsumer()
 
   def checkListsNotEmpty(): Boolean = {
     consumerController.rocketslistAll.isEmpty &&
@@ -17,8 +19,9 @@ class SpaceDataController() {
     false
   }
   
-  def bla(): Unit = {
-    consumerController.consumeFromKafkaWithSpark("starlinksats-active")
+  def getStarlinkSpeedList(): List[StarlinkSat] = {
+    val starlinksatlistSpeed = sparkConsumer.consumeFromKafkaWithSpark("starlinksats-active")
+    starlinksatlistSpeed
   }
 
   def getSpaceEntitiesList(slct: String, entity: String): List[SpaceEntity] = {
@@ -35,8 +38,6 @@ class SpaceDataController() {
   def getRocketList(selector: SelectorSpaceEntity): List[SpaceEntity] = {
     val result: List[SpaceEntity] = selector match {
       case `all` =>
-        // consumerController.consumeFromKafkaWithSpark2("rockets-all")
-        // consumerController.consumeFromKafkaWithSpark("rockets-all")
         consumerController.rocketslistAll
       case `active` =>
         consumerController.rocketslisActive
