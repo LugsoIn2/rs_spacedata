@@ -1,21 +1,15 @@
-package SpaceData.controller
+package SpaceData.controller.actor
 
 import akka.actor.{Actor, ActorSystem, Props, ActorLogging}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.Unmarshal
 import akka.stream.ActorMaterializer
-import SpaceData.controller.factories.{StarlinkSatFactory, RocketFactory}
-import SpaceData.util._
-
 import scala.concurrent.ExecutionContextExecutor
 import scala.util.{Failure, Success}
-
-import SpaceData.model.{Launch, StarlinkSat, SpaceEntity}
-
-import io.circe.Json
-import io.circe.parser._
-import io.circe._
+import SpaceData.model.{SpaceEntity}
+import SpaceData.controller.actor.HttpClientActorHelpers
+import SpaceData.controller.factories.{StarlinkSatFactory, RocketFactory}
 
 // Message to trigger HTTP request in actor
 case class GetSpaceEntities(endpoint: String)
@@ -43,8 +37,8 @@ class HttpClientActor extends Actor with ActorLogging {
             val data = Unmarshal(response.entity).to[String]
             data.onComplete {
                 case Success(body) =>
-                  spaceEntities = createSpaceEntitiesInstances(endpoint, body)
-                  // sender() ! spaceEntities
+                  spaceEntities = HttpClientActorHelpers.createSpaceEntitiesInstances(endpoint, body)
+                  sender() ! spaceEntities
                 case Failure(ex) =>
                   println(s"Failed to unmarshal response body: $ex")
                   spaceEntities = List.empty
@@ -58,26 +52,7 @@ class HttpClientActor extends Actor with ActorLogging {
     case GetCurrentState =>
       // Respond with the current state
       sender() ! spaceEntities
-  }
-
-  
-  def createSpaceEntitiesInstances(endpoint: String, body: String): List[SpaceEntity] = {
-    val entityList: List[SpaceEntity] = endpoint match {
-      case "/starlink" => parseToList(body).map(item => StarlinkSatFactory.createInstance(item))
-      case "/rockets"  => parseToList(body).map(item => RocketFactory.createInstance(item))
-      case _           => List.empty
-    }
-    entityList
-  }
-
-  def parseToList(json: String): List[io.circe.Json] = {
-    parse(json) match {
-      case Right(json) => json.asArray.getOrElse(Vector.empty).toList
-      case Left(error) =>
-        println(s"Failed to parse JSON: $error")
-        List.empty
-    }
-  }
+  }  
 }
 
 object HttpClientActor {

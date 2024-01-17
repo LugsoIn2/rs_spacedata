@@ -2,30 +2,20 @@ import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit}
 import akka.util.Timeout
 import akka.util.ByteString
+import akka.pattern.ask
+import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
+import akka.http.scaladsl.unmarshalling.Unmarshal
+import akka.stream.scaladsl.{Source, Sink, Keep}
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.Eventually._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.time.{Millis, Seconds, Span}
-import SpaceData.controller.{GetSpaceEntities, GetCurrentState, HttpClientActor}
+import org.scalatest.BeforeAndAfterAll
+import SpaceData.controller.actor.{GetSpaceEntities, GetCurrentState, HttpClientActor}
 import SpaceData.model.{SpaceEntity, StarlinkSat}
-import akka.pattern.ask
-import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
-import akka.stream.scaladsl.Source
-import akka.http.scaladsl.model.headers.RawHeader
-import akka.http.scaladsl.model.HttpEntity.Strict
-import akka.http.scaladsl.unmarshalling.Unmarshal
-import io.circe.Json
-//import io.circe.literal._
-import io.circe.parser._
-import org.scalatest.concurrent.Eventually._
-
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
-import akka.http.scaladsl.model.ContentTypes
-import akka.stream.scaladsl.Sink
-import akka.stream.scaladsl.Keep
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.matchers.should.Matchers._
 
 class HttpClientActorSpec extends TestKit(ActorSystem("HttpClientActorSpec"))
   with ImplicitSender
