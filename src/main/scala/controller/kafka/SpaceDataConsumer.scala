@@ -10,31 +10,14 @@ import java.time.Duration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import org.apache.spark.sql._
-import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import org.apache.spark.{SparkConf, SparkContext}
-// import org.apache.spark.streaming.{Seconds, StreamingContext}
-import org.apache.spark.streaming.kafka010
-import org.apache.spark.sql.kafka010
-import org.apache.spark.sql.Column
 import org.apache.log4j.{Level, Logger}
-import org.apache.kafka.common.serialization.StringDeserializer
-// import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
-
-import java.time.Duration
-import scala.collection.JavaConverters._
 import org.apache.log4j.LogManager
-import SpaceData.model.Rocket
 import SpaceData.model.StarlinkSat
-import scala.util.Success
-import scala.util.Failure
-import org.apache.spark.sql.Row
-import org.apache.spark.sql.{SparkSession, DataFrame}
-import org.apache.spark.sql._
 import org.apache.spark.sql.streaming.Trigger
 import scala.collection.mutable.ListBuffer
-import org.apache.spark.sql.functions._
+
 
 class SpaceDataConsumer() {
   val kafkaBroker = "localhost:9092"
