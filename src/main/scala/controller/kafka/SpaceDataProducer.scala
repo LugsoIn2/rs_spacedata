@@ -2,9 +2,9 @@ package SpaceData.controller.kafka
 
 import SpaceData.model.{StarlinkSat, Rocket, SpaceEntity}
 import SpaceData.controller.{active, inactive, all}
-import SpaceData.controller.HttpClientActor
-import SpaceData.controller.GetSpaceEntities
-import SpaceData.controller.GetCurrentState
+import SpaceData.controller.actor.HttpClientActor
+import SpaceData.controller.actor.GetSpaceEntities
+import SpaceData.controller.actor.GetCurrentState
 import SpaceData.controller.SelectorSpaceEntity
 import akka.actor.{ActorSystem, Props, ActorRef}
 import akka.stream.ActorMaterializer

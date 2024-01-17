@@ -12,7 +12,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatest.BeforeAndAfterAll
-import SpaceData.controller.{GetSpaceEntities, GetCurrentState, HttpClientActor}
+import SpaceData.controller.actor.{GetSpaceEntities, GetCurrentState, HttpClientActor}
 import SpaceData.model.{SpaceEntity, StarlinkSat}
 import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
