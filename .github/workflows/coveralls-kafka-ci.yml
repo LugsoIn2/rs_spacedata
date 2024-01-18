@@ -46,3 +46,7 @@ jobs:
         uses: coverallsapp/github-action@v2
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+
+      - name: Purge Github Cache for Coveralls badge
+        run: |
+          curl -X PURGE https://camo.githubusercontent.com/ab30e1cbf43df88d5fc62ff4bddb860abe5cd95b6c0b23b7dfcdc2c1df631df6/68747470733a2f2f636f766572616c6c732e696f2f7265706f732f6769746875622f4c7567736f496e322f72735f7370616365646174612f62616467652e7376673f266b696c6c5f63616368653d31
