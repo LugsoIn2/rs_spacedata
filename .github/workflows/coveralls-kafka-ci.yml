@@ -31,7 +31,7 @@ jobs:
 
       - name: Start Kafka with Docker-Compose
         run: |
-          docker-compose -f submodules/kafka/zk-single-kafka-single up -d
+          docker-compose -f submodules/kafka/zk-single-kafka-single.yml up -d
         #working-directory: path/repository
 
       - name: Run tests and generate Coverage Report
@@ -41,7 +41,7 @@ jobs:
 
       - name: Stop Kafka Docker-Compose
         run: |
-          docker-compose -f submodules/kafka/zk-single-kafka-single down
+          docker-compose -f submodules/kafka/zk-single-kafka-single.yml down
         #working-directory: path/repository
 
       - name: Coveralls
