@@ -38,9 +38,13 @@ class SpaceDataProducer() {
     httpClientActorStarlinkSats ! GetSpaceEntities("/starlink")
     httpClientActorRockets ! GetSpaceEntities("/rockets")
 
+    produceStarlinkSatEntities()
+    produceRocketEntities()    
+  }
+
+  def produceStarlinkSatEntities() {
     implicit val timeout: Timeout = Timeout(10.seconds)
 
-    // StarlinkSats
     val futureStarlinkSatsAll: Future[List[SpaceEntity]] = (httpClientActorStarlinkSats ? GetCurrentState)
       .mapTo[List[SpaceEntity]]
       .recover { case _ => Nil }
@@ -51,8 +55,11 @@ class SpaceDataProducer() {
 
     val starlinkSatsInactive = Await.result(getAndFilterEntities(false, httpClientActorStarlinkSats, "starlinksat"), 10.seconds)
     produceEntities(starlinkSatsInactive, "starlinksats-inactive")
+  }
 
-    // Rockets
+  def produceRocketEntities() {
+    implicit val timeout: Timeout = Timeout(10.seconds)
+
     val futureRocketsAll: Future[List[SpaceEntity]] = (httpClientActorRockets ? GetCurrentState)
       .mapTo[List[SpaceEntity]]
       .recover { case _ => Nil }

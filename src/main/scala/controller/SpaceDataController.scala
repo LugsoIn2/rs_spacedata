@@ -63,7 +63,7 @@ class SpaceDataController() {
 
   def getSpaceEntitiyDetails(id: String, entity: String): Option[SpaceEntity] = {
     val starlinksatlist = getSpaceEntitiesList("all", entity: String)
-    val foundEntitiy: Option[SpaceEntity] = findStarlinkSatById(starlinksatlist,id)
+    val foundEntitiy: Option[SpaceEntity] = findSpaceEntityById(starlinksatlist,id)
     foundEntitiy match {
       case Some(entry) =>
         Some(entry)
@@ -72,7 +72,7 @@ class SpaceDataController() {
     }
   }
 
-  def findStarlinkSatById(entity: List[SpaceEntity], targetId: String): Option[SpaceEntity] = {
+  def findSpaceEntityById(entity: List[SpaceEntity], targetId: String): Option[SpaceEntity] = {
     entity.find(_.id == targetId)
   }
 
