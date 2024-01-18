@@ -19,8 +19,5 @@ object DSLParser {
 
   private def isValidEntity(entity: String): Boolean =
     List("starlinksat", "rocket").contains(entity.toLowerCase)
-
-  // private def isValidID(entity: String): Boolean =
-  //   List("starlinksat", "rockets").contains(entity.toLowerCase)
 }
 
