@@ -46,10 +46,10 @@ class SpaceDataProducer() {
       .recover { case _ => Nil }
     produceEntities(Await.result(futureStarlinkSatsAll, 10.seconds), "starlinksats-all")
 
-    val starlinkSatsActive = Await.result(getAndFilterEntites(true, httpClientActorStarlinkSats, "starlinksat"), 10.seconds)
+    val starlinkSatsActive = Await.result(getAndFilterEntities(true, httpClientActorStarlinkSats, "starlinksat"), 10.seconds)
     produceEntities(starlinkSatsActive, "starlinksats-active")
 
-    val starlinkSatsInactive = Await.result(getAndFilterEntites(false, httpClientActorStarlinkSats, "starlinksat"), 10.seconds)
+    val starlinkSatsInactive = Await.result(getAndFilterEntities(false, httpClientActorStarlinkSats, "starlinksat"), 10.seconds)
     produceEntities(starlinkSatsInactive, "starlinksats-inactive")
 
     // Rockets
@@ -58,14 +58,14 @@ class SpaceDataProducer() {
       .recover { case _ => Nil }
     produceEntities(Await.result(futureRocketsAll, 10.seconds), "rockets-all")
 
-    val rocketsActive = Await.result(getAndFilterEntites(true, httpClientActorRockets, "rocket"), 10.seconds)
+    val rocketsActive = Await.result(getAndFilterEntities(true, httpClientActorRockets, "rocket"), 10.seconds)
     produceEntities(rocketsActive, "rockets-active")
 
-    val rocketsInactive = Await.result(getAndFilterEntites(false, httpClientActorRockets, "rocket"), 10.seconds)
+    val rocketsInactive = Await.result(getAndFilterEntities(false, httpClientActorRockets, "rocket"), 10.seconds)
     produceEntities(rocketsInactive, "rockets-inactive")
   }
 
-  def getAndFilterEntites(isActive: Boolean, httpClientActor: ActorRef, entityType: String): Future[List[SpaceEntity]] = {
+  def getAndFilterEntities(isActive: Boolean, httpClientActor: ActorRef, entityType: String): Future[List[SpaceEntity]] = {
     implicit val timeout: Timeout = Timeout(10.seconds)
     Source.single(())
       .mapAsync(1)(_ => httpClientActor ? GetCurrentState)

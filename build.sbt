@@ -56,6 +56,7 @@ val dependencies = Seq(
   "com.typesafe.akka" %% "akka-testkit" % "2.6.17" % Test,
   "com.typesafe.akka" %% "akka-stream-testkit" % "2.6.17" % Test,
   "com.typesafe.akka" %% "akka-http-testkit" % "10.2.7" % Test,
+  "io.github.embeddedkafka" %% "embedded-kafka" % "3.6.1"
 )
 
 lazy val root = project
