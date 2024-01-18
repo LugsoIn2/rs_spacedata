@@ -32,17 +32,14 @@ jobs:
       - name: Start Kafka with Docker-Compose
         run: |
           docker-compose -f submodules/kafka/zk-single-kafka-single.yml up -d
-        #working-directory: path/repository
 
       - name: Run tests and generate Coverage Report
         run: |
           sbt coverage test coverageReport
-        working-directory: path/to/your/repository
 
       - name: Stop Kafka Docker-Compose
         run: |
           docker-compose -f submodules/kafka/zk-single-kafka-single.yml down
-        #working-directory: path/repository
 
       - name: Coveralls
         uses: coverallsapp/github-action@v2
