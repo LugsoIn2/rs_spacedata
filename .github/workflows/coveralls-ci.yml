@@ -20,8 +20,10 @@ jobs:
           distribution: 'temurin'
           cache: 'sbt'
       - name: Run tests
-        run: sbt clean coverage test
+        run: sbt coverage test
       - name: Coverage Report
-        run: sbt coverageReport coveralls
+        run: sbt coverageReport
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
         env:
           COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
