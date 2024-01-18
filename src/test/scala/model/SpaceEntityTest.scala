@@ -82,7 +82,7 @@ class SpaceEntitySpec extends AnyWordSpec with Matchers {
         "active" -> true
       )
 
-      Json.toJson(rocket) shouldEqual expectedJson
+      Json.toJson(rocket)(Rocket.rocketFormat) shouldEqual expectedJson
     }
 
     "be serializable to JSON for StarlinkSat" in {
@@ -113,7 +113,7 @@ class SpaceEntitySpec extends AnyWordSpec with Matchers {
         "speed" -> 456.3
       )
 
-      Json.toJson(starlinkSat) shouldEqual expectedJson
+      Json.toJson(starlinkSat)(StarlinkSat.starlinkSatFormat) shouldEqual expectedJson
     }
 
   }

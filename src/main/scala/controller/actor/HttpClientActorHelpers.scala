@@ -19,9 +19,7 @@ object HttpClientActorHelpers {
   def parseToList(json: String): List[io.circe.Json] = {
     parse(json) match {
       case Right(json) => json.asArray.getOrElse(Vector.empty).toList
-      case Left(error) =>
-        println(s"Failed to parse JSON: $error")
-        List.empty
+      case Left(error) => List.empty
     }
   }
 }

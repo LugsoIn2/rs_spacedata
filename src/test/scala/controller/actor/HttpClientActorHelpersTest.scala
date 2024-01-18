@@ -1,4 +1,4 @@
-package controller
+package controller.actor
 
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpecLike
@@ -49,6 +49,10 @@ class HttpClientActorSpec extends AnyWordSpecLike {
         )
       )
       HttpClientActorHelpers.parseToList(validJsonString) shouldEqual expectedJsonList
+    }
+    "parse invalid JSON to a list of Json" in {
+      val invalidJsonString = """[{"id": "1", "name": "Starlink1", "type": "satellite" "active": true}]"""
+      HttpClientActorHelpers.parseToList(invalidJsonString) shouldBe empty
     }
   }
 }

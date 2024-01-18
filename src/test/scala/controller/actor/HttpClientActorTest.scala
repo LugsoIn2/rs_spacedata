@@ -35,11 +35,12 @@ class HttpClientActorSpec extends TestKit(ActorSystem("HttpClientActorSpec"))
       val futureSpaceEntities: Future[List[SpaceEntity]] = (actorRef ? GetSpaceEntities("/starlink"))
         .mapTo[List[SpaceEntity]]
 
-      // Using ScalaTest's built-in eventually to handle asynchronous assertions
       eventually {
-        futureSpaceEntities.onComplete { entities =>
-          entities.asInstanceOf[List[SpaceEntity]] should not be empty 
-          entities.asInstanceOf[List[SpaceEntity]].head shouldBe a[StarlinkSat]
+        futureSpaceEntities.map { entities =>
+          entities should not be empty 
+          entities.head shouldBe a[Rocket]
+        }.recover {
+          case ex: Throwable => fail(s"Failed with exception: $ex")
         }
       }
     }
@@ -53,11 +54,12 @@ class HttpClientActorSpec extends TestKit(ActorSystem("HttpClientActorSpec"))
       val futureSpaceEntities: Future[List[SpaceEntity]] = (actorRef ? GetCurrentState)
         .mapTo[List[SpaceEntity]]
 
-      // Using ScalaTest's built-in eventually to handle asynchronous assertions
       eventually {
-        futureSpaceEntities.onComplete { entities =>
-          entities.asInstanceOf[List[SpaceEntity]] should not be empty 
-          entities.asInstanceOf[List[SpaceEntity]].head shouldBe a[Rocket]
+        futureSpaceEntities.map { entities =>
+          entities should not be empty 
+          entities.head shouldBe a[Rocket]
+        }.recover {
+          case ex: Throwable => fail(s"Failed with exception: $ex")
         }
       }
     }
@@ -71,11 +73,12 @@ class HttpClientActorSpec extends TestKit(ActorSystem("HttpClientActorSpec"))
       val futureSpaceEntities: Future[List[SpaceEntity]] = (actorRef ? GetCurrentState)
         .mapTo[List[SpaceEntity]]
 
-      // Using ScalaTest's built-in eventually to handle asynchronous assertions
       eventually {
-        futureSpaceEntities.onComplete { entities =>
-          entities.asInstanceOf[List[SpaceEntity]].length should not be 0 
-          entities.asInstanceOf[List[SpaceEntity]].head shouldBe a[Rocket]
+        futureSpaceEntities.map { entities =>
+          entities should not be empty 
+          entities.head shouldBe a[Rocket]
+        }.recover {
+          case ex: Throwable => fail(s"Failed with exception: $ex")
         }
       }
     }
@@ -105,11 +108,12 @@ class HttpClientActorSpec extends TestKit(ActorSystem("HttpClientActorSpec"))
       val futureSpaceEntities: Future[List[SpaceEntity]] = (actorRef ? GetSpaceEntities("/rockets"))
         .mapTo[List[SpaceEntity]]
 
-      // Using ScalaTest's built-in eventually to handle asynchronous assertions
       eventually {
-        futureSpaceEntities.onComplete { entities =>
-          entities.asInstanceOf[List[SpaceEntity]] should not be empty 
-          entities.asInstanceOf[List[SpaceEntity]].head shouldBe a[StarlinkSat]
+        futureSpaceEntities.map { entities =>
+          entities should not be empty 
+          entities.head shouldBe a[Rocket]
+        }.recover {
+          case ex: Throwable => fail(s"Failed with exception: $ex")
         }
       }
     }
