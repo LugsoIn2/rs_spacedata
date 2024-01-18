@@ -58,9 +58,10 @@ trait TUIDSLMode {
       val source = Source.fromFile(if (filePath.isEmpty) defaultPath else filePath)
       val commands = source.getLines().toList
       source.close()
-      commands.foreach { dslcommand =>
+      commands.map(dslCommand => executeDSLParser(dslCommand))
+      /*commands.foreach { dslcommand =>
         executeDSLParser(dslcommand)
-      }
+      }*/
     } catch {
       case e: Exception =>
         println(s"Error reading or processing DSL commands from file: $e")
