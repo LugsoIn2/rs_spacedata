@@ -1,0 +1,48 @@
+name: coveralls-kafka-ci
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test-with-docker:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:dind
+        ports:
+          - 2375:2375
+        options: --privileged
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'sbt'
+
+      - name: Start Kafka with Docker-Compose
+        run: |
+          docker-compose -f submodules/kafka/zk-single-kafka-single.yml up -d
+          docker run --rm --network=host alpine ash -c "apk add --no-cache netcat-openbsd && nc -zv localhost 9092"
+          echo "Kafka is ready!"
+
+      - name: Run tests and generate Coverage Report
+        run: |
+          sbt coverage test coverageReport
+
+      - name: Stop Kafka Docker-Compose
+        run: |
+          docker-compose -f submodules/kafka/zk-single-kafka-single.yml down
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
