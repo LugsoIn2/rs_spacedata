@@ -9,7 +9,6 @@ import java.time.Duration
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import org.apache.log4j.{Level, Logger, LogManager}
-//import org.apache.kafka.clients.consumer.ConsumerRecords
 
 
 
@@ -48,14 +47,6 @@ class SpaceDataConsumer() {
     consumer.subscribe(List(topicName).asJava)
 
     consumeRecords(consumer, updateFunction)
-    // try {
-    //   while (true) {
-    //     val records = consumer.poll(Duration.ofMillis(100))
-    //     records.forEach(record => processRecord(record, updateFunction))
-    //   }
-    // } finally {
-    //   consumer.close()
-    // }
   }
 
   def consumeRecords(consumer: KafkaConsumer[String, String], updateFunction: List[SpaceEntity] => Unit): Unit = {
@@ -67,38 +58,14 @@ class SpaceDataConsumer() {
     /*val processedRecords: List[ProcessedRecordType] =*/
     recordList.map(record => processRecord(record, updateFunction))
 
-    // Process each record using recursion
-    //processRecords(records.iterator(), updateFunction)
-
-    //if(!Thread.currentThread().isInterrupted) {
-      consumeRecords(consumer, updateFunction)
-    //}
+    consumeRecords(consumer, updateFunction)
 
     // Close the consumer when done
     consumer.close()
   }
 
-  def processRecords(iterator: java.util.Iterator[ConsumerRecord[String, String]], updateFunction: List[SpaceEntity] => Unit): Unit = {
-    if (iterator.hasNext) {
-      // Process the current record
-      val record = iterator.next()
-      //processRecord(record, updateFunction)
-      val json = Json.parse(record.value())
-
-      json.validate[List[SpaceEntity]] match {
-        case JsSuccess(spaceEntities, _) => updateFunction(spaceEntities)
-        case JsError(errors) => println(s"Error parsing JSON: $errors")
-      }
-
-      // Recursively process the remaining records
-      processRecords(iterator, updateFunction)
-    }
-  }
-
-
   private def processRecord(record: ConsumerRecord[String, String], updateFunction: List[SpaceEntity] => Unit): Unit = {
     val json = Json.parse(record.value())
-
     json.validate[List[SpaceEntity]] match {
       case JsSuccess(spaceEntities, _) => updateFunction(spaceEntities)
       case JsError(errors) => println(s"Error parsing JSON: $errors")

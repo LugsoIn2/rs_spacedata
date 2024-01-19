@@ -16,7 +16,6 @@ class SpaceDataController() {
     consumerController.starlinksatlistAll.isEmpty &&
     consumerController.starlinksatlistActive.isEmpty &&
     consumerController.starlinksatlistInactive.isEmpty
-    false
   }
   
   def getStarlinkSpeedList(): List[StarlinkSat] = {
