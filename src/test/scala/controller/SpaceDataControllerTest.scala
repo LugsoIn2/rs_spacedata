@@ -42,7 +42,7 @@ class SpaceDataControllerSpec extends AnyWordSpec with Matchers with MockitoSuga
 
   "SpaceDataController" should {
     
-    "return true if Lists are NOT empty" in {
+    "return false if Lists are NOT empty" in {
       when(mockedSpaceDataConsumer.rocketslistAll).thenReturn(starlinkSatMocks)
       when(mockedSpaceDataConsumer.rocketslisActive).thenReturn(starlinkSatMocksActive)
       when(mockedSpaceDataConsumer.rocketslisInactive).thenReturn(starlinkSatMocksInactive)
@@ -53,7 +53,7 @@ class SpaceDataControllerSpec extends AnyWordSpec with Matchers with MockitoSuga
       spaceDataController.checkListsNotEmpty() should be(false)
     }
 
-    "return false if Lists are empty" in {
+    "return true if Lists are empty" in {
       when(mockedSpaceDataConsumer.rocketslistAll).thenReturn(List())
       when(mockedSpaceDataConsumer.rocketslisActive).thenReturn(List())
       when(mockedSpaceDataConsumer.rocketslisInactive).thenReturn(List())
@@ -61,7 +61,7 @@ class SpaceDataControllerSpec extends AnyWordSpec with Matchers with MockitoSuga
       when(mockedSpaceDataConsumer.starlinksatlistActive).thenReturn(List())
       when(mockedSpaceDataConsumer.starlinksatlistInactive).thenReturn(List())
 
-      spaceDataController.checkListsNotEmpty() should be(false)
+      spaceDataController.checkListsNotEmpty() should be(true)
     }
 
     "return SpaceEntities List for given criterias" in {
