@@ -15,17 +15,17 @@ object TUIStrings {
       |||                     \____/\_|   \_| |_/\____/\____/           |___/ \_| |_/\_/\_| |_/                           ||
       |||                                                                                                                 ||
       |||                                                                                                                 ||
-      |||                                     Press "d" to show the Dashboard                                             ||
-      |||                                     Press "sl" to show Starlink Satalites                                       ||
-      |||                                     Press "la" to show Launches                                                 ||
-      |||                                     Press "r" to show Rockets                                                   ||
-      |||                                     Press "rid" to show Rockets                                                 ||
-      |||                                     Press "slid" to show specific Starlink Satalite details via the id          ||
-      |||                                     Press "laid" to show specific Launch details via the id                     ||
-      |||                                     Press "slspeed" to calculate Starlink Sat speed                             ||
-      |||                                     Type "dsl" to enter DSL mode                                                ||
-      |||                                     Type "dslfile" to enter DSL-File mode                                       ||
-      |||                                     Type "exit" to exit the tool                                                ||
+      |||                     Type "d" to show the Dashboard                                                              ||
+      |||                     Type "sl" to show Starlink Satalites                                                        ||
+      |||                     Type "la" to show Launches                                                                  ||
+      |||                     Type "r" to show Rockets                                                                    ||
+      |||                     Type "rid" to show Rockets                                                                  ||
+      |||                     Type "slid" to show specific Starlink Satalite details via the id                           ||
+      |||                     Type "laid" to show specific Launch details via the id                                      ||
+      |||                     Type "slspeed" to calculate Starlink Sat speed                                              ||
+      |||                     Type "dsl" to enter DSL mode                                                                ||
+      |||                     Type "dslfile" to enter DSL-File mode                                                       ||
+      |||                     Type "exit" to exit the tool                                                                ||
       |||                                                                                                                 ||
       |||=================================================================================================================||
       |""".stripMargin

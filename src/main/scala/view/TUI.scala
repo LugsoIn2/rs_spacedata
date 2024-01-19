@@ -4,16 +4,21 @@ import SpaceData.model.{StarlinkSat, Rocket, SpaceEntity}
 import SpaceData.util.dsl.{DSLParser, ShowCommand}
 import scala.io.Source
 import SpaceData.controller.SpaceDataController
+import scala.annotation.tailrec
 
 
 class TUI(var controller:SpaceDataController) extends TUIDSLMode with TUIHelpers {
 
-  while (
-    controller.checkListsNotEmpty()
-  ) {
-    Thread.sleep(1000)
-    println("SpaceData is Loading, please wait...")
+  @tailrec
+  private def waitForData(): Unit = {
+    if (controller.checkListsNotEmpty()) {
+      Thread.sleep(1000)
+      println("SpaceData is Loading, please wait...")
+      waitForData() // Recursive 
+    }
   }
+
+  waitForData()
 
   printHeader()
 
