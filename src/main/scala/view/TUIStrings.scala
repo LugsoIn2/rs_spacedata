@@ -15,17 +15,24 @@ object TUIStrings {
       |||                     \____/\_|   \_| |_/\____/\____/           |___/ \_| |_/\_/\_| |_/                           ||
       |||                                                                                                                 ||
       |||                                                                                                                 ||
-      |||                     Type "d" to show the Dashboard                                                              ||
-      |||                     Type "sl" to show Starlink Satalites                                                        ||
-      |||                     Type "la" to show Launches                                                                  ||
-      |||                     Type "r" to show Rockets                                                                    ||
-      |||                     Type "rid" to show Rockets                                                                  ||
-      |||                     Type "slid" to show specific Starlink Satalite details via the id                           ||
-      |||                     Type "laid" to show specific Launch details via the id                                      ||
-      |||                     Type "slspeed" to calculate Starlink Sat speed                                              ||
-      |||                     Type "dsl" to enter DSL mode                                                                ||
-      |||                     Type "dslfile" to enter DSL-File mode                                                       ||
-      |||                     Type "exit" to exit the tool                                                                ||
+      |||                    Dashboard:                                                                                   ||
+      |||                        Type "d" to show the Dashboard                                                           ||
+      |||                                                                                                                 ||
+      |||                    StarLink Satellites:                                                                         ||
+      |||                        Type "sl" to show Starlink Satalites                                                     ||
+      |||                        Type "slid" to show specific Starlink Satalite details via the                           ||
+      |||                        Type "slspeed" to calculate Starlink Sat speed                                           ||
+      |||                                                                                                                 ||   
+      |||                    Rockets:                                                                                     ||
+      |||                        Type "r" to show Rockets                                                                 ||
+      |||                        Type "rid" to show Rockets                                                               ||
+      |||                                                                                                                 ||
+      |||                    DSLModes:                                                                                    ||
+      |||                        Type "dsl" to enter DSL mode                                                             ||
+      |||                        Type "dslfile" to enter DSL-File mode                                                    ||
+      |||                                                                                                                 ||
+      |||                                                                                                                 ||
+      |||                        Type "exit" to exit the tool                                                             ||
       |||                                                                                                                 ||
       |||=================================================================================================================||
       |""".stripMargin
