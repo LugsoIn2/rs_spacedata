@@ -61,12 +61,18 @@ class SpaceDataConsumer() {
   def consumeRecords(consumer: KafkaConsumer[String, String], updateFunction: List[SpaceEntity] => Unit): Unit = {
     val records = consumer.poll(Duration.ofMillis(100))
 
-    // Process each record using recursion
-    processRecords(records.iterator(), updateFunction)
+    // Convert the Java records to a Scala collection (e.g., List)
+    val recordList: List[ConsumerRecord[String, String]] = records.iterator().asScala.toList
+    // Use map to process each record
+    /*val processedRecords: List[ProcessedRecordType] =*/
+    recordList.map(record => processRecord(record, updateFunction))
 
-    if(!Thread.currentThread().isInterrupted) {
+    // Process each record using recursion
+    //processRecords(records.iterator(), updateFunction)
+
+    //if(!Thread.currentThread().isInterrupted) {
       consumeRecords(consumer, updateFunction)
-    }
+    //}
 
     // Close the consumer when done
     consumer.close()
@@ -76,7 +82,13 @@ class SpaceDataConsumer() {
     if (iterator.hasNext) {
       // Process the current record
       val record = iterator.next()
-      processRecord(record, updateFunction)
+      //processRecord(record, updateFunction)
+      val json = Json.parse(record.value())
+
+      json.validate[List[SpaceEntity]] match {
+        case JsSuccess(spaceEntities, _) => updateFunction(spaceEntities)
+        case JsError(errors) => println(s"Error parsing JSON: $errors")
+      }
 
       // Recursively process the remaining records
       processRecords(iterator, updateFunction)
