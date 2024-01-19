@@ -73,31 +73,6 @@ class SpaceDataConsumer() {
     }
   }
 
-  // def consumeRecords(consumer: KafkaConsumer[String, String], updateFunction: List[SpaceEntity] => Unit): Unit = {
-  //   val records = consumer.poll(Duration.ofMillis(100))
-
-  //   // Convert the Java records to a Scala collection (e.g., List)
-  //   val recordList: List[ConsumerRecord[String, String]] = records.iterator().asScala.toList
-
-  //   // Process each record using foldLeft
-  //   recordList.foldLeft(updateFunction) { (updateFn, record) =>
-  //     processRecord(record, updateFn)
-  //   }
-
-  //   // Close the consumer when done
-  //   consumer.close()
-  // }
-
-  // private def processRecord(record: ConsumerRecord[String, String], updateFunction: List[SpaceEntity] => Unit): List[SpaceEntity] => Unit = {
-  //   val json = Json.parse(record.value())
-  //   json.validate[List[SpaceEntity]] match {
-  //     case JsSuccess(spaceEntities, _) => updateFunction compose (_ => spaceEntities)
-  //     case JsError(errors) =>
-  //       println(s"Error parsing JSON: $errors")
-  //       identity[List[SpaceEntity]] // Do nothing if there is an error
-  //   }
-  // }
-
   private def updateRocketsListAll(entities: List[SpaceEntity]): Unit = {
     rocketslistAll = entities
   }
